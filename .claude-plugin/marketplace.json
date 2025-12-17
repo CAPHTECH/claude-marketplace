@@ -1,0 +1,23 @@
+{
+  "name": "caphtech-marketplace",
+  "owner": {
+    "name": "CAPH TECH Inc.",
+    "email": "info@caph.tech"
+  },
+  "metadata": {
+    "description": "CAPH TECH official plugin marketplace for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "critical-code-review",
+      "source": "./plugin",
+      "description": "CAPH TECH marketplace plugin with critical-code-review skill",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["code-review", "skill"],
+      "category": "development"
+    }
+  ]
+}
