@@ -9,7 +9,7 @@
   },
   "plugins": [
     {
-      "name": "CAPH TECH Plugin",
+      "name": "caph-tech-plugin",
       "source": "./plugin",
       "description": "CAPH TECH marketplace plugin",
       "version": "1.0.0",
