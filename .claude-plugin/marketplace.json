@@ -9,14 +9,14 @@
   },
   "plugins": [
     {
-      "name": "critical-code-review",
+      "name": "CAPH TECH Plugin",
       "source": "./plugin",
-      "description": "CAPH TECH marketplace plugin with critical-code-review skill",
+      "description": "CAPH TECH marketplace plugin",
       "version": "1.0.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
-      "keywords": ["code-review", "skill"],
+      "keywords": ["coding", "skill"],
       "category": "development"
     }
   ]
