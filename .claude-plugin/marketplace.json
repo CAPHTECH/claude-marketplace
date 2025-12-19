@@ -18,6 +18,17 @@
       },
       "keywords": ["coding", "skill"],
       "category": "development"
+    },
+    {
+      "name": "webapp-dev-plugin",
+      "source": "./webapp-dev-plugin",
+      "description": "Webアプリ開発支援プラグイン。Chrome DevTools MCPを使用したデバッグ、UI操作、ネットワーク分析、パフォーマンス計測を提供。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["webapp", "debugging", "chrome-devtools", "performance", "network"],
+      "category": "development"
     }
   ]
 }
