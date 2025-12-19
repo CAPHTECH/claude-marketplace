@@ -88,6 +88,18 @@ performance_stop_trace()
 performance_analyze_insight(insightSetId: "...", insightName: "LCPBreakdown")
 ```
 
+## 活用シナリオ
+
+| シナリオ | プロンプト例 |
+|---------|-------------|
+| **コード変更の検証** | "localhost:3000の変更を確認して" |
+| **エラー診断** | "ログインフォーム送信時のエラーを分析" |
+| **E2Eテスト** | "サインアップ→入力→送信を試して失敗理由を教えて" |
+| **レイアウト修正** | "ヘッダーのオーバーフロー要素を修正して" |
+| **パフォーマンス監査** | "このページのLCPをチェックして" |
+
+詳細な活用例: [references/use-cases.md](references/use-cases.md)
+
 ## デバッグシナリオ別ガイド
 
 詳細な手順は以下を参照:
@@ -95,6 +107,7 @@ performance_analyze_insight(insightSetId: "...", insightName: "LCPBreakdown")
 - **UIデバッグ**: [references/ui-debugging.md](references/ui-debugging.md)
 - **ネットワークデバッグ**: [references/network-debugging.md](references/network-debugging.md)
 - **パフォーマンス分析**: [references/performance-analysis.md](references/performance-analysis.md)
+- **活用シナリオ集**: [references/use-cases.md](references/use-cases.md)
 
 ## 重要なポイント
 
