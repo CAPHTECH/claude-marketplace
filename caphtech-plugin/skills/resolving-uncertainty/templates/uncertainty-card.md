@@ -1,0 +1,15 @@
+## U-XX: <title>
+- Category:
+- Uncertainty (question):
+- Current hypothesis:
+- If wrong (impact):
+- Evidence so far:
+- Score:
+  - Impact:
+  - Evidence:
+  - Urgency:
+  - Effort:
+  - Priority:
+- Status: Open / Investigating / Validated / Rejected / Accepted
+- Next observation:
+- Evidence links:
