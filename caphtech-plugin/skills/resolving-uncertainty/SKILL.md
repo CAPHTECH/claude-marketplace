@@ -32,9 +32,9 @@ description: Turns ambiguity into an Uncertainty Register, prioritizes items, an
 - 制約（Constraints）
 
 ### Step 1: Itemize uncertainties
-`templates/uncertainty-register.md` を使って、まず10個まで項目化する。
+`assets/uncertainty-register.md` を使って、まず10個まで項目化する。
 足りない場合のみ増やす。
-必要なら `reference/triage-questions.md` を使って抜けを探す。
+必要なら `references/triage-questions.md` を使って抜けを探す。
 
 ### Step 2: Normalize & de-duplicate
 各項目を次の形に揃える：
@@ -42,7 +42,7 @@ description: Turns ambiguity into an Uncertainty Register, prioritizes items, an
 - 既に“観測で答えが出ている”ものは uncertainty から外し、事実として別枠へ
 
 ### Step 3: Rank (prioritize)
-各項目に 1〜5 でスコアを付ける（詳細は `reference/scoring.md`）。
+各項目に 1〜5 でスコアを付ける（詳細は `references/scoring.md`）。
 - Impact（影響度）
 - Evidence（根拠の強さ）※弱いほど不確実
 - Urgency（緊急度）
@@ -54,7 +54,7 @@ Priority = Impact × (6 - Evidence) × Urgency ÷ Effort
 上位N（通常3〜5）を選ぶ。
 
 ### Step 4: Convert to observation tasks
-上位Nについて `templates/observation-task.md` を使い、観測タスクに落とす。
+上位Nについて `assets/observation-task.md` を使い、観測タスクに落とす。
 必ず含める：
 - Hypothesis（仮説）
 - Method（現物/証拠/知識）
@@ -62,7 +62,7 @@ Priority = Impact × (6 - Evidence) × Urgency ÷ Effort
 - Decision rule（採用/撤回の条件）
 - Evidence artifact（ログ/スクショ/計測/テスト結果など）
 
-観測方法のカタログは `reference/observation-methods.md` を参照。
+観測方法のカタログは `references/observation-methods.md` を参照。
 
 ### Step 5: Plan-validate-execute (optional, recommended for high stakes)
 複雑・大量・破壊的な作業に繋がる場合：
@@ -74,7 +74,7 @@ Priority = Impact × (6 - Evidence) × Urgency ÷ Effort
 
 ### Step 6: Close the loop
 各項目を Validated / Rejected / Accepted に更新し、Evidence を必ず残す。
-意思決定が絡む場合は `templates/decision-record.md` を使って決定と理由を残す。
+意思決定が絡む場合は `assets/decision-record.md` を使って決定と理由を残す。
 
 ## Examples
 例：要件が曖昧で決められない
@@ -85,7 +85,4 @@ Priority = Impact × (6 - Evidence) × Urgency ÷ Effort
   3) Top-3優先不確実性
   4) 観測タスク（仮説/手順/判定/証拠/タイムボックス）
 
-より詳しい例は `examples/example.md` を参照。
-
-## Version History
-- v1.0.0 (2025-12-20): Initial release
+より詳しい例は `references/example.md` を参照。
