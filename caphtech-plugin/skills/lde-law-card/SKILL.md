@@ -34,6 +34,10 @@ description: |
 - Statement: <自然言語 1〜3行>
 - Formal-ish: <疑似式 / 型 / predicate（任意だが曖昧さ削減に有効）>
 
+- Terms (required):
+  - <このLawが参照するTerm ID。最低1つ必須>
+  - 例: TERM-inventory-available, TERM-order-quantity
+
 - Exceptions:
   - <例外条件と理由。無ければ "None">
 
@@ -51,6 +55,11 @@ description: |
   - Log/Event: <event name / fields>
 ```
 
+## 相互拘束ルール
+
+- **Lawは孤立禁止**: すべてのLawは最低1つのTermを参照する必要がある
+- **Terms参照はLink Mapと連動**: `/lde-link-map` で Law ↔ Term の関係を管理
+
 ## Severity（重要度）
 
 | レベル | 説明 |
@@ -66,11 +75,13 @@ description: |
 2. **分類**: Invariant / Pre / Post / Policy のいずれかに分類
 3. **Scope定義**: 適用範囲（モジュール/エンドポイント/ジョブ）を明確化
 4. **Statement記述**: 自然言語で1〜3行で記述
-5. **Exceptions定義**: 例外条件があれば明記
-6. **Handling決定**: Severity + 違反時動作 + Owner
-7. **Verification設定**: Test または Runtime Check を最低1つ
-8. **Observability設定**: Telemetry または Log/Event を最低1つ
-9. **Grounding Map更新**: Law ↔ Test ↔ Telemetry の対応を記録
+5. **Terms紐付け**: このLawが参照するTermを明示（最低1つ必須）
+6. **Exceptions定義**: 例外条件があれば明記
+7. **Handling決定**: Severity + 違反時動作 + Owner
+8. **Verification設定**: Test または Runtime Check を最低1つ
+9. **Observability設定**: Telemetry または Log/Event を最低1つ
+10. **Link Map更新**: `/lde-link-map` で Law ↔ Term の関係を記録
+11. **Grounding Map更新**: Law ↔ Test ↔ Telemetry の対応を記録
 
 ## 実例：在庫の不変条件
 
@@ -80,6 +91,11 @@ description: |
 - Scope: `inventory.reserveStock` / `inventory.releaseStock`
 - Statement: 利用可能在庫は総在庫から予約済み在庫を引いた値に等しい
 - Formal-ish: `∀t: available(t) = total(t) - reserved(t)`
+
+- Terms:
+  - TERM-inventory-available（利用可能在庫）
+  - TERM-inventory-total（総在庫）
+  - TERM-inventory-reserved（予約済み在庫）
 
 - Exceptions:
   - None
@@ -106,6 +122,10 @@ description: |
 - Scope: `order.create` API
 - Statement: 注文数量は利用可能在庫を超えてはならない
 - Formal-ish: `orderQty ≤ available`
+
+- Terms:
+  - TERM-order-quantity（注文数量）
+  - TERM-inventory-available（利用可能在庫）
 
 - Exceptions:
   - バックオーダー許可商品は例外（Policy LAW-policy-backorder 参照）

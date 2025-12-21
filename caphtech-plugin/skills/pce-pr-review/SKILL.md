@@ -2,12 +2,14 @@
 name: pce-pr-review
 description: |
   PCE (Process-Context Engine) を活用したPRレビュースキル。Compile→Execute→Captureのフローでレビューを行い、知見を蓄積する。
+  LDE（Law-Driven Engineering）との統合により、Law遵守・Grounding検証も実行。
 
   トリガー条件:
   - 「PRをレビューして」
   - 「PR #123 を確認して」
   - 「変更内容をチェックして」
   - gh pr view の結果を見た後
+  - 「Law観点でレビューして」
 ---
 
 # PCE PR Review Skill
@@ -28,6 +30,8 @@ review_context:
     - 過去の類似PR
     - 既知のバグ/課題
     - テスト戦略
+    - Law Catalog（LDE）
+    - Grounding Map（LDE）
 
   constraints:
     - セキュリティ要件
@@ -49,6 +53,8 @@ review_context:
 4. **テスト**: カバレッジは十分か
 5. **セキュリティ**: 脆弱性はないか
 6. **性能**: ボトルネックはないか
+7. **Law遵守（LDE）**: 既存Lawに違反していないか
+8. **接地完了（LDE）**: 新規LawにTest/Telemetryがあるか
 
 #### 指摘の分類
 | レベル | 意味 | 対応 |
@@ -66,6 +72,31 @@ review_delta:
   new_rules: 発見した新ルール
   next_review_points: 次回のチェック観点
   test_additions: 追加すべきテスト根拠
+  law_candidates: 新Law候補（LDE）
+  grounding_gaps: 接地不足のLaw（LDE）
+```
+
+### LDE統合チェック（Step 2.5）
+
+LDEプロジェクトでは `/lde-grounding-check` と連携：
+
+```yaml
+lde_review:
+  law_compliance:
+    - law_id: LAW-xxx
+      status: PASS | FAIL
+      details: <違反箇所>
+
+  grounding_status:
+    - law_id: LAW-yyy
+      test: ✅ | ❌
+      runtime: ✅ | ❌
+      telemetry: ✅ | ❌
+
+  new_law_candidates:
+    - statement: <発見した制約>
+      type: Pre | Post | Invariant | Policy
+      action: → /lde-law-card
 ```
 
 ## レビューテンプレート

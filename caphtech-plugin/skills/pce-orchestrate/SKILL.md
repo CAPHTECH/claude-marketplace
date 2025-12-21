@@ -2,12 +2,14 @@
 name: pce-orchestrate
 description: |
   PCE (Process-Context Engine) の統合オーケストレーションスキル。PCEサイクル全体を管理し、他のPCEスキルを適切なタイミングで起動する。
+  LDE（Law-Driven Engineering）との統合により、Law駆動のコンテキスト管理も実現。
 
   トリガー条件:
   - 複雑なタスクを開始する時
   - 「PCEで進めて」
   - 「コンテキスト駆動で実装して」
   - プロジェクト全体を見渡す必要がある時
+  - LDEプロジェクトでの開発ライフサイクル管理
 ---
 
 # PCE Orchestrate Skill
@@ -59,6 +61,30 @@ PCE循環全体を管理し、各スキルを適切に起動してプロセス�
 2. セッションノート作成
 3. 次回への引き継ぎ準備
 
+## LDE統合フロー
+
+LDEプロジェクトでは、PCE循環にLawフェーズを統合する：
+
+```
+PCE Phase          LDE Phase           統合スキル
+─────────────────────────────────────────────────────
+Activation    ←→   Phase A: Law同定    lde-law-discovery
+Scope         ←→   Phase B: Lawカード  lde-law-card
+Execute       ←→   Phase C-D: 接地実装  lde-grounding-check
+Evaluate      ←→   Law検証             pce-evaluate (Law観点)
+Collection    ←→   Phase E: 変更運用    pce-law-monitor
+```
+
+### LDE統合時の追加ステップ
+
+1. **Phase 1拡張**: `/lde-law-discovery` で既存Law発見
+2. **Phase 3拡張**: Law遵守チェックを実装に統合
+3. **Phase 4拡張**: `/lde-grounding-check` でLaw接地検証
+4. **Phase 5拡張**: `/pce-law-monitor` で違反パターン収集
+5. **Phase 6拡張**: `/uncertainty-to-law` で新Law候補を構造化
+
+詳細なLDE統合ワークフローは `/lde-pce-workflow` を参照。
+
 ## スキル起動マトリクス
 
 | 状況 | 起動するスキル |
@@ -68,6 +94,16 @@ PCE循環全体を管理し、各スキルを適切に起動してプロセス�
 | 成果物完成時 | pce-evaluate → pce-collection |
 | 知見が蓄積 | pce-structuring |
 | セッション長期化 | pce-compact |
+
+### LDE統合時の追加マトリクス
+
+| 状況 | 起動するスキル |
+|------|---------------|
+| Law発見が必要 | lde-law-discovery |
+| 新Law定義時 | lde-law-card |
+| PR前の接地確認 | lde-grounding-check |
+| Law違反監視 | pce-law-monitor |
+| 仮説のLaw化 | uncertainty-to-law |
 
 ## 使用例
 
