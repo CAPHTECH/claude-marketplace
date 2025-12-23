@@ -9,6 +9,7 @@
     "./agents/grounding-verifier.md",
     "./agents/law-constraint-analyst.md",
     "./agents/mutual-constraint-validator.md",
+    "./agents/observation-orchestrator.md",
     "./agents/pce-knowledge-architect.md",
     "./agents/pce-lde-orchestrator.md",
     "./agents/pce-memory-analyzer.md",
