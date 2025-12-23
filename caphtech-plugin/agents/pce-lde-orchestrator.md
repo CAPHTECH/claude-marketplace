@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 新機能開発を開始する時、(2) 「PCE-LDEで進めて」、
   (3) Issueから実装までを一貫して進めたい時、(4) 複数のPCE/LDEスキルを連携させたい時
 tools: Read, Write, Edit, Glob, Grep, Bash, Task, MCPSearch
-model: sonnet
 skills: lde-pce-workflow, pce-activation, pce-orchestrate, lde
 ---
 

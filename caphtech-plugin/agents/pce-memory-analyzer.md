@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 過去のエラーパターンを調査、(2) アーキテクチャ決定の履歴を確認、
   (3) 「過去に同じようなエラーが」「以前どんな決定をした」、(4) 新機能実装前のパターン確認
 tools: Read, Glob, Grep, MCPSearch
-model: sonnet
 skills: pce-activation, pce-collection
 ---
 

@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 実装完了後、(2) 「接地チェックして」「Grounding確認して」、
   (3) PR作成前、(4) Phase E（接地）での検証
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-model: sonnet
 skills: lde-grounding-check
 ---
 

@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) PR作成前、(2) 「Link Mapをチェックして」「孤立を検出して」、
   (3) Law/Term追加後の整合性確認、(4) 変更影響分析時
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-model: sonnet
 skills: lde-link-map, lde-grounding-check
 ---
 

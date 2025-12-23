@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 新規ドメインの語彙整理、(2) 「Termを抽出して」「語彙を分析して」、
   (3) Phase A（Vocabulary同定）、(4) Phase D（Term Card化）
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-model: sonnet
 skills: lde-term-card, lde-law-discovery, lde-link-map
 ---
 

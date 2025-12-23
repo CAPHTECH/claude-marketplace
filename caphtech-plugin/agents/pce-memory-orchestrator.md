@@ -7,7 +7,6 @@ description: |
   使用タイミング: (1) 長時間調査タスクの開始時、(2) セッション継続時のコンテキスト復元、
   (3) 「学んだことを記録しておいて」「調査結果を保存して」
 tools: Read, Write, MCPSearch
-model: sonnet
 skills: pce-activation, pce-collection, pce-compact
 ---
 

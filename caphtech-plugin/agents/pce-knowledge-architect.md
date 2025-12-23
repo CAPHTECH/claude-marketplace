@@ -7,7 +7,6 @@ description: |
   使用タイミング: (1) 実装完了後の知見整理、(2) ドメイン固有のCLAUDE.md作成、
   (3) 「パターンとアンチパターンを整理して」「ADRをまとめて」
 tools: Read, Write, Edit, Glob, Grep, MCPSearch
-model: sonnet
 skills: pce-collection, pce-structuring
 ---
 

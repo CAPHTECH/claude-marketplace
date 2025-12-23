@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 「必要な観測をして」、(2) 「観測して」、
   (3) 実装前後のチェック、(4) リリース前チェック、(5) 問題調査時
 tools: Read, Glob, Grep, Bash
-model: sonnet
 skills: observation-minimum-set, spec-observation, boundary-observation, dependency-observation, security-observation, concurrency-observation, operability-observation
 ---
 

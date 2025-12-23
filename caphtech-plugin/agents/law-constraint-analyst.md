@@ -6,7 +6,6 @@ description: |
   使用タイミング: (1) 制約の発見、(2) 「Lawを抽出して」「不変条件を探して」、
   (3) Phase B（Law同定）、(4) Phase C（Law Card化）
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-model: sonnet
 skills: lde-law-card, lde-law-discovery, lde-link-map
 ---
 
