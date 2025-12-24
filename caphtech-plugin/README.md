@@ -139,6 +139,7 @@ Issue実装フロー:
 | `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
 | `critical-code-review` | 批判的コードレビュー |
 | `pce-memory-collector` | pce-memory情報収集 |
+| `proprioceptive-dev-agent` | 固有受容感覚に基づく安全な自律編集・検証ループ設計 |
 | `resolving-uncertainty` | 不確実性の解消 |
 
 ## ディレクトリ構造
