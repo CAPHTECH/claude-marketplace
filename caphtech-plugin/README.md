@@ -105,6 +105,7 @@ Sense → Model → Predict → Change → Ground → Record
 | スキル | 説明 |
 |--------|------|
 | `ai-led-onboarding` | AI主導の作業開始オンボーディング。最小スキーマ（因果・境界・不変条件・壊れ方・観測）を短時間で再構築 |
+| `pr-onboarding` | PR作成時のオンボーディング記述。変更の契約（What/Why/不変条件/影響範囲/壊れ方/検証/ロールバック）をPR本文に |
 | `knowledge-validator` | pce-memory活用の5種類の知識検証ワークフロー |
 | `uncertainty-to-law` | 検証済み仮説をLDEのLawに昇格 |
 | `resolving-uncertainty` | 不確実性の解消 |
@@ -187,13 +188,13 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全39スキル）
+## スキル一覧（全40スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
 | ELD (Evidence-Loop Development) | 18 |
 | Observation | 7 |
-| Onboarding & Knowledge | 4 |
+| Onboarding & Knowledge | 5 |
 | Documentation & Specification | 3 |
 | Testing & Quality | 3 |
 | Refactoring | 2 |
