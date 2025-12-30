@@ -84,6 +84,142 @@ Sense → Model → Predict → Change → Ground → Record
 4. **Minimal Change**: 最小単位で変更し、即時検証する
 5. **Source of Truth**: 真実は常に「現在のコード」
 
+## 開発フロー
+
+このプラグインは2つの主要ワークフローを提供します。
+
+### ワークフロー選択
+
+| ケース | 推奨ワークフロー | トリガー |
+|--------|-----------------|----------|
+| Issue起点で作業開始 | Issue Workflow | `Issue #N を対応して` |
+| 新機能/バグ修正/リファクタリング | ELD統合ループ | `/eld` |
+| 総合的な開発（Issue→PR完了） | 両方を組み合わせ | `issue-workflow-orchestrator-agent` |
+
+### Issue Workflow（Issue起点開発）
+
+Issue受領からPR完了までを一貫管理するワークフロー。
+
+```
+Phase 1: Intake（トリアージ）
+  └→ /issue-intake
+     - 分類: Critical/Major/Minor/Enhancement/NeedsInfo
+     - severity_score + confidence
+     - uncertainty_flags → 次フェーズ判断
+
+Phase 2: Context（文脈構築）
+  └→ /ai-led-onboarding
+  └→ /impact-analysis（Major以上）
+
+Phase 3: Uncertainty Resolution（不確実性解消）
+  └→ /resolving-uncertainty（不確実性がある場合）
+
+Phase 4: Task Decomposition（タスク分解）
+  └→ /eld-sense-task-decomposition
+
+Phase 5: Implementation（実装）
+  └→ /eld + /observation-minimum-set
+
+Phase 6: Review（レビュー）
+  └→ /eld-ground-pr-review → PR作成
+```
+
+#### ワークフローテンプレート
+
+| 分類 | severity | テンプレート | 特徴 |
+|------|----------|-------------|------|
+| trivial | 1-2 | `trivial_fix_v1` | 最小フロー（intake→実装→review） |
+| minor | 3-5 | `minor_bugfix_v1` | 標準フロー |
+| major | 6-8 | `major_bugfix_v2` | 標準＋オンボーディング＋強化観測 |
+| critical | 9-10 | `critical_hotfix_v1` | 緊急フロー（並列化、事後対応） |
+| security | - | `security_fix_v1` | セキュリティ強化フロー |
+| feature | - | `feature_v1` | 設計フェーズ追加 |
+
+### ELD統合ループ（証拠駆動開発）
+
+```
+Phase 1: Issue（受付）
+  - pce.memory.activate で関連知識を活性化
+  - Issue Contractを作成（目的/不変条件/物差し/停止条件）
+  - Term/Law候補を列挙
+  → スキル: /eld-sense-activation, /eld-model-law-discovery
+
+Phase 2: Design（設計）
+  - Law/Term Cards作成（相互参照あり、孤立なし）
+  - Grounding Plan（必要テスト/Telemetry）
+  - Change Plan（微小変更列＋各ステップのチェック）
+  → スキル: /eld-model-law-card, /eld-model-term-card
+
+Phase 3: Implementation（実装ループ）
+  1. Sense   → 触るシンボル/境界/設定の身体図更新
+  2. Predict → 期待される因果と失敗モード
+  3. Change  → 最小単位で変更、Pure/IO分離を維持
+  4. Ground  → テスト/Telemetryで観測写像を満たす
+  5. Record  → Context Delta記録
+  → スキル: /eld
+
+Phase 4: Review（レビュー）
+  - 因果と証拠の整合
+  - Law/Term孤立チェック
+  - Evidence Ladder達成レベル確認
+  → スキル: /eld-ground-check, /eld-ground-pr-review
+
+Phase 5: Ops（運用）
+  - Telemetryで Law違反を監視
+  - pce-memoryへのフィードバック
+```
+
+### エージェントの使い分け
+
+| 状況 | 使用エージェント |
+|------|-----------------|
+| Issue起点で作業開始 | `issue-workflow-orchestrator-agent` |
+| PCE-LDE統合開発 | `pce-lde-orchestrator` |
+| 観測スキルの選択・実行 | `observation-orchestrator` |
+| Term発見・Card化 | `vocabulary-term-analyst` |
+| Law発見・Card化 | `law-constraint-analyst` |
+| 相互拘束検証（PR前） | `mutual-constraint-validator` |
+| 接地検証 | `grounding-verifier` |
+| 知識の収集・文書化 | `pce-knowledge-architect` |
+| 過去パターン調査 | `pce-memory-analyzer` |
+| 長時間調査（知識永続化） | `pce-memory-orchestrator` |
+
+### クイックスタート
+
+```bash
+# Issue起点の開発（推奨）
+「Issue #123 を対応して」  # issue-workflow-orchestrator-agent が起動
+
+# 機能開発・バグ修正
+/eld
+
+# 個別フェーズの実行
+/issue-intake          # Issue初期トリアージ
+/eld-sense-activation  # コンテキスト活性化
+/eld-model-law-card    # Law Card作成
+/eld-ground-check      # 接地状況の検証
+/eld-record-collection # 知識記録
+
+# 観測（品質チェック）
+/observation-minimum-set  # 最小観測セット
+/security-observation     # セキュリティ観測
+/boundary-observation     # 境界条件観測
+```
+
+### 完了条件と停止条件
+
+#### 完了条件
+- Issue Contractの物差しが満たされている
+- Law/Termが接地している（Evidence Ladder L1以上）
+- Evidence Packが揃っている
+- すべての必須テストがパス
+
+#### 停止条件（発生時は追加計測/スコープ縮小）
+- 予測と現実の継続的乖離（想定外のテスト失敗3回以上）
+- 観測不能な変更の増加
+- セキュリティ脆弱性検出
+- スコープ変更検出（affected_modules > 3）
+
 ## Observation Skills
 
 コード品質と安全性を観測するためのスキル群です。
