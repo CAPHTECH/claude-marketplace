@@ -1,0 +1,13 @@
+{
+  "name": "apple-platform-plugin",
+  "description": "Apple Platform development plugin for Claude Code - Swift, SwiftUI, iOS/macOS/watchOS/tvOS",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "agents": [
+    "./agents/ios-architecture-advisor.md",
+    "./agents/swift-code-analyzer.md"
+  ],
+  "skills": "./skills/"
+}
