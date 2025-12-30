@@ -84,6 +84,69 @@ Sense → Model → Predict → Change → Ground → Record
 4. **Minimal Change**: 最小単位で変更し、即時検証する
 5. **Source of Truth**: 真実は常に「現在のコード」
 
+## Observation Skills
+
+コード品質と安全性を観測するためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `boundary-observation` | 境界条件・エッジケースの観測 |
+| `concurrency-observation` | 並行性の観測 |
+| `dependency-observation` | 依存関係の観測 |
+| `operability-observation` | 運用性の観測 |
+| `security-observation` | セキュリティの観測 |
+| `spec-observation` | 仕様整合性の観測 |
+| `observation-minimum-set` | 最小観測セット |
+
+## Onboarding & Knowledge Management
+
+オンボーディングと知識管理のためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `ai-led-onboarding` | AI主導の作業開始オンボーディング。最小スキーマ（因果・境界・不変条件・壊れ方・観測）を短時間で再構築 |
+| `knowledge-validator` | pce-memory活用の5種類の知識検証ワークフロー |
+| `uncertainty-to-law` | 検証済み仮説をLDEのLawに昇格 |
+| `resolving-uncertainty` | 不確実性の解消 |
+
+## Documentation & Specification
+
+ドキュメント生成と仕様管理のためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `doc-gen` | 根拠に基づく開発者向けドキュメント生成（マップ・フロー・プレイブック・台帳） |
+| `spec-gen` | コードからAs-Is spec（現状仕様）を根拠付きで抽出 |
+| `technical-book-writer` | Markdown形式の技術書執筆支援 |
+
+## Testing & Quality
+
+テスト設計と品質管理のためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `test-design-audit` | モデル駆動型テスト設計。モデル化と監査で抜け漏れを見える化 |
+| `llm-eval-designer` | LLM生成システムの検証設計。幻覚・過学習などLLM特有の失敗モードを考慮 |
+| `critical-code-review` | 批判的コードレビュー |
+
+## Refactoring
+
+リファクタリング支援のためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `refactoring-discovery` | リファクタリング機会の検出（責務過多・密結合・SOLID違反など） |
+| `refactoring-executor` | テストファースト検証で安全な段階的リファクタリング実行 |
+
+## Other Skills
+
+その他の開発支援スキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `app-idea-workshop` | アプリアイデアワークショップ |
+| `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
+
 ## エージェント
 
 ELD統合開発のための専用エージェント群です。
@@ -106,29 +169,6 @@ ELD統合開発のための専用エージェント群です。
 | `pce-knowledge-architect` | 知識の収集・構造化・文書化 | Record Phase |
 | `pce-memory-orchestrator` | セッション間の知識永続化 | 長時間調査時 |
 
-## Observation Skills
-
-コード品質と安全性を観測するためのスキル群です。
-
-| スキル | 説明 |
-|--------|------|
-| `boundary-observation` | 境界条件・エッジケースの観測 |
-| `concurrency-observation` | 並行性の観測 |
-| `dependency-observation` | 依存関係の観測 |
-| `operability-observation` | 運用性の観測 |
-| `security-observation` | セキュリティの観測 |
-| `spec-observation` | 仕様整合性の観測 |
-| `observation-minimum-set` | 最小観測セット |
-
-## その他のスキル
-
-| スキル | 説明 |
-|--------|------|
-| `app-idea-workshop` | アプリアイデアワークショップ |
-| `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
-| `critical-code-review` | 批判的コードレビュー |
-| `resolving-uncertainty` | 不確実性の解消 |
-
 ## ディレクトリ構造
 
 ```
@@ -139,11 +179,25 @@ caphtech-plugin/
 │   ├── eld-sense-*/  # Senseフェーズスキル
 │   ├── eld-model-*/  # Modelフェーズスキル
 │   ├── eld-ground-*/ # Groundフェーズスキル
-│   └── eld-record-*/ # Recordフェーズスキル
+│   ├── eld-record-*/ # Recordフェーズスキル
+│   ├── *-observation/ # Observationスキル
+│   └── ...           # その他のスキル
 ├── agents/           # エージェント定義
 ├── commands/         # コマンド定義
 └── hooks/            # フック定義
 ```
+
+## スキル一覧（全39スキル）
+
+| カテゴリ | スキル数 |
+|---------|---------|
+| ELD (Evidence-Loop Development) | 18 |
+| Observation | 7 |
+| Onboarding & Knowledge | 4 |
+| Documentation & Specification | 3 |
+| Testing & Quality | 3 |
+| Refactoring | 2 |
+| Other | 2 |
 
 ## インストール
 
