@@ -38,6 +38,7 @@ Apple Platform（iOS/macOS/watchOS/tvOS）開発を支援するスキル・エ�
 | スキル | 説明 |
 |--------|------|
 | `ios-design-direction` | デザイン哲学・クリエイティブディレクション。Apple HIG、SwiftUI実装、アクセシビリティ、マルチプラットフォーム対応 |
+| `ios-ia-navigation` | 情報設計（IA）と画面遷移設計。タブ/push/modal選定、iPad適応、ディープリンク、状態保持ポリシー |
 
 ### デバッグ・自動化
 
@@ -71,6 +72,7 @@ Apple Platform（iOS/macOS/watchOS/tvOS）開発を支援するスキル・エ�
 /ios-test-design           # テスト設計を支援
 /xcode-project             # Xcodeプロジェクト設定を支援
 /ios-design-direction      # デザイン哲学とHIG準拠を支援
+/ios-ia-navigation         # 情報設計と画面遷移を設計
 
 # エージェントの利用
 「iOSのアーキテクチャを相談したい」  # ios-architecture-advisor
@@ -100,6 +102,7 @@ apple-platform-plugin/
 │   ├── ios-snapshot-test/
 │   ├── ios-performance/
 │   ├── ios-design-direction/  # デザイン・UI/UX
+│   ├── ios-ia-navigation/     # 情報設計・画面遷移
 │   └── ios-simulator-debug/   # デバッグ・自動化
 ├── agents/                    # エージェント定義
 │   ├── ios-architecture-advisor.md
