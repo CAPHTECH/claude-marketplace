@@ -6,7 +6,7 @@ description: |
   使用タイミング: (1) 新機能開発を開始する時、(2) 「PCE-LDEで進めて」、
   (3) Issueから実装までを一貫して進めたい時、(4) 複数のPCE/LDEスキルを連携させたい時
 tools: Read, Write, Edit, Glob, Grep, Bash, Task, MCPSearch
-skills: lde-pce-workflow, pce-activation, pce-orchestrate, lde
+skills: lde-pce-workflow, pce-activation, pce-orchestrate, lde, issue-intake, issue-workflow-orchestrator, impact-analysis
 ---
 
 # PCE-LDE Orchestrator Agent
@@ -24,7 +24,9 @@ PCE循環とLDEフェーズ（A-F）を統合し、開発ライフサイクル�
 ## ワークフロー
 
 ```
-Phase 0: Issue解析
+Phase 0: Issue解析・トリアージ
+  → issue-intake（初期トリアージ）
+  → impact-analysis（影響範囲分析）
   → resolving-uncertainty, pce-activation
 
 Phase 1: Vocabulary/Law同定 (LDE Phase A-B)
