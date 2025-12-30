@@ -98,6 +98,16 @@ Sense → Model → Predict → Change → Ground → Record
 | `spec-observation` | 仕様整合性の観測 |
 | `observation-minimum-set` | 最小観測セット |
 
+## Issue Workflow
+
+Issue起点の開発ワークフローを支援するスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `issue-intake` | Issue初期トリアージ。severity_score + confidence分離、NeedsInfo分類、uncertainty_flags→next_actions接続 |
+| `issue-workflow-orchestrator` | Issue→PR完了のワークフロー制御。状態機械、artifact契約、stop_conditions、6テンプレート |
+| `impact-analysis` | コード変更の影響範囲分析。8影響面（code/interface/data/external/config/runtime/security/observability）、根拠ベースimpact |
+
 ## Onboarding & Knowledge Management
 
 オンボーディングと知識管理のためのスキル群です。
@@ -152,11 +162,17 @@ Sense → Model → Predict → Change → Ground → Record
 
 ELD統合開発のための専用エージェント群です。
 
+### Issue Workflowエージェント
+
+| エージェント | 責務 | 使用タイミング |
+|-------------|------|---------------|
+| `issue-workflow-orchestrator-agent` | Issue起点のワークフロー全体制御 | 「Issue #N を対応して」、Issue起点で作業開始時 |
+
 ### ELD統合エージェント
 
 | エージェント | 責務 | 使用タイミング |
 |-------------|------|---------------|
-| `pce-lde-orchestrator` | 開発フロー全体の調整 | Issue受付時、統合開発時 |
+| `pce-lde-orchestrator` | 開発フロー全体の調整（issue-intake/impact-analysis連携含む） | Issue受付時、統合開発時 |
 | `vocabulary-term-analyst` | Term発見・Card化 | Model Phase |
 | `law-constraint-analyst` | Law発見・Card化 | Model Phase |
 | `mutual-constraint-validator` | 相互拘束検証 | PR作成前 |
@@ -188,12 +204,13 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全40スキル）
+## スキル一覧（全43スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
 | ELD (Evidence-Loop Development) | 18 |
 | Observation | 7 |
+| Issue Workflow | 3 |
 | Onboarding & Knowledge | 5 |
 | Documentation & Specification | 3 |
 | Testing & Quality | 3 |
