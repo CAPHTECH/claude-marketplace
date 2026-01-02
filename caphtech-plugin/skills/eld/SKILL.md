@@ -247,6 +247,11 @@ ELDループ内で使用する補助スキル:
 | `/eld-model-term-card` | Term Card作成 |
 | `/eld-model-link-map` | Link Map管理 |
 
+### Predict（予測）
+| スキル | 用途 |
+|--------|------|
+| `/eld-predict-impact` | 影響予測・段階化計画・停止条件 |
+
 ### Ground（接地）
 | スキル | 用途 |
 |--------|------|
