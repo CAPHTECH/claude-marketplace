@@ -6,7 +6,7 @@ description: |
   よるタスク分解を統合し、Issue→PR完了までを一貫して管理する。
   使用タイミング: (1) 「Issue #N を対応して」、(2) 「このIssueを解決して」、
   (3) Issue起点で作業を開始する時、(4) 複数スキルを連携させてIssue対応したい時
-tools: Read, Write, Edit, Glob, Grep, Bash, Task, MCPSearch
+tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
 skills: issue-intake, issue-workflow-orchestrator, impact-analysis, ai-led-onboarding, eld-sense-task-decomposition, resolving-uncertainty
 ---
 

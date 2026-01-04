@@ -12,7 +12,7 @@
       "name": "caphtech-plugin",
       "source": "./caphtech-plugin",
       "description": "CAPH TECH marketplace plugin",
-      "version": "1.0.0",
+      "version": "1.2.1",
       "author": {
         "name": "CAPH TECH Inc."
       },
