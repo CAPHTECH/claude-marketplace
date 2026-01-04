@@ -15,6 +15,7 @@
     "./agents/pce-lde-orchestrator.md",
     "./agents/pce-memory-analyzer.md",
     "./agents/pce-memory-orchestrator.md",
+    "./agents/pr-comment-resolver-agent.md",
     "./agents/vocabulary-term-analyst.md"
   ],
   "skills": "./skills/"
