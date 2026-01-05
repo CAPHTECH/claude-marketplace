@@ -11,7 +11,8 @@ description: |
   - 「Lawを定義して」「Termをカード化して」（旧LDE）
   - 「安全に変更して」「証拠パックを作成して」（旧Proprioceptive）
   - 「コンテキスト駆動で実装して」「PCEで進めて」（旧PCE）
-  - 新機能開発、バグ修正、リファクタリング
+  - 「ELDでデバッグして」「法則視点でバグ調査して」（デバッグ）
+  - 新機能開発、バグ修正、リファクタリング、障害調査
 ---
 
 # Evidence-Loop Development (ELD)
@@ -100,7 +101,7 @@ Sense → Model → Predict → Change → Ground → Record
 ```yaml
 成果物:
   - Law/Term Cards: 相互参照あり、孤立なし
-  - Grounding Plan: 必要テスト/Telemetry
+  - Grounding Plan: 必要テスト/Telemetry（Evidence Ladder対応）
   - Change Plan: 微小変更列＋各ステップのチェック
 ```
 
@@ -109,8 +110,9 @@ Sense → Model → Predict → Change → Ground → Record
 2. Term Card化（意味/境界/観測写像）
 3. Link Map更新（孤立チェック）
 4. 影響予測と段階化計画
+5. **Grounding Plan策定**（`/test-design-audit`でテスト設計）
 
-使用スキル: `/eld-model-law-card`, `/eld-model-term-card`
+使用スキル: `/eld-model-law-card`, `/eld-model-term-card`, `/test-design-audit`
 
 ### Phase 3: Implementation（実装ループ）
 
@@ -228,6 +230,40 @@ Claude:
 Phase 2: Designに進みますか？
 ```
 
+## デバッグへの適用
+
+ELDの統一ループはデバッグにも適用できる。バグを「法則（Law）からの逸脱」として捉え、
+証拠ループで系統的に解決する。
+
+### デバッグループ
+
+```
+Sense → Model → Predict → Change → Ground → Record
+  ↑                                            ↓
+  └──────────── 法則復元まで循環 ←──────────────┘
+```
+
+| Phase | 通常開発 | デバッグ適用 |
+|-------|----------|--------------|
+| **Sense** | コード観測 | 症状の観測 + 関連法則候補の列挙 |
+| **Model** | Law/Term同定 | 破られた法則の仮説形成 + 論理式化 |
+| **Predict** | 影響予測 | 法則違反の伝播範囲予測 |
+| **Change** | 微小変更 | 法則復元のための最小修正 |
+| **Ground** | 接地検証 | 証拠の梯子での法則復元確認 |
+| **Record** | 知識蓄積 | バグパターン + 法則違反パターン記録 |
+
+### ELD的デバッグの特徴
+
+| 観点 | 従来 | ELD的 |
+|------|------|-------|
+| 視点 | 「なぜ壊れた？」 | 「どの法則が破られた？」 |
+| 証拠 | ログ・スタックトレース | 法則違反の論理的証明 |
+| 修正 | 症状の除去 | 法則の復元 |
+| 検証 | 「動いた」 | 「法則が満たされた」（L0-L4） |
+| 蓄積 | バグ票 | Law/Term Card + パターン |
+
+詳細は `/eld-debug` スキルを参照。
+
 ## ユーティリティスキル
 
 ELDループ内で使用する補助スキル:
@@ -247,14 +283,10 @@ ELDループ内で使用する補助スキル:
 | `/eld-model-term-card` | Term Card作成 |
 | `/eld-model-link-map` | Link Map管理 |
 
-### Predict（予測）
-| スキル | 用途 |
-|--------|------|
-| `/eld-predict-impact` | 影響予測・段階化計画・停止条件 |
-
 ### Ground（接地）
 | スキル | 用途 |
 |--------|------|
+| `/test-design-audit` | **テスト設計監査（ELD統合版）** - Law/Term駆動のテスト設計 |
 | `/eld-ground-check` | 接地状況の検証 |
 | `/eld-ground-evaluate` | 成果物評価 |
 | `/eld-ground-law-monitor` | Law違反監視 |
@@ -269,3 +301,8 @@ ELDループ内で使用する補助スキル:
 | `/eld-record-maintenance` | 知識メンテナンス |
 | `/eld-record-memory-collector` | メモリ収集 |
 | `/eld-record-knowledge-transfer` | 知識転送 |
+
+### Debug（デバッグ）
+| スキル | 用途 |
+|--------|------|
+| `/eld-debug` | 法則駆動デバッグ（バグ=法則違反として分析・修正） |

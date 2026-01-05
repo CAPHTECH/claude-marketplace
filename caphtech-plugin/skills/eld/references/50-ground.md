@@ -8,6 +8,18 @@
 - L0だけで完了扱いしない
 - 本番環境での違反検知を可能にする
 
+## テスト設計には `/test-design-audit` を使用
+
+体系的なテスト設計には `/test-design-audit` スキルを使用する。
+このスキルはELDと統合されており、以下を提供する：
+
+- **Law/Term → テスト条件への導出**: REQとLaw/Termを対応付け
+- **Evidence Ladder対応**: Severityに応じたカバレッジ基準
+- **Law接地監査**: テスト条件ツリーの監査
+- **Grounding Map連携**: テスト項目とLaw/Termの紐付け
+
+詳細は `/test-design-audit` スキルを参照。
+
 ## Evidence Ladder（証拠の梯子）
 
 | Level | 内容 | 必須条件 | 備考 |
