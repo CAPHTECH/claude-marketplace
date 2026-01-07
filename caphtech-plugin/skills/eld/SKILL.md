@@ -90,7 +90,11 @@ Sense → Model → Predict → Change → Ground → Record
 
 **実行内容**:
 1. `pce.memory.activate` で関連知識を活性化
-2. `context_bundle` でゴールベースのコード検索
+2. 目的に応じたツールでコード調査（`10-sense.md` 参照）
+   - 特定キーワード → `Grep`
+   - 定義・参照追跡 → `LSP` / `serena`
+   - シンボル検索 → `serena`（利用可能時）
+   - 意味的関連探索 → `kiri context_bundle`
 3. Issue Contractを作成（`issue-template.md`使用）
 4. Term/Law候補を列挙
 

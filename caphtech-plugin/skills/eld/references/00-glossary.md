@@ -128,11 +128,25 @@ Issue単位の局所的な契約。
 ### 触診（Palpation）
 身体図を更新するための探索行為。
 
-**手法**:
-1. `context_bundle`: ゴールベースの関連コード検索
-2. `files_search`: キーワード/パターン検索
-3. `deps_closure`: 依存関係グラフの取得
-4. `snippets_get`: 特定ファイルの詳細取得
+**目的別ツール選択**:
+
+| 目的 | ツール | 備考 |
+|------|--------|------|
+| 特定キーワード検索 | `Grep` | 正規表現対応、高速 |
+| ファイルパターン検索 | `Glob` | `**/*.ts` 等 |
+| 定義・参照追跡 | `LSP` / `serena` | 言語理解に基づく |
+| シンボル検索・編集 | `serena` | LSP + シンボル単位操作 |
+| 特定ファイル読み込み | `Read` | パス既知時 |
+| 意味的関連探索 | `kiri context_bundle` | セマンティック検索 |
+| キーワードファイル検索 | `kiri files_search` | 曖昧な検索向け |
+| 依存関係分析 | `kiri deps_closure` | 影響範囲特定 |
+| 詳細取得 | `kiri snippets_get` | 範囲指定読み込み |
+| 複雑な調査 | `Task (Explore)` | 並列探索 |
+
+**serena MCP**（`.serena/project.yml`存在時）:
+- `find_symbol`: シンボル検索
+- `find_referencing_symbols`: 参照元シンボル検索
+- `replace_symbol_body`: シンボル単位での置換
 
 ---
 

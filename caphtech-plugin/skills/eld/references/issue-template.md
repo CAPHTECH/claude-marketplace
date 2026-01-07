@@ -45,7 +45,12 @@ ELD (Evidence-Loop Development) のIssue Contract雛形。
 
 ```markdown
 ## 関連モジュール
-<!-- kiri context_bundleで特定したファイル -->
+<!-- 目的に応じたツールで特定したファイル:
+     - Grep: 特定キーワード検索
+     - Glob: ファイルパターン検索
+     - LSP: 定義・参照追跡
+     - kiri context_bundle: 意味的関連探索
+-->
 - `path/to/file.ts:line` - 説明
 
 
