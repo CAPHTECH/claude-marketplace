@@ -31,9 +31,9 @@ Law/Termで規範を定め、安全な微小変更で実装し、知識を構造
 ## 統一ループ
 
 ```
-Sense → Model → Predict → Change → Ground → Record
-  ↑                                            ↓
-  └──────────────── 循環 ←─────────────────────┘
+Sense → Model → Predict → Change → Ground → Commit → Record
+  ↑                                                      ↓
+  └──────────────────── 循環 ←───────────────────────────┘
 ```
 
 | Phase | 内容 | 参照 |
@@ -43,6 +43,7 @@ Sense → Model → Predict → Change → Ground → Record
 | **Predict** | 影響を因果タイプ分類、段階化戦略と停止条件を確定 | `30-predict.md` |
 | **Change** | 最小単位で変更、Pure/IO分離を優先 | `40-change.md` |
 | **Ground** | テスト/Telemetry/再現手順で接地 | `50-ground.md` |
+| **Commit** | 検証通過後にコミット（1ステップ=1コミット） | `40-change.md` |
 | **Record** | Context Deltaをpce-memory/ADR/Catalogへ反映 | `60-record.md` |
 
 ## 統一概念
@@ -127,7 +128,8 @@ Sense → Model → Predict → Change → Ground → Record
 2. Predict → 期待される因果と失敗モード
 3. Change  → 最小単位で変更、Pure/IO分離を維持
 4. Ground  → テスト/Telemetryで観測写像を満たす
-5. Record  → Context Delta記録
+5. Commit  → 検証通過後にコミット（詳細: 40-change.md）
+6. Record  → Context Delta記録
 ```
 
 **停止条件チェック**:
@@ -286,6 +288,11 @@ ELDループ内で使用する補助スキル:
 | `/eld-model-law-card` | Law Card作成 |
 | `/eld-model-term-card` | Term Card作成 |
 | `/eld-model-link-map` | Link Map管理 |
+
+### Change/Commit（変更・コミット）
+| スキル | 用途 |
+|--------|------|
+| `/git-commit` | ステップ完了時のコミット |
 
 ### Ground（接地）
 | スキル | 用途 |
