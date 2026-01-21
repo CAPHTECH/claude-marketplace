@@ -1,11 +1,13 @@
 {
   "name": "caphtech-plugin",
   "description": "CAPH TECH marketplace plugin for Claude Code",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "author": {
     "name": "CAPH TECH Inc."
   },
   "agents": [
+    "./agents/architecture-analysis-reporter.md",
+    "./agents/architecture-knowledge-builder.md",
     "./agents/grounding-verifier.md",
     "./agents/issue-workflow-orchestrator-agent.md",
     "./agents/law-constraint-analyst.md",

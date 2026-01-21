@@ -294,6 +294,78 @@ Issue起点の開発ワークフローを支援するスキル群です。
 | `app-idea-workshop` | アプリアイデアワークショップ |
 | `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
 
+## Architecture Review
+
+アーキテクチャの体系的なレビューを行うためのスキル群です。「推測で埋めない」を原則とし、unknownはunknown、assumptionは明示的に記録します。
+
+### ワークフロー
+
+```
+Phase 1-3: Knowledge Building（知識構築）
+  system-map-collector → invariant-extractor → component-dossier-builder
+
+Phase 4-6: Analysis & Reporting（分析・報告）
+  architecture-reviewer → synthesis-analyzer → review-report-generator
+```
+
+### Phase 1-3: Knowledge Building
+
+| スキル | Phase | 説明 |
+|--------|-------|------|
+| `system-map-collector` | 1 | システムマップ収集。コンポーネント、依存関係、データフロー、境界、ランタイム、認証フロー、API契約を構造化 |
+| `invariant-extractor` | 2 | 不変条件抽出。システムマップから8カテゴリのInvariants/Global Rulesを抽出（Security/Data/Audit/Idempotency/Architecture/API/Failure/Environment） |
+| `component-dossier-builder` | 3 | コンポーネントカード作成。RAG検索単位となる詳細なコンポーネントカードを生成（purpose/contracts/owned_data/dependencies/failure_modes/state/non_functional/test_strategy/unknowns/assumptions） |
+
+### Phase 4-6: Analysis & Reporting
+
+| スキル | Phase | 説明 |
+|--------|-------|------|
+| `architecture-reviewer` | 4 | 3種類の分析を並行実行。コンポーネント内（ノード）、インタラクション（エッジ）、クロスカッティング（縦串）の3視点で問題検出 |
+| `synthesis-analyzer` | 5 | 矛盾検出と優先順位付け。4類型の矛盾（改善案間/前提破壊/不変条件/ADR）を検出し、プロジェクト特性に基づきP0-P4で優先順位付け |
+| `review-report-generator` | 6 | 意思決定用レポート生成。scope/failure_mode/trigger_conditions/evidence/options/priority/implementation/acceptance_criteriaを含む標準形式 |
+
+### 使い方
+
+```bash
+# Phase 1-3: 知識構築
+/system-map-collector      # システムマップ収集
+/invariant-extractor       # 不変条件抽出
+/component-dossier-builder # コンポーネントカード作成
+
+# Phase 4-6: 分析・報告
+/architecture-reviewer     # 3種類の分析
+/synthesis-analyzer        # 矛盾検出・優先順位付け
+/review-report-generator   # レポート生成
+```
+
+### 出力ファイル
+
+```
+system-map/
+├── components.yaml      # Phase 1
+├── dependencies.yaml    # Phase 1
+├── data-flow.yaml       # Phase 1
+├── boundaries.yaml      # Phase 1
+├── runtime.yaml         # Phase 1
+├── auth-flow.yaml       # Phase 1
+├── api-contracts.yaml   # Phase 1
+└── invariants.yaml      # Phase 2
+
+component-dossiers/
+└── {component-id}.yaml  # Phase 3
+
+architecture-review/{timestamp}/
+├── findings.yaml        # Phase 4
+├── synthesis.yaml       # Phase 5
+└── report/              # Phase 6
+    ├── summary.md
+    ├── p0-blockers.md
+    ├── p1-critical.md
+    ├── p2-high.md
+    ├── backlog.md
+    └── adrs-needed.md
+```
+
 ## エージェント
 
 ELD統合開発のための専用エージェント群です。
@@ -322,6 +394,13 @@ ELD統合開発のための専用エージェント群です。
 | `pce-knowledge-architect` | 知識の収集・構造化・文書化 | Record Phase |
 | `pce-memory-orchestrator` | セッション間の知識永続化 | 長時間調査時 |
 
+### Architecture Reviewエージェント
+
+| エージェント | 責務 | 使用タイミング |
+|-------------|------|---------------|
+| `architecture-knowledge-builder` | Phase 1-3の知識構築（システムマップ→不変条件→コンポーネントカード） | 「アーキテクチャの知識を構築して」、レビュー準備段階 |
+| `architecture-analysis-reporter` | Phase 4-6の分析・報告（3種類分析→矛盾検出→レポート生成） | 「アーキテクチャを分析して」、「レビューレポートを作成して」 |
+
 ## ディレクトリ構造
 
 ```
@@ -340,7 +419,7 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全43スキル）
+## スキル一覧（全49スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
@@ -351,6 +430,7 @@ caphtech-plugin/
 | Documentation & Specification | 3 |
 | Testing & Quality | 3 |
 | Refactoring | 2 |
+| Architecture Review | 6 |
 | Other | 2 |
 
 ## インストール
