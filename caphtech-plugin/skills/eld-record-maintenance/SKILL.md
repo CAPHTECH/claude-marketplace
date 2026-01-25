@@ -3,8 +3,14 @@ name: eld-record-maintenance
 description: |
   PCE (Process Context Engine) のメンテナンススキル。現存する Claim の品質を維持し、
   間違い・不要・古い・重複した Claim を整理する。pce_memory_feedback を使用して
-  更新・削除・評価を行う。メモリの健全性を保ちたい場合、Claim の品質問題を発見した場合、
-  定期的なメモリ整理を行いたい場合に使用する。
+  更新・削除・評価を行う。
+
+  トリガー条件:
+  - 「メモリをメンテナンスして」「Claimを整理して」「古いClaimを削除して」
+  - メモリの健全性を保ちたい場合
+  - Claim の品質問題を発見した場合
+  - 定期的なメモリ整理を行いたい場合
+
   Observation 収集、AC の構築、タスクごとのメモリ最適化は行わない。
 ---
 
@@ -371,3 +377,37 @@ text: "認証には AWS Cognito を使用。Cognito sub (UUID) を安定識別�
 
 - `references/feedback_guide.md` - feedback の詳細ガイド
 - `references/quality_criteria.md` - 品質評価基準の詳細
+
+---
+
+## 品質優先原則（Superpowers統合）
+
+### 核心原則
+
+1. **Epistemic Humility**: 推測を事実として扱わない。`unknown`と言う勇気を持つ
+2. **Evidence First**: 結論ではなく因果と証拠を中心にする
+3. **Minimal Change**: 最小単位で変更し、即時検証する
+4. **Grounded Laws**: Lawは検証可能・観測可能でなければならない
+5. **Source of Truth**: 真実は常に現在のコード。要約はインデックス
+
+### 「速さより質」の実践
+
+- 要件の曖昧さによる手戻りを根本から排除
+- テストなし実装を許さない
+- 観測不能な変更を防ぐ
+
+### 完了の定義
+
+- [ ] Evidence Ladder目標レベル達成
+- [ ] Issue Contractの物差し満足
+- [ ] Law/Termが接地している（Grounding Map確認）
+- [ ] Link Mapに孤立がない
+- [ ] ロールバック可能な状態
+
+### 停止条件
+
+以下が発生したら即座に停止し、追加計測またはスコープ縮小：
+
+- 予測と現実の継続的乖離（想定外テスト失敗3回以上）
+- 観測不能な変更の増加（物差しで検証できない変更）
+- ロールバック線の崩壊（戻せない変更の発生）

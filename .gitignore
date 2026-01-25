@@ -1,3 +1,4 @@
 .kiri/
 .claude/
 *.log
+.idea/

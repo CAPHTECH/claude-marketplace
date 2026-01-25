@@ -18,8 +18,8 @@ Sense → Model → Predict → Change → Ground → Record
 |-------|------|-----------|
 | **Sense** | コードの事実/意図/関係を観測 | `eld-sense-*` |
 | **Model** | 語彙（Term）と関係（Law）を同定 | `eld-model-*` |
-| **Predict** | 影響を因果タイプ分類、段階化 | - |
-| **Change** | 最小単位で変更 | - |
+| **Predict** | 影響を因果タイプ分類、段階化 | `eld-predict-impact` |
+| **Change** | 最小単位で変更、高リスク時は隔離 | `eld-change-worktree` |
 | **Ground** | テスト/Telemetryで接地 | `eld-ground-*` |
 | **Record** | Context Deltaを記録 | `eld-record-*` |
 
@@ -33,9 +33,11 @@ Sense → Model → Predict → Change → Ground → Record
 #### Sense（感知）
 | スキル | 説明 |
 |--------|------|
+| `eld-sense-requirements-brainstorming` | 要件の曖昧さを対話的に明確化 |
 | `eld-sense-activation` | アクティブコンテキスト構築 |
 | `eld-sense-scope` | タスクスコープの定義 |
 | `eld-sense-task-decomposition` | タスク分解 |
+| `eld-sense-parallel-orchestrator` | 並列実行最適化 |
 
 #### Model（モデル化）
 | スキル | 説明 |
@@ -48,10 +50,12 @@ Sense → Model → Predict → Change → Ground → Record
 #### Ground（接地）
 | スキル | 説明 |
 |--------|------|
+| `eld-ground-tdd-enforcer` | TDDサイクル強制とL1達成 |
 | `eld-ground-check` | 接地状況の検証 |
 | `eld-ground-evaluate` | 成果物評価 |
 | `eld-ground-law-monitor` | Law違反監視 |
 | `eld-ground-pr-review` | PRレビュー |
+| `eld-ground-pre-completion` | PR作成前の完成前検証 |
 
 #### Record（記録）
 | スキル | 説明 |
@@ -419,11 +423,11 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全49スキル）
+## スキル一覧（全51スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
-| ELD (Evidence-Loop Development) | 18 |
+| ELD (Evidence-Loop Development) | 20 |
 | Observation | 7 |
 | Issue Workflow | 3 |
 | Onboarding & Knowledge | 5 |

@@ -90,6 +90,10 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 ```
 
 **実行内容**:
+0. **要件明確化** (新機能開発時):
+   - `/eld-sense-requirements-brainstorming` で要件の曖昧さを対話的に解消
+   - Law/Term観点、境界条件、失敗モードから体系的に質問
+   - Issue Contract 下書き生成
 1. `pce.memory.activate` で関連知識を活性化
 2. 目的に応じたツールでコード調査（`10-sense.md` 参照）
    - 特定キーワード → `Grep`
@@ -99,7 +103,7 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 3. Issue Contractを作成（`issue-template.md`使用）
 4. Term/Law候補を列挙
 
-使用スキル: `/eld-sense-activation`, `/eld-model-law-discovery`
+使用スキル: `/eld-sense-requirements-brainstorming` (新機能時), `/eld-sense-activation`, `/eld-model-law-discovery`
 
 ### Phase 2: Design（設計）
 
@@ -126,11 +130,26 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 ```
 1. Sense   → 触るシンボル/境界/設定の身体図更新
 2. Predict → 期待される因果と失敗モード
+           → High/Criticalリスク時はworktree提案
 3. Change  → 最小単位で変更、Pure/IO分離を維持
+           → worktree隔離環境で実験（高リスク時）
 4. Ground  → テスト/Telemetryで観測写像を満たす
+           → TDD強制（RED-GREEN-REFACTOR）でL1達成
 5. Commit  → 検証通過後にコミット（詳細: 40-change.md）
 6. Record  → Context Delta記録
 ```
+
+**高リスク変更の隔離**:
+- リスクレベルがHigh/Criticalの場合、worktreeで隔離環境作成
+- 実験成功後、Cherry-pick/Rebase/Mergeでmainに統合
+- 失敗時は即座にworktree削除で元に戻る
+
+**TDD強制**:
+- S0/S1 Lawは必ずL1（ユニットテスト）達成が必須
+- RED（失敗テスト）→ GREEN（最小実装）→ REFACTOR（品質改善）サイクル
+- テストなし実装を許さず、コミット前にEvidence L1確認
+
+使用スキル: `/eld-change-worktree`, `/eld-ground-tdd-enforcer`, `/eld-predict-impact`, `/eld-record-collection`
 
 **停止条件チェック**:
 - 予測と現実の継続的乖離
@@ -173,6 +192,24 @@ PR作成: `pr-template.md` 使用
 | **Fact** | 関数シグネチャ、型定義、パス | 高 | `session` |
 | **Semantic** | モジュールの意図、ビジネスルール | 中 | `project` |
 | **Relational** | 呼び出し関係、データフロー | 低 | `project` |
+
+## 品質優先原則（Superpowers統合）
+
+### 核心原則
+
+1. **Epistemic Humility**: 推測を事実として扱わない。`unknown`と言う勇気を持つ
+2. **Evidence First**: 結論ではなく因果と証拠を中心にする
+3. **Minimal Change**: 最小単位で変更し、即時検証する
+4. **Grounded Laws**: Lawは検証可能・観測可能でなければならない
+5. **Source of Truth**: 真実は常に現在のコード。要約はインデックス
+
+### 「速さより質」の実践
+
+- 要件の曖昧さによる手戻りを根本から排除
+- テストなし実装を許さない
+- 観測不能な変更を防ぐ
+
+完了条件・停止条件の詳細は次セクション参照。
 
 ## 完了条件と停止条件
 
@@ -280,6 +317,7 @@ ELDループ内で使用する補助スキル:
 | `/eld-sense-activation` | アクティブコンテキスト構築 |
 | `/eld-sense-scope` | タスクスコープの定義 |
 | `/eld-sense-task-decomposition` | タスク分解 |
+| `/eld-sense-parallel-orchestrator` | 並列実行最適化 |
 
 ### Model（モデル化）
 | スキル | 用途 |
@@ -302,6 +340,7 @@ ELDループ内で使用する補助スキル:
 | `/eld-ground-evaluate` | 成果物評価 |
 | `/eld-ground-law-monitor` | Law違反監視 |
 | `/eld-ground-pr-review` | PRレビュー |
+| `/eld-ground-pre-completion` | PR作成前検証 |
 
 ### Record（記録）
 | スキル | 用途 |
