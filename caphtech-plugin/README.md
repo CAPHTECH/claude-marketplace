@@ -276,9 +276,21 @@ Issue起点の開発ワークフローを支援するスキル群です。
 
 | スキル | 説明 |
 |--------|------|
-| `test-design-audit` | モデル駆動型テスト設計。モデル化と監査で抜け漏れを見える化 |
+| `test-design-audit` | テスト設計プロセス全体のフレームワーク。要求→モデル化→テスト条件→監査の流れで「何をテストすべきか」を導出 |
+| `systematic-test-design` | ユニットテスト＋PBT（Property-Based Testing）の実装スキル。「どうテストを実装するか」を設計 |
 | `llm-eval-designer` | LLM生成システムの検証設計。幻覚・過学習などLLM特有の失敗モードを考慮 |
 | `critical-code-review` | 批判的コードレビュー |
+
+### test-design-audit vs systematic-test-design
+
+| 観点 | test-design-audit | systematic-test-design |
+|------|-------------------|------------------------|
+| **目的** | テスト設計プロセス全体（抜け漏れ防止） | テスト実装の具体的手法 |
+| **フォーカス** | 「何をテストすべきか」を導出 | 「どうテストを実装するか」を設計 |
+| **成果物** | 要求一覧、テスト条件ツリー、トレーサビリティ表 | ユニットテスト、プロパティカタログ、ジェネレータ群、反例コーパス |
+| **手法** | 5モデル化＋監査＋Evidence Ladder | ユニットテスト3種類（典型例/境界例/回帰例）＋PBT7分類＋意地悪レベルL0-L8 |
+
+**使い分け**: `test-design-audit`で「テスト条件」を導出し、`systematic-test-design`で「テストコード」を実装する。
 
 ## Refactoring
 
@@ -423,7 +435,7 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全51スキル）
+## スキル一覧（全52スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
@@ -432,7 +444,7 @@ caphtech-plugin/
 | Issue Workflow | 3 |
 | Onboarding & Knowledge | 5 |
 | Documentation & Specification | 3 |
-| Testing & Quality | 3 |
+| Testing & Quality | 4 |
 | Refactoring | 2 |
 | Architecture Review | 6 |
 | Other | 2 |

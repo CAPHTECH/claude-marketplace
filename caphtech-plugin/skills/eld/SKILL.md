@@ -336,6 +336,7 @@ ELDループ内で使用する補助スキル:
 | スキル | 用途 |
 |--------|------|
 | `/test-design-audit` | **テスト設計監査（ELD統合版）** - Law/Term駆動のテスト設計 |
+| `/systematic-test-design` | **体系的テスト設計** - ユニットテスト＋PBT統合 |
 | `/eld-ground-check` | 接地状況の検証 |
 | `/eld-ground-evaluate` | 成果物評価 |
 | `/eld-ground-law-monitor` | Law違反監視 |
