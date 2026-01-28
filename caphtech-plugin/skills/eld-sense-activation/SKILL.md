@@ -1,5 +1,6 @@
 ---
 name: eld-sense-activation
+context: fork
 description: |
   PCE (Process-Context Engine) のアクティブコンテキスト構築スキル。タスクに最適化されたコンテキストをコンパイルし、プロセス駆動の投入物を生成する。
 

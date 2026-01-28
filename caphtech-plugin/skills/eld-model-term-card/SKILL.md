@@ -1,5 +1,6 @@
 ---
 name: eld-model-term-card
+context: fork
 description: |
   LDE（Law-Driven Engineering）のTerm Card作成スキル。
   ドメインの語彙（Vocabulary）を標準フォーマットで文書化し、名辞抽象を具体化する。

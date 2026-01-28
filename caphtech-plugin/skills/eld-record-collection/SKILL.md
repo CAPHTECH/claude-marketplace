@@ -1,5 +1,6 @@
 ---
 name: eld-record-collection
+context: fork
 description: |
   PCE (Process-Context Engine) のContext Delta収集スキル。開発プロセス中に生まれた知見を体系的に収集・記録する。
 

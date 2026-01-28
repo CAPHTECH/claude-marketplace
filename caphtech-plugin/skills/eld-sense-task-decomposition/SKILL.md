@@ -1,5 +1,6 @@
 ---
 name: eld-sense-task-decomposition
+context: fork
 description: |
   PCE (Process-Context Engine) のタスク分解スキル。親→子→孫の入れ子構造でタスクを分解し、各プロセスへのコンテキスト継承を設計する。
 

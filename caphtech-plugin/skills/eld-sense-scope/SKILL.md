@@ -1,5 +1,6 @@
 ---
 name: eld-sense-scope
+context: fork
 description: |
   PCE (Process-Context Engine) のスコープ管理スキル。入れ子プロセス間のコンテキスト継承を設計し、親子間のハンドオフを最適化する。
 

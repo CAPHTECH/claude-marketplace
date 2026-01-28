@@ -1,5 +1,6 @@
 ---
 name: eld
+context: fork
 description: |
   Evidence-Loop Development (ELD) - 証拠で回す統合開発手法。
   コード観測（旧DCCA）、Law/Term規範（旧LDE）、安全な変更（旧Proprioceptive）、

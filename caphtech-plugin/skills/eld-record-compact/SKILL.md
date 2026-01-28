@@ -1,5 +1,6 @@
 ---
 name: eld-record-compact
+context: fork
 description: |
   PCE (Process-Context Engine) のコンテキスト圧縮スキル。長期タスクの履歴を要約・圧縮し、セッション継続を可能にする。
 

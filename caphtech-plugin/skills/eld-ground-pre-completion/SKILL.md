@@ -1,5 +1,6 @@
 ---
 name: eld-ground-pre-completion
+context: fork
 description: |
   PR作成前の完成前検証チェックリスト実行。
   Evidence Pack完全性、Law/Term孤立、Evidence Ladder達成レベルを体系的に確認。

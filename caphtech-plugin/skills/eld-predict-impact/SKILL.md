@@ -1,5 +1,6 @@
 ---
 name: eld-predict-impact
+context: fork
 description: |
   ELD（Evidence-Loop Development）のPredict（予測）フェーズスキル。
   変更の影響を因果タイプで分類し、段階化戦略と停止条件を確定する。

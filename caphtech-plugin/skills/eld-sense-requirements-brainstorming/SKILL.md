@@ -1,5 +1,6 @@
 ---
 name: eld-sense-requirements-brainstorming
+context: fork
 description: |
   要件の曖昧さを能動的に発見する対話的ブレインストーミングスキル。
   Issue Contract作成前に、Law/Term観点、境界条件、失敗モードから多角的質問を生成。

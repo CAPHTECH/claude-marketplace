@@ -1,5 +1,6 @@
 ---
 name: pr-comment-resolver
+context: fork
 description: |
   PRのすべてのコメント（レビューコメント、一般コメント、インラインコメント）を取得し、
   種類別（指摘/質問/提案/承認）に分類、優先順位をつけて対応を実行するスキル。

@@ -1,5 +1,6 @@
 ---
 name: issue-intake
+context: fork
 description: |
   Issueの初期トリアージスキル。Issueを受け取り、標準化された分析結果（分類・深刻度・影響スコープ・不確実性・次アクション参照）を生成する。GitHub/Jira/Linear等のトラッカーからissue_payload形式で受け取る。
 

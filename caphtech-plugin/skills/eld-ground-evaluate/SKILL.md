@@ -1,5 +1,6 @@
 ---
 name: eld-ground-evaluate
+context: fork
 description: |
   PCE (Process-Context Engine) の出力評価スキル。生成物の品質とLaw（法則）との整合性を検証する。
   LDE（Law-Driven Engineering）との統合により、Law遵守チェックも実行。

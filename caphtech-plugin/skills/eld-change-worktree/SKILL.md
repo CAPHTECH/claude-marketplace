@@ -1,5 +1,6 @@
 ---
 name: eld-change-worktree
+context: fork
 description: |
   高リスク変更時にgit worktreeで隔離環境を作成。
   eld-predict-impactでHigh/Critical判定された変更に対して安全な実験環境を提供。

@@ -1,5 +1,6 @@
 ---
 name: github-project
+context: fork
 description: |
   GitHub Projectの管理スキル。ghコマンドを使用してプロジェクトの確認、アイテム追加・状態変更、フィールド更新を行う。
 

@@ -1,5 +1,6 @@
 ---
 name: eld-ground-tdd-enforcer
+context: fork
 description: |
   TDDサイクル（RED-GREEN-REFACTOR）を強制するスキル。
   Evidence Ladder L1（ユニットテスト）を最低条件として、テストなし実装を防止。

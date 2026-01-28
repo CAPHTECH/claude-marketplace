@@ -1,5 +1,6 @@
 ---
 name: refactoring-executor
+context: fork
 description: Execute refactoring safely with test-first verification following best practices. Takes refactoring discovery reports as input and performs incremental refactoring with continuous validation. Ensures tests stay green, captures metrics, and generates execution logs. Use after refactoring-discovery analysis to implement recommended improvements. (project, gitignored)
 ---
 

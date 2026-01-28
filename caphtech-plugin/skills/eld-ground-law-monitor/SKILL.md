@@ -1,5 +1,6 @@
 ---
 name: eld-ground-law-monitor
+context: fork
 description: |
   PCE（Process-Context Engine）とLDE（Law-Driven Engineering）を統合した実行時Law違反監視スキル。
   本番環境でのLaw違反を検知し、pce-memoryにフィードバックして継続的改善を促す。

@@ -1,5 +1,6 @@
 ---
 name: refactoring-discovery
+context: fork
 description: Discover refactoring opportunities by analyzing code for excessive responsibilities, tight coupling, low cohesion, and SOLID principle violations. Generate detailed reports with redesign proposals tailored to the project's architecture. Use when analyzing existing code modules for quality issues, before major refactoring, or to maintain code health. Performs module-by-module analysis on demand. (project, gitignored)
 ---
 

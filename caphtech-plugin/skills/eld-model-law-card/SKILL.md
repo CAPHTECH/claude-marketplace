@@ -1,5 +1,6 @@
 ---
 name: eld-model-law-card
+context: fork
 description: |
   LDE（Law-Driven Engineering）のLaw Card作成スキル。
   ビジネス上の「守るべき条件」を標準フォーマットで文書化する。

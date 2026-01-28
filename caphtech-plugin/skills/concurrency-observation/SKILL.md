@@ -1,5 +1,6 @@
 ---
 name: concurrency-observation
+context: fork
 description: "並行性の観測。データレース、デッドロック、タイミング依存バグを検出。Use when: async/await実装、スレッド/goroutine使用、共有状態操作、本番でだけ起きる問題、たまに落ちるテスト調査。"
 ---
 

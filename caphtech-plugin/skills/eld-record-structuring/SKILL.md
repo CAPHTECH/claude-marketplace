@@ -1,5 +1,6 @@
 ---
 name: eld-record-structuring
+context: fork
 description: |
   PCE (Process-Context Engine) のコンテキスト構造化スキル。収集した知識を適切な場所・粒度で構造化し、再利用可能にする。
 

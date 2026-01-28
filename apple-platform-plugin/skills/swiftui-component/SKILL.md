@@ -1,5 +1,6 @@
 ---
 name: swiftui-component
+context: fork
 description: SwiftUIコンポーネント設計支援。View構造化、状態管理（@State/@Binding/@Observable）、Previewマクロ活用、アクセシビリティ対応。「SwiftUIコンポーネントを設計して」「Viewを構造化して」で使用。
 ---
 

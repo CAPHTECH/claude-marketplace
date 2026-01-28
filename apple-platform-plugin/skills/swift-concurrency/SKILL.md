@@ -1,5 +1,6 @@
 ---
 name: swift-concurrency
+context: fork
 description: |
   Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止。
   使用タイミング: (1) 並行処理コードの実装時、(2) Swift 6 Strict Concurrency対応時、

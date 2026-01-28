@@ -1,5 +1,6 @@
 ---
 name: uncertainty-to-law
+context: fork
 description: |
   resolving-uncertaintyで検証された仮説をLDE（Law-Driven Engineering）のLawに昇格させるスキル。
   検証済みの不確実性からビジネス上の「守るべき条件」を抽出し、Law Catalogに追加する。

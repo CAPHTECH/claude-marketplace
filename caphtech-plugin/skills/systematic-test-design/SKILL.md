@@ -1,5 +1,6 @@
 ---
 name: systematic-test-design
+context: fork
 description: |
   ユニットテストとPBT（Property-Based Testing）を組み合わせた体系的テスト設計スキル。
   「脳を使う場所」を原因推理から「プロパティとジェネレータの設計」へ移動させる。

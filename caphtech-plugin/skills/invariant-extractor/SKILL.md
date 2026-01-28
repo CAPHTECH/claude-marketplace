@@ -1,5 +1,6 @@
 ---
 name: invariant-extractor
+context: fork
 description: |
   system-map-collectorで作成したシステムマップからInvariants（不変条件）とGlobal Rules（全体ルール）を抽出するスキル。
   コンポーネント、境界、データフロー、ランタイム要素等からシステム全体で守るべき制約を発見し、検証可能性を分類する。

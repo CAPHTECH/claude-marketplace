@@ -1,5 +1,6 @@
 ---
 name: eld-record-memory-collector
+context: fork
 description: Collect and verify project information for pce-memory with multi-model validation using Codex CLI. Use when gathering project context, onboarding to a new codebase, or building a knowledge base. Triggers on "collect project info", "build knowledge base", "index this project", or "remember this codebase".
 ---
 

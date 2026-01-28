@@ -1,5 +1,6 @@
 ---
 name: eld-record-knowledge-transfer
+context: fork
 description: |
   PCE (Process-Context Engine) の知識移転スキル。セッション/メンバー間での知識の連続性を確保し、引き継ぎを円滑にする。
 

@@ -1,5 +1,6 @@
 ---
 name: ai-readability-analysis
+context: fork
 description: |
   コードのAI可読性を分析し、生成AIがバグ修正や変更を行う際に苦戦する原因となる問題を特定するスキル。
   以下の場合に使用する：

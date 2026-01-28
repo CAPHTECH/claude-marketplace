@@ -1,5 +1,6 @@
 ---
 name: knowledge-validator
+context: fork
 description: |
   pce-memory + shirushiを活用した知識検証・整合性チェックスキル。
   以下の場合に使用:

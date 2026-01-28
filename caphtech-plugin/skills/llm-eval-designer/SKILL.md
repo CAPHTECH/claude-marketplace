@@ -1,5 +1,6 @@
 ---
 name: llm-eval-designer
+context: fork
 description: |
   LLM生成システムの検証設計スキル。assay-kitフレームワークを活用し、LLM特有の失敗モード（幻覚、例への過学習、部分的処理）を考慮した総合的なテストケース設計を支援する。
 

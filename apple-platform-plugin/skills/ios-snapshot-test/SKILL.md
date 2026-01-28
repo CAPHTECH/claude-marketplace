@@ -1,5 +1,6 @@
 ---
 name: ios-snapshot-test
+context: fork
 description: |
   スナップショットテスト支援。swift-snapshot-testing、UI変更検出。
   使用タイミング: (1) UIコンポーネントのリグレッションテスト、(2) デザインシステムの検証、

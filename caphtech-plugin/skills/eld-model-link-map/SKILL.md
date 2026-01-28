@@ -1,5 +1,6 @@
 ---
 name: eld-model-link-map
+context: fork
 description: |
   LDE（Law-Driven Engineering）のLink Map（連結表）管理スキル。
   Law ↔ Term の相互参照関係を可視化し、孤立の検出と影響分析を行う。

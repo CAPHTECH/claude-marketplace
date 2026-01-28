@@ -1,5 +1,6 @@
 ---
 name: eld-model-law-discovery
+context: fork
 description: |
   コードベースや要件からVocabulary（語彙）とLaw（守るべき条件）を自動発見するスキル。
   名辞抽象（Term/Type）と関係抽象（Law/制約）の両方を抽出し、

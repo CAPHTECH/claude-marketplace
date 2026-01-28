@@ -1,5 +1,6 @@
 ---
 name: technical-book-writer
+context: fork
 description: Comprehensive guide for writing technical books in Markdown format. Use this skill when creating new chapters, managing code examples, reviewing content for technical accuracy and consistency, or organizing book structure (TOC, cross-references). Provides templates, validation scripts, and best practices for technical writing workflows.
 ---
 

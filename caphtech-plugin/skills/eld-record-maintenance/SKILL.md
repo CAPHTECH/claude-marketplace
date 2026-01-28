@@ -1,5 +1,6 @@
 ---
 name: eld-record-maintenance
+context: fork
 description: |
   PCE (Process Context Engine) のメンテナンススキル。現存する Claim の品質を維持し、
   間違い・不要・古い・重複した Claim を整理する。pce_memory_feedback を使用して

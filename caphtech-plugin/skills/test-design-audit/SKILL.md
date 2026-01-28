@@ -1,5 +1,6 @@
 ---
 name: test-design-audit
+context: fork
 description: |
   ELD統合版テスト設計監査スキル。Law/Term駆動でテスト設計の抜け漏れを防止する。
   モデル化とEvidence Ladderを組み合わせ、法則の接地を体系的に検証する。

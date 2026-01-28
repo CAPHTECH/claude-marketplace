@@ -1,5 +1,6 @@
 ---
 name: eld-ground-check
+context: fork
 description: |
   LDE（Law-Driven Engineering）の接地（Grounding）検証スキル。
   LawとTermの両方について、検証手段・観測手段が設定されているか検証する。

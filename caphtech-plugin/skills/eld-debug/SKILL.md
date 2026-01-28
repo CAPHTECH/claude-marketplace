@@ -1,5 +1,6 @@
 ---
 name: eld-debug
+context: fork
 description: |
   ELD的デバッグ手法 - 法則（Law）視点でバグを分析・修正する。
   バグを「法則からの逸脱」として捉え、証拠ループで系統的に解決する。

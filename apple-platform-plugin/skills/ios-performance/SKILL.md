@@ -1,5 +1,6 @@
 ---
 name: ios-performance
+context: fork
 description: "iOSアプリのパフォーマンス最適化支援スキル。Instruments活用、メモリ/CPU/GPU使用率分析、アプリ起動時間・バッテリー消費の最適化をサポート。Use when: パフォーマンス問題の調査、アプリ最適化、メモリリーク検出、起動時間短縮、バッテリー消費改善。"
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: ios-simulator-debug
+context: fork
 description: |
   iOS SimulatorをAIで操作してデバッグ・検証。ビルド→起動→UI操作→スクショ→分析のループ。
   使用タイミング: (1) UIの動作確認が必要な時、(2) 「Simulatorで確認して」「スクショ撮って」、

@@ -1,5 +1,6 @@
 ---
 name: operability-observation
+context: fork
 description: "運用観測性の確保。ログ、メトリクス、ヘルスチェック、設定検証でバグを扱う能力を担保。Use when: デプロイ前チェック、障害調査が困難、原因不明、ログ設計、メトリクス設計、設定管理実装。"
 ---
 

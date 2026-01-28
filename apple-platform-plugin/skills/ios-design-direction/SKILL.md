@@ -1,5 +1,6 @@
 ---
 name: ios-design-direction
+context: fork
 description: |
   iOSアプリのデザイン哲学とクリエイティブディレクション。Apple Human Interface Guidelinesに基づく
   Clarity/Deference/Depthの原則、SwiftUIによる実装パターン、アクセシビリティ設計を包括的にガイド。

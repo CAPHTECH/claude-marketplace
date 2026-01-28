@@ -1,5 +1,6 @@
 ---
 name: critical-code-review
+context: fork
 description: Perform critical code review with automated fix suggestions. Use when reviewing code changes, pull requests, specific files, or branch diffs. Triggers on requests like "review this code", "critical review", "code review for PR #123", or "review changes in src/". Optionally uses Codex CLI for secondary review when available.
 ---
 

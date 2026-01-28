@@ -1,5 +1,6 @@
 ---
 name: eld-ground-pr-review
+context: fork
 description: |
   PCE (Process-Context Engine) を活用したPRレビュースキル。Compile→Execute→Captureのフローでレビューを行い、知見を蓄積する。
   LDE（Law-Driven Engineering）との統合により、Law遵守・Grounding検証も実行。

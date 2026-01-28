@@ -1,5 +1,6 @@
 ---
 name: swift-protocol
+context: fork
 description: プロトコル指向設計の支援。Protocol拡張、Associated Types設計、依存性注入パターンを提案。「プロトコルを設計して」「依存性注入を実装して」で使用。
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: ios-ia-navigation
+context: fork
 description: |
   iOSアプリの情報設計（IA）と画面遷移（ナビゲーション）を設計するスキル。Apple HIGとWWDCセッションに基づき、
   タブ/階層push/モーダルを情報階層とタスク構造から逆算して選定し、根拠と未確定事項を可視化しながら設計を完遂する。

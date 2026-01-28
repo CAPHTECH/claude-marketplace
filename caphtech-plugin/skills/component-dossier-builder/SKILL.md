@@ -1,5 +1,6 @@
 ---
 name: component-dossier-builder
+context: fork
 description: |
   各コンポーネントの詳細情報を構造化した「ドシエ（調査書）」を作成するスキル。
   system-map/components.yamlを入力として、RAG検索の核となるコンポーネントカードを生成する。

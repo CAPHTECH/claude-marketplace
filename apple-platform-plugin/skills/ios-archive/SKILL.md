@@ -1,5 +1,6 @@
 ---
 name: ios-archive
+context: fork
 description: |
   アーカイブ・配布支援。App Store Connect、TestFlight、Ad Hoc/Enterprise配布。
   使用タイミング: (1) App Storeへの提出準備時、(2) TestFlight配布時、

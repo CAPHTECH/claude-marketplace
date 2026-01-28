@@ -1,5 +1,6 @@
 ---
 name: xcode-project
+context: fork
 description: Xcodeプロジェクト設定支援。ビルド設定の最適化、Target/Scheme構成、SPM(Swift Package Manager)活用、xcconfig活用など、プロジェクト構成に関する包括的なサポートを提供する。「Xcodeプロジェクトを設定したい」「ビルド設定を最適化したい」「SPMを導入したい」と言った時に使用する。
 ---
 

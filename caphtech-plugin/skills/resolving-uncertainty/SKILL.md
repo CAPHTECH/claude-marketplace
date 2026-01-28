@@ -1,5 +1,6 @@
 ---
 name: resolving-uncertainty
+context: fork
 description: Turns ambiguity into an Uncertainty Register, prioritizes items, and produces observation tasks/experiments with evidence and decision rules. Use when the user mentions uncertainty/unknowns/assumptions/validation/investigation/hypotheses/risks or cannot decide (不確実性, 曖昧, 未知, 前提, 仮説, 検証, 調査, 優先順位, 観測, 意思決定).
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: eld-sense-parallel-orchestrator
+context: fork
 description: |
   依存関係のないタスクを自動検出し、並列実行を最適化。
   Task toolを活用し、Context継承を適切に管理。

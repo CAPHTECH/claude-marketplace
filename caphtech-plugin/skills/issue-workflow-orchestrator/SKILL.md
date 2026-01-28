@@ -1,5 +1,6 @@
 ---
 name: issue-workflow-orchestrator
+context: fork
 description: |
   Issueワークフロー統括スキル。Issue受領から実装・検証・PRレビュー完了までを、分類に応じたテンプレートで統括し、フェーズ成果物を構造化して引き継ぎながら進行する。
 

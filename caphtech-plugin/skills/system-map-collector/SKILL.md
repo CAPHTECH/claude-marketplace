@@ -1,5 +1,6 @@
 ---
 name: system-map-collector
+context: fork
 description: |
   システムマップを収集・作成するスキル。コードベースを調査し、アーキテクチャ情報をYAML形式で出力する。
 

@@ -1,5 +1,6 @@
 ---
 name: impact-analysis
+context: fork
 description: |
   コード変更の影響範囲分析スキル。変更が引き起こし得る影響を影響面（code/interface/data/external/config/runtime/security/observability）ごとに整理し、「どこをレビューし、何をテストし、何を観測すべきか」を根拠つきで提示する。
 

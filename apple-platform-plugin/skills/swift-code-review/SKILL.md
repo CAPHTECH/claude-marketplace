@@ -1,5 +1,6 @@
 ---
 name: swift-code-review
+context: fork
 description: Swiftコードの品質レビュー。Swift 6のStrict Concurrency対応、プロトコル指向設計、値型/参照型の使用、エラーハンドリングをチェック。「Swiftコードをレビューして」「Swift 6対応を確認して」で使用。
 ---
 
