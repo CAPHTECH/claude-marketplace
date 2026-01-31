@@ -1,0 +1,96 @@
+# =================================================================
+# Debug Verification Report スキーマ
+# =================================================================
+# eld-debug Ground フェーズの出力。検証レポート。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - achieved_level
+  - law_restoration
+  - status
+
+properties:
+  achieved_level:
+    type: string
+    enum: [L0, L1, L2, L3, L4]
+    description: 達成した証拠レベル
+
+  evidence_list:
+    type: array
+    items:
+      type: object
+      required:
+        - type
+        - content
+        - result
+      properties:
+        type:
+          type: string
+          enum: [type_check, static_analysis, unit_test, pbt, integration_test, e2e_test, fuzz_test, chaos_test, telemetry]
+        level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+        content:
+          type: string
+          description: 何を検証したか
+        result:
+          type: string
+          enum: [pass, fail, skip]
+        location:
+          type: string
+          description: テストファイルやログの場所
+
+  law_restoration:
+    type: object
+    required:
+      - logic_formula
+      - verification_method
+      - result
+    properties:
+      logic_formula:
+        type: string
+        description: 検証した法則
+      verification_method:
+        type: string
+        description: どう検証したか
+      result:
+        type: string
+        enum: [restored, partial, not_achieved]
+
+  hypothesis_validation:
+    type: object
+    description: 仮説の妥当性確認
+    properties:
+      hypothesis_correct:
+        type: boolean
+      evidence:
+        type: string
+      alternative_explanation:
+        type: string
+        description: 仮説が間違っていた場合の代替説明
+
+  status:
+    type: string
+    enum: [PASS, FAIL, WARN]
+
+  next_action:
+    type: object
+    description: 次のアクション（FAILの場合）
+    properties:
+      action:
+        type: string
+        enum: [proceed_to_record, revise_hypothesis, additional_observation, escalate]
+      reason:
+        type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      iteration:
+        type: integer
+        description: デバッグループの反復回数

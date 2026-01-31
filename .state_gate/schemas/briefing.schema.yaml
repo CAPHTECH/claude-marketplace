@@ -1,0 +1,164 @@
+# =================================================================
+# Briefing (作戦ブリーフ) スキーマ
+# =================================================================
+# ai-led-onboarding の出力。最小スキーマ6点を含む。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - purpose
+  - boundary
+  - invariants
+  - failure_hypotheses
+  - observation
+  - unknowns
+
+properties:
+  # 1. 目的
+  purpose:
+    type: object
+    required:
+      - goal
+      - success_criteria
+    properties:
+      goal:
+        type: string
+        description: この作業で何を成立させたいか（1-2文）
+        maxLength: 200
+      success_criteria:
+        type: array
+        description: 成功条件（最大3項目）
+        maxItems: 3
+        items:
+          type: string
+      constraints:
+        type: array
+        description: 制約（期限、互換性、性能、セキュリティ）
+        items:
+          type: string
+
+  # 2. 境界
+  boundary:
+    type: object
+    required:
+      - in_scope
+      - out_of_scope
+    properties:
+      in_scope:
+        type: array
+        description: 触る範囲
+        items:
+          type: string
+      out_of_scope:
+        type: array
+        description: 触らない範囲
+        items:
+          type: string
+      dependencies:
+        type: array
+        description: 依存（DB/外部API/他モジュール）
+        items:
+          type: string
+
+  # 3. 不変条件
+  invariants:
+    type: array
+    description: 壊してはいけない条件（最大3つ）
+    maxItems: 3
+    items:
+      type: object
+      required:
+        - condition
+        - symptom_if_broken
+      properties:
+        condition:
+          type: string
+          description: 不変条件の記述
+        symptom_if_broken:
+          type: string
+          description: 破った時の症状
+        related_law:
+          type: string
+          description: 関連するLaw ID
+
+  # 4. 壊れ方仮説
+  failure_hypotheses:
+    type: object
+    required:
+      - likely
+      - fatal
+      - hidden
+    properties:
+      likely:
+        type: object
+        description: 起きやすい失敗
+        properties:
+          description: { type: string }
+          detection: { type: string }
+      fatal:
+        type: object
+        description: 致命的な失敗
+        properties:
+          description: { type: string }
+          detection: { type: string }
+      hidden:
+        type: object
+        description: 気づきにくい失敗
+        properties:
+          description: { type: string }
+          detection: { type: string }
+
+  # 5. 観測・検証
+  observation:
+    type: object
+    required:
+      - pre_check
+    properties:
+      pre_check:
+        type: array
+        description: 着手前に確かめること
+        items:
+          type: object
+          properties:
+            what: { type: string }
+            how: { type: string }
+            timebox: { type: string }
+      detection:
+        type: array
+        description: 壊れた時にどこで検知するか
+        items:
+          type: object
+          properties:
+            failure: { type: string }
+            detection_point: { type: string }
+
+  # 6. 未確定リスト
+  unknowns:
+    type: array
+    description: まだ分かっていないこと
+    items:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: 不明点を疑問文で
+        resolution:
+          type: string
+          description: 解消手段
+        priority:
+          type: string
+          enum: [high, medium, low]
+
+  # メタデータ
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      task_ref:
+        type: string
+        description: タスク/Issue参照

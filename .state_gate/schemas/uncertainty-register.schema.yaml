@@ -1,0 +1,157 @@
+# =================================================================
+# Uncertainty Register スキーマ
+# =================================================================
+# resolving-uncertainty の出力。不確実性の台帳。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - decision_frame
+  - uncertainties
+
+properties:
+  decision_frame:
+    type: object
+    description: 意思決定のフレーム
+    required:
+      - decision
+    properties:
+      decision:
+        type: string
+        description: 決めたいこと
+      when:
+        type: string
+        description: 期限
+      stakes:
+        type: string
+        description: 失敗時の損失
+      constraints:
+        type: array
+        items:
+          type: string
+
+  uncertainties:
+    type: array
+    description: 不確実性のリスト（10個まで）
+    maxItems: 10
+    items:
+      type: object
+      required:
+        - id
+        - question
+        - scores
+        - status
+      properties:
+        id:
+          type: string
+          pattern: "^U-[0-9]{3}$"
+        question:
+          type: string
+          description: 疑問文で記述
+        scores:
+          type: object
+          required:
+            - impact
+            - evidence
+            - urgency
+            - effort
+          properties:
+            impact:
+              type: integer
+              minimum: 1
+              maximum: 5
+              description: 影響度
+            evidence:
+              type: integer
+              minimum: 1
+              maximum: 5
+              description: 根拠の強さ（弱いほど不確実）
+            urgency:
+              type: integer
+              minimum: 1
+              maximum: 5
+              description: 緊急度
+            effort:
+              type: integer
+              minimum: 1
+              maximum: 5
+              description: 観測コスト
+            priority:
+              type: number
+              description: "計算式: Impact × (6-Evidence) × Urgency ÷ Effort"
+        status:
+          type: string
+          enum: [open, in_progress, validated, rejected, accepted]
+        observation_task:
+          $ref: "#/$defs/observation_task"
+        evidence:
+          type: object
+          properties:
+            artifact:
+              type: string
+              description: 証拠へのパス/リンク
+            result:
+              type: string
+            conclusion:
+              type: string
+
+  top_n:
+    type: array
+    description: 優先度上位N（3-5）
+    items:
+      type: string
+      description: 不確実性ID
+
+  facts:
+    type: array
+    description: 観測で答えが出た事実（uncertaintyから外れたもの）
+    items:
+      type: object
+      properties:
+        statement:
+          type: string
+        evidence:
+          type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      return_to_state:
+        type: string
+        description: 解消後に戻る状態
+
+$defs:
+  observation_task:
+    type: object
+    description: 観測タスク
+    required:
+      - hypothesis
+      - method
+      - timebox
+      - decision_rule
+    properties:
+      hypothesis:
+        type: string
+        description: 仮説
+      method:
+        type: string
+        description: 観測方法（現物/証拠/知識）
+      timebox:
+        type: string
+        description: 上限時間
+      decision_rule:
+        type: object
+        properties:
+          accept_if:
+            type: string
+            description: 採用条件
+          reject_if:
+            type: string
+            description: 撤回条件
+      evidence_artifact:
+        type: string
+        description: ログ/スクショ/計測結果

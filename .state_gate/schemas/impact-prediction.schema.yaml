@@ -1,0 +1,173 @@
+# =================================================================
+# Impact Prediction スキーマ
+# =================================================================
+# eld-predict-impact の出力。影響予測と段階化計画。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - summary
+  - change_scope
+  - staged_plan
+
+properties:
+  summary:
+    type: object
+    required:
+      - risk_level
+      - recommended_steps
+    properties:
+      target_files:
+        type: integer
+      target_symbols:
+        type: integer
+      direct_impacts:
+        type: integer
+      indirect_impacts:
+        type: integer
+      unknowns:
+        type: integer
+      risk_level:
+        type: string
+        enum: [Low, Medium, High, Critical]
+      recommended_steps:
+        type: integer
+
+  change_scope:
+    type: object
+    properties:
+      target_files:
+        type: array
+        items:
+          type: object
+          properties:
+            path:
+              type: string
+            change_type:
+              type: string
+              enum: [modify, add, delete]
+            symbols:
+              type: array
+              items:
+                type: string
+      related_laws:
+        type: array
+        items:
+          type: string
+      related_terms:
+        type: array
+        items:
+          type: string
+
+  direct_impacts:
+    type: array
+    items:
+      type: object
+      required:
+        - change
+        - causal_type
+        - risk
+      properties:
+        change:
+          type: string
+        causal_type:
+          type: string
+          enum: [compatibility, performance, reliability, security, observability]
+        risk:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        affected_components:
+          type: array
+          items:
+            type: string
+        mitigation:
+          type: string
+
+  indirect_impacts:
+    type: array
+    items:
+      type: object
+      properties:
+        dependent:
+          type: string
+        impact_type:
+          type: string
+        risk:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        verification:
+          type: string
+
+  unknown_impacts:
+    type: array
+    items:
+      type: object
+      properties:
+        description:
+          type: string
+        possible_risk:
+          type: string
+        investigation:
+          type: string
+
+  staged_plan:
+    type: array
+    description: 段階化計画
+    items:
+      type: object
+      required:
+        - step
+        - name
+        - change
+        - verification
+        - success_criteria
+        - rollback
+      properties:
+        step:
+          type: integer
+        name:
+          type: string
+        change:
+          type: string
+        causal_type:
+          type: string
+          enum: [compatibility, performance, reliability, security, observability]
+        risk:
+          type: string
+          enum: [Low, Medium, High, Critical]
+        verification:
+          type: string
+        success_criteria:
+          type: string
+        rollback:
+          type: string
+
+  stop_conditions:
+    type: object
+    properties:
+      standard:
+        type: array
+        items:
+          type: string
+      custom:
+        type: array
+        items:
+          type: object
+          properties:
+            condition:
+              type: string
+            action:
+              type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      approved_by:
+        type: string
+      approved_at:
+        type: string
+        format: date-time

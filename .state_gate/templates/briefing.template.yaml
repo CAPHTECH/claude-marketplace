@@ -1,0 +1,79 @@
+# =================================================================
+# Briefing Template (作戦ブリーフ)
+# =================================================================
+# /ai-led-onboarding で作成する最小スキーマ
+# =================================================================
+
+# 1. 目的
+purpose:
+  goal: |
+    # この作業で何を成立させたいか（1-2文）
+
+  success_criteria:
+    # 成功条件（最大3項目）
+    -
+  constraints:
+    # 制約（期限、互換性、性能、セキュリティ）
+    -
+
+# 2. 境界
+boundary:
+  in_scope:
+    # 触る範囲
+    -
+  out_of_scope:
+    # 触らない範囲
+    -
+  dependencies:
+    # 依存（DB/外部API/他モジュール）
+    -
+
+# 3. 不変条件（最大3つ）
+invariants:
+  - condition: |
+      # 壊してはいけない条件1
+    symptom_if_broken: |
+      # 破った時の症状
+    related_law: # LAW-xxx
+
+# 4. 壊れ方仮説
+failure_hypotheses:
+  likely:
+    description: |
+      # 起きやすい失敗パターン
+    detection: |
+      # 検知手段（テスト/ログ/メトリクス）
+  fatal:
+    description: |
+      # 致命的な失敗
+    detection: |
+      # 検知手段
+  hidden:
+    description: |
+      # 気づきにくい失敗
+    detection: |
+      # 検知手段
+
+# 5. 観測・検証
+observation:
+  pre_check:
+    # 着手前に確かめること
+    - what:
+      how:
+      timebox: 15min
+  detection:
+    # 壊れた時にどこで検知するか
+    - failure:
+      detection_point:
+
+# 6. 未確定リスト
+unknowns:
+  - question: |
+      # まだ分かっていないこと（疑問文で）
+    resolution: |
+      # 解消手段
+    priority: high  # high/medium/low
+
+metadata:
+  created_at:
+  task_ref:

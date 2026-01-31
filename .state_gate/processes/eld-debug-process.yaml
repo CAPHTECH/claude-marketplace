@@ -1,0 +1,412 @@
+# =================================================================
+# ELD Debug Process - 法則駆動デバッグ
+# =================================================================
+# バグ = 法則（Law）からの逸脱として捉え、証拠ループで系統的に解決
+# =================================================================
+
+id: eld-debug
+version: "1.0.0"
+description: |
+  ELD的デバッグプロセス。
+  「なぜ壊れた？」ではなく「どの法則が破られた？」の視点でバグを分析・修正する。
+
+# -----------------------------------------------------------------
+# 設定
+# -----------------------------------------------------------------
+settings:
+  artifact_base: ".state_gate/artifacts/debug"
+  schema_base: ".state_gate/schemas"
+
+# -----------------------------------------------------------------
+# ロール定義
+# -----------------------------------------------------------------
+roles:
+  human:
+    description: 人間（開発者、QA）
+    can_emit:
+      - "*"
+  ai:
+    description: AIアシスタント
+    can_emit:
+      - hypothesis_formed
+      - impact_predicted
+      - fix_applied
+      - verification_complete
+      - knowledge_recorded
+      - hypothesis_rejected
+      - needs_more_evidence
+  system:
+    description: 自動システム
+    can_emit:
+      - artifact_validated
+      - ci_passed
+      - ci_failed
+
+# -----------------------------------------------------------------
+# 状態定義（7状態 + blocked + complete）
+# -----------------------------------------------------------------
+states:
+  # 初期状態
+  - name: idle
+    description: バグ報告待ち
+    prompt: |
+      ## デバッグ開始待ち
+
+      バグ報告や障害を受け付けています。
+
+      **開始方法**:
+      - Issueや報告を提供してください
+      - 「このバグを調査して」と指示してください
+
+      **開始すると `/eld-debug` のフローが始まります**
+
+  # Phase 1: Sense（症状の観測）
+  - name: sense
+    description: |
+      症状を観測し、関連する法則候補を列挙するフェーズ。
+      「何が起きているか」を正確に把握する。
+    prompt: |
+      ## Sense フェーズ - 症状の観測
+
+      **目的**: 症状を観測し、関連する法則候補を列挙する
+
+      ### 使用スキル
+      **`/eld-debug`** のSenseフェーズを実行
+      **`/test-design-audit`** - テストカバレッジのギャップを特定（バグの根本原因発見に活用）
+
+      ### 観測項目
+      1. **現象**: 何が起きているか
+      2. **再現条件**: いつ、どのような状況で発生するか
+      3. **影響範囲**: どのユーザー/機能に影響するか
+      4. **観測した変数**: 値と期待値
+      5. **法則候補**: この症状に関連しそうな法則
+      6. **テストギャップ**: カバーされていないLaw/境界条件
+
+      ### 観測手段
+      - ログ・トレース（構造化ログ、分散トレース）
+      - メトリクス（APM、プロファイリング）
+      - デバッガ（ステップ実行、ブレークポイント）
+      - ユーザー報告（エラーレポート、再現手順）
+      - 履歴・差分（git bisect、デプロイ履歴）
+      - **テスト設計監査**: 既存テストのカバレッジ分析
+
+      ### 成果物
+      `.state_gate/artifacts/debug/symptom-observation.yaml` を作成
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/symptom-observation.yaml"
+        description: 症状観測記録
+
+  # Phase 2: Model（法則違反の仮説形成）
+  - name: model
+    description: |
+      破られた法則を特定し、論理式として表現するフェーズ。
+      仮説を形成し、反証可能な形で記述する。
+    prompt: |
+      ## Model フェーズ - 法則違反の仮説形成
+
+      **目的**: 破られた法則を特定し、論理式として表現する
+
+      ### 使用スキル
+      **`/eld-debug`** のModelフェーズを実行
+      **`/eld-model-law-discovery`** - 法則が暗黙的な場合
+      **`/systematic-test-design`** - PBTプロパティ設計でエッジケースを炙り出す
+
+      ### 仮説形成プロセス
+      1. **法則の明示化**: 暗黙の法則を言語化
+      2. **論理式化**: 自然言語を論理式に変換
+      3. **違反箇所の特定**: どこで法則が破られているか
+      4. **PBTで検証**: Property-based testingで仮説を検証
+
+      ### PBTによるバグ炙り出し
+      - **不変条件プロパティ**: 「常に成り立つべき」法則をPBTで検証
+      - **ジェネレータ**: 境界値・異常値を自動生成
+      - **反例発見**: PBTが見つけた反例を仮説の根拠に
+
+      ### 成果物
+      `.state_gate/artifacts/debug/hypothesis.yaml` を作成
+
+      ```yaml
+      破られた法則:
+        Law名: <名前>
+        カテゴリ: [Invariant | Pre | Post | Policy]
+        論理式: <∀x. P(x) → Q(x) 形式>
+        自然言語: <平易な説明>
+
+      仮説:
+        原因推測: <なぜ法則が破られたか>
+        根拠: <仮説を支持する観測事実>
+        反証可能性: <この仮説が間違っていたら何が観測されるか>
+        pbt_findings: <PBTで発見した反例（あれば）>
+      ```
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/hypothesis.yaml"
+        description: 法則違反仮説
+
+  # Phase 3: Predict（影響予測）
+  - name: predict
+    description: |
+      法則違反の影響範囲と、修正による副作用を予測するフェーズ。
+    prompt: |
+      ## Predict フェーズ - 影響予測
+
+      **目的**: 法則違反の影響範囲と、修正による副作用を予測する
+
+      ### 使用スキル
+      **`/eld-debug`** のPredictフェーズを実行
+      **`/eld-predict-impact`** - 影響分析の詳細
+
+      ### 予測内容
+      1. **伝播範囲**: 法則違反がどこまで影響しているか
+      2. **副作用**: 修正による意図しない変更
+      3. **失敗モード**: 修正がうまくいかなかった場合の兆候
+
+      ### 停止条件を設定
+      「このサインが出たら修正アプローチを見直す」を明確に定義
+
+      ### 成果物
+      `.state_gate/artifacts/debug/fix-prediction.yaml` を作成
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/fix-prediction.yaml"
+        description: 修正影響予測
+
+  # Phase 4: Change（法則復元）
+  - name: change
+    description: |
+      最小限の変更で法則を復元するフェーズ。
+    prompt: |
+      ## Change フェーズ - 法則復元
+
+      **目的**: 最小限の変更で法則を復元する
+
+      ### 使用スキル
+      **`/eld-debug`** のChangeフェーズを実行
+      **`/eld-ground-tdd-enforcer`** - リグレッションテストを先に書く
+      **`/systematic-test-design`** - ユニットテスト + PBT でリグレッション防止
+
+      ### 変更原則
+      1. **最小変更**: 法則復元に必要な最小の変更
+      2. **Pure優先**: 副作用のない変更を優先
+      3. **可逆性確保**: ロールバック可能な状態を維持
+
+      ### テストファースト（TDD）
+      1. まず「法則が満たされたことを確認するテスト」を書く（RED）
+      2. **PBTでリグレッション防止**: 同類のバグを自動検出するプロパティを設計
+      3. 最小限の修正で法則を復元（GREEN）
+      4. 必要に応じてリファクタ（REFACTOR）
+
+      ### PBT反例コーパス
+      Modelフェーズで発見した反例をリグレッションテストに変換
+
+      ### 成果物
+      `.state_gate/artifacts/debug/fix-log.yaml` を作成
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/fix-log.yaml"
+        description: 修正ログ
+
+  # Phase 5: Ground（証拠による検証）
+  - name: ground
+    description: |
+      法則が復元されたことを証拠で確認するフェーズ。
+    prompt: |
+      ## Ground フェーズ - 証拠による検証
+
+      **目的**: 法則が復元されたことを証拠で確認する
+
+      ### 使用スキル
+      **`/eld-debug`** のGroundフェーズを実行
+      **`/eld-ground-check`** - 接地検証
+      **`/test-design-audit`** - 修正後のテストカバレッジを監査
+      **`/systematic-test-design`** - PBT結果の検証
+
+      ### 証拠の梯子（Evidence Ladder）
+      | Level | 手段 | 検証内容 |
+      |-------|------|----------|
+      | **L0** | 型チェック・静的解析 | 法則が「書ける」か |
+      | **L1** | ユニットテスト・PBT | 法則が単体で成立するか |
+      | **L2** | 統合テスト・E2E | 法則が連携で成立するか |
+      | **L3** | 失敗注入・Fuzz | 法則が異常時も守られるか |
+      | **L4** | 本番Telemetry | 法則が実運用で成立しているか |
+
+      ### テスト設計監査
+      - **カバレッジ確認**: 修正したLawがテストでカバーされているか
+      - **境界条件**: 類似のエッジケースもカバーされているか
+      - **PBT検証**: プロパティが十分な範囲をカバーしているか
+
+      ### 判定基準
+      - **成功**: 法則が復元された（最低L1以上）+ テストカバレッジ確保
+      - **部分的**: 一部の法則のみ復元
+      - **失敗**: 仮説が間違っていた → Senseに戻る
+
+      ### 成果物
+      `.state_gate/artifacts/debug/verification-report.yaml` を作成
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/verification-report.yaml"
+        description: 検証レポート
+
+  # Phase 6: Record（知識の蓄積）
+  - name: record
+    description: |
+      バグパターンと解決策を将来のために記録するフェーズ。
+    prompt: |
+      ## Record フェーズ - 知識の蓄積
+
+      **目的**: バグパターンと解決策を将来のために記録する
+
+      ### 使用スキル
+      **`/eld-debug`** のRecordフェーズを実行
+      **`/eld-record-collection`** - 知識蓄積
+
+      ### 記録内容
+      1. **バグパターン**: 法則違反のパターンとして抽象化
+      2. **根本原因**: なぜ法則が破られたかの分析
+      3. **検出方法**: このパターンを早期発見する方法
+      4. **防止策**: 再発を防ぐための施策
+
+      ### Law/Term更新
+      必要に応じてLaw/Term Cardを更新または新規作成
+
+      ### 成果物
+      `.state_gate/artifacts/debug/bug-pattern.yaml` を作成
+    required_artifacts:
+      - path: ".state_gate/artifacts/debug/bug-pattern.yaml"
+        description: バグパターン記録
+
+  # 仮説却下状態
+  - name: hypothesis_rejected
+    description: |
+      仮説が検証で否定された状態。
+      新しい観測に基づいて仮説を再形成する。
+    prompt: |
+      ## 仮説却下 - 再観測が必要
+
+      検証の結果、仮説が間違っていることが判明しました。
+
+      ### 次のアクション
+      1. **追加観測**: 見落とした症状や変数がないか
+      2. **仮説の修正**: 観測に基づいて新しい仮説を形成
+      3. **スコープ縮小**: より小さな問題に分割
+
+      **`/resolving-uncertainty`** を使用して不確実性を整理することもできます
+
+  # 完了状態
+  - name: complete
+    description: デバッグ完了
+    prompt: |
+      ## デバッグ完了
+
+      法則が復元され、知識が記録されました。
+
+      ### 確認項目
+      - [ ] 破られた法則が特定されている
+      - [ ] 法則が復元されたことが証拠で確認されている（L1以上）
+      - [ ] バグパターンが記録されている
+      - [ ] 必要に応じてLaw/Term Cardが更新されている
+
+# -----------------------------------------------------------------
+# 遷移定義
+# -----------------------------------------------------------------
+transitions:
+  # idle → sense
+  - from: idle
+    to: sense
+    event: start_debug
+    description: デバッグ開始
+
+  # sense → model
+  - from: sense
+    to: model
+    event: observation_complete
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/symptom-observation.yaml"
+
+  # sense → hypothesis_rejected (追加観測が必要)
+  - from: sense
+    to: hypothesis_rejected
+    event: needs_more_evidence
+    description: 観測不足で仮説形成できない
+
+  # model → predict
+  - from: model
+    to: predict
+    event: hypothesis_formed
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/hypothesis.yaml"
+
+  # predict → change
+  - from: predict
+    to: change
+    event: impact_predicted
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/fix-prediction.yaml"
+
+  # change → ground
+  - from: change
+    to: ground
+    event: fix_applied
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/fix-log.yaml"
+
+  # ground → record (成功時)
+  - from: ground
+    to: record
+    event: verification_passed
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/verification-report.yaml"
+      - type: custom
+        config:
+          script: |
+            # verification-reportのstatusがPASSまたはWARNであること
+            grep -q "status: PASS\|status: WARN" .state_gate/artifacts/debug/verification-report.yaml
+
+  # ground → hypothesis_rejected (失敗時)
+  - from: ground
+    to: hypothesis_rejected
+    event: verification_failed
+    description: 仮説が間違っていた
+
+  # hypothesis_rejected → sense
+  - from: hypothesis_rejected
+    to: sense
+    event: restart_observation
+    description: 追加観測から再開
+
+  # hypothesis_rejected → model
+  - from: hypothesis_rejected
+    to: model
+    event: revise_hypothesis
+    description: 新しい仮説を形成
+
+  # record → complete
+  - from: record
+    to: complete
+    event: knowledge_recorded
+    guards:
+      - type: artifact_exists
+        config:
+          path: ".state_gate/artifacts/debug/bug-pattern.yaml"
+
+  # complete → idle
+  - from: complete
+    to: idle
+    event: reset
+    description: 新しいデバッグセッションを開始
+
+  # 任意の状態から中断
+  - from: "*"
+    to: idle
+    event: abort
+    description: デバッグを中止
+    guards:
+      - type: role
+        config:
+          required: human

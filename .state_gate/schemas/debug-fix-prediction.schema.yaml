@@ -1,0 +1,121 @@
+# =================================================================
+# Debug Fix Prediction スキーマ
+# =================================================================
+# eld-debug Predict フェーズの出力。修正影響予測。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - impact_prediction
+  - fix_prediction
+  - stop_conditions
+
+properties:
+  impact_prediction:
+    type: object
+    required:
+      - direct_impact
+    properties:
+      direct_impact:
+        type: array
+        items:
+          type: object
+          properties:
+            area:
+              type: string
+            description:
+              type: string
+            affected_components:
+              type: array
+              items:
+                type: string
+      indirect_impact:
+        type: array
+        items:
+          type: object
+          properties:
+            area:
+              type: string
+            description:
+              type: string
+            propagation_path:
+              type: string
+
+  fix_prediction:
+    type: object
+    required:
+      - expected_effect
+    properties:
+      expected_effect:
+        type: string
+        description: 修正で何が改善されるか
+      side_effect_risks:
+        type: array
+        items:
+          type: object
+          properties:
+            risk:
+              type: string
+            likelihood:
+              type: string
+              enum: [high, medium, low]
+            mitigation:
+              type: string
+      rollback_plan:
+        type: object
+        properties:
+          method:
+            type: string
+          estimated_time:
+            type: string
+          data_loss_risk:
+            type: boolean
+
+  stop_conditions:
+    type: array
+    description: このサインが出たら修正アプローチを見直す
+    items:
+      type: object
+      required:
+        - signal
+        - action
+      properties:
+        signal:
+          type: string
+          description: 停止条件となるサイン
+        action:
+          type: string
+          description: 取るべきアクション
+
+  fix_strategy:
+    type: object
+    properties:
+      approach:
+        type: string
+        enum: [patch, refactor, workaround, rollback]
+      phases:
+        type: array
+        items:
+          type: object
+          properties:
+            step:
+              type: string
+            verification:
+              type: string
+      estimated_changes:
+        type: object
+        properties:
+          files:
+            type: integer
+          lines_added:
+            type: integer
+          lines_removed:
+            type: integer
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time

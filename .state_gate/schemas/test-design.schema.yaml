@@ -1,0 +1,278 @@
+# =================================================================
+# Test Design スキーマ
+# =================================================================
+# test-design-audit と systematic-test-design の出力。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - summary
+  - requirements
+  - test_conditions
+  - coverage
+
+properties:
+  summary:
+    type: object
+    properties:
+      total_requirements:
+        type: integer
+      total_laws:
+        type: integer
+      total_terms:
+        type: integer
+      total_test_conditions:
+        type: integer
+      total_test_cases:
+        type: integer
+      coverage_rate:
+        type: string
+        description: "例: 15/15 Laws (100%)"
+
+  # Phase 1: 要求一覧
+  requirements:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - type
+        - description
+      properties:
+        id:
+          type: string
+          pattern: "^REQ-[0-9]{3}$"
+        type:
+          type: string
+          enum: [functional, non_functional, constraint, operational, regulatory, ux]
+        description:
+          type: string
+        acceptance_criteria:
+          type: string
+        law_term:
+          type: string
+          description: 対応するLaw/Term ID
+        status:
+          type: string
+          enum: [covered, uncovered, partial]
+
+  # Phase 2: モデル（サマリのみ）
+  models:
+    type: object
+    properties:
+      feature_tree:
+        type: string
+        description: 機能分解ツリーへの参照
+      state_model:
+        type: string
+        description: 状態モデルへの参照
+      data_model:
+        type: string
+        description: データモデルへの参照
+      external_if_model:
+        type: string
+        description: 外部IFモデルへの参照
+      risk_model:
+        type: string
+        description: リスクモデルへの参照
+
+  # Phase 3: カバレッジ基準
+  coverage:
+    type: object
+    properties:
+      evidence_ladder:
+        type: object
+        properties:
+          l0_required:
+            type: array
+            items:
+              type: string
+          l1_required:
+            type: array
+            items:
+              type: string
+          l2_required:
+            type: array
+            items:
+              type: string
+          l3_required:
+            type: array
+            items:
+              type: string
+          l4_required:
+            type: array
+            items:
+              type: string
+      law_coverage:
+        type: array
+        items:
+          type: object
+          properties:
+            law_id:
+              type: string
+            severity:
+              type: string
+              enum: [S0, S1, S2, S3]
+            required_level:
+              type: string
+            current_level:
+              type: string
+            status:
+              type: string
+              enum: [achieved, partial, not_started]
+
+  # Phase 4: テスト条件
+  test_conditions:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - description
+        - law_term
+        - evidence_level
+      properties:
+        id:
+          type: string
+          pattern: "^TCND-[0-9]{3}$"
+        description:
+          type: string
+        req_ids:
+          type: array
+          items:
+            type: string
+        law_term:
+          type: string
+        evidence_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+        category:
+          type: string
+          enum: [normal, boundary, error, security, performance, state]
+
+  # Phase 6: テスト項目
+  test_cases:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - tcnd_id
+        - description
+      properties:
+        id:
+          type: string
+          pattern: "^TEST-[0-9]{3}$"
+        tcnd_id:
+          type: string
+        req_id:
+          type: string
+        law_term:
+          type: string
+        evidence_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4]
+        precondition:
+          type: string
+        input:
+          type: string
+        expected:
+          type: string
+        test_type:
+          type: string
+          enum: [unit_typical, unit_boundary, unit_regression, pbt, integration, e2e]
+
+  # systematic-test-design: プロパティカタログ
+  pbt_properties:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [invariant, algebraic, roundtrip, reference_model, metamorphic, robustness, state_machine]
+        law_term:
+          type: string
+        description:
+          type: string
+        generator_level:
+          type: string
+          enum: [L0, L1, L2, L3, L4, L5, L6, L7, L8]
+
+  # systematic-test-design: 反例コーパス
+  counterexamples:
+    type: array
+    items:
+      type: object
+      properties:
+        law_term:
+          type: string
+        description:
+          type: string
+        input:
+          type: object
+        expected:
+          type: string
+        discovered:
+          type: string
+          format: date
+        regression_test:
+          type: string
+          description: 回収先のテストファイル
+
+  # 監査結果
+  audit:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date-time
+      perspectives:
+        type: array
+        items:
+          type: string
+      findings:
+        type: array
+        items:
+          type: object
+          properties:
+            category:
+              type: string
+            description:
+              type: string
+            severity:
+              type: string
+              enum: [critical, major, minor, info]
+            status:
+              type: string
+              enum: [open, resolved, wontfix]
+
+  # トレーサビリティ
+  traceability:
+    type: object
+    properties:
+      uncovered_requirements:
+        type: array
+        items:
+          type: string
+      ungrounded_laws:
+        type: array
+        items:
+          type: string
+      orphan_tests:
+        type: array
+        items:
+          type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

@@ -1,0 +1,146 @@
+# =================================================================
+# Debug Bug Pattern スキーマ
+# =================================================================
+# eld-debug Record フェーズの出力。バグパターン記録。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - pattern
+  - root_cause
+  - detection_prevention
+
+properties:
+  pattern:
+    type: object
+    required:
+      - name
+      - violation_type
+      - symptoms
+    properties:
+      name:
+        type: string
+        description: 識別しやすい名前
+      violation_type:
+        type: string
+        enum: [Invariant, Pre, Post, Policy]
+      symptoms:
+        type: array
+        items:
+          type: string
+        description: 典型的な現れ方
+      tags:
+        type: array
+        items:
+          type: string
+        description: 検索用タグ
+
+  root_cause:
+    type: object
+    required:
+      - category
+      - details
+    properties:
+      category:
+        type: string
+        enum: [design, implementation, environment, operation, specification]
+      details:
+        type: string
+        description: なぜ発生したか
+      contributing_factors:
+        type: array
+        items:
+          type: string
+
+  detection_prevention:
+    type: object
+    properties:
+      early_detection:
+        type: array
+        items:
+          type: object
+          properties:
+            method:
+              type: string
+              enum: [test, lint, review, monitoring, ci]
+            description:
+              type: string
+            implemented:
+              type: boolean
+      prevention:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [design, process, tool, documentation]
+            description:
+              type: string
+            implemented:
+              type: boolean
+
+  related_artifacts:
+    type: object
+    properties:
+      laws:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            action:
+              type: string
+              enum: [created, updated, unchanged]
+      terms:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            action:
+              type: string
+              enum: [created, updated, unchanged]
+      tests:
+        type: array
+        items:
+          type: object
+          properties:
+            file:
+              type: string
+            description:
+              type: string
+
+  similar_bugs:
+    type: array
+    description: 類似のバグへの参照
+    items:
+      type: object
+      properties:
+        reference:
+          type: string
+        similarity:
+          type: string
+
+  lessons_learned:
+    type: array
+    items:
+      type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      issue_ref:
+        type: string
+      resolution_time:
+        type: string
+        description: 解決にかかった時間
+      iterations:
+        type: integer
+        description: デバッグループの反復回数

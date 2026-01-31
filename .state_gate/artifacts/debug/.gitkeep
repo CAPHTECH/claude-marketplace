@@ -1,0 +1,8 @@
+# このディレクトリにはデバッグフェーズの成果物が保存されます
+# 成果物の例:
+# - symptom-observation.yaml
+# - hypothesis.yaml
+# - fix-prediction.yaml
+# - fix-log.yaml
+# - verification-report.yaml
+# - bug-pattern.yaml

@@ -1,0 +1,89 @@
+# =================================================================
+# Debug Fix Log スキーマ
+# =================================================================
+# eld-debug Change フェーズの出力。修正ログ。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - changes
+  - verification_points
+
+properties:
+  changes:
+    type: array
+    items:
+      type: object
+      required:
+        - file
+        - intent
+      properties:
+        file:
+          type: string
+          description: 変更対象ファイル
+        diff_summary:
+          type: string
+          description: 変更内容の要約
+        intent:
+          type: string
+          description: なぜこの変更で法則が復元されるか
+        commit:
+          type: string
+          description: コミットSHA
+
+  regression_test:
+    type: object
+    description: リグレッションテスト（先に書く）
+    properties:
+      file:
+        type: string
+      test_name:
+        type: string
+      law_verified:
+        type: string
+        description: このテストが検証する法則
+      status:
+        type: string
+        enum: [red, green]
+
+  verification_points:
+    type: array
+    description: 変更後に確認すべきこと
+    items:
+      type: object
+      required:
+        - point
+        - method
+      properties:
+        point:
+          type: string
+        method:
+          type: string
+          enum: [test, manual, log, metric]
+        status:
+          type: string
+          enum: [pending, verified, failed]
+
+  change_principles:
+    type: object
+    description: 変更原則の遵守状況
+    properties:
+      minimal_change:
+        type: boolean
+        description: 法則復元に必要な最小の変更か
+      pure_preferred:
+        type: boolean
+        description: 副作用のない変更を優先したか
+      reversible:
+        type: boolean
+        description: ロールバック可能か
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      branch:
+        type: string

@@ -1,0 +1,206 @@
+# =================================================================
+# Grounding Report スキーマ
+# =================================================================
+# eld-ground-check の出力。接地検証レポート。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - summary
+  - status
+
+properties:
+  summary:
+    type: object
+    properties:
+      total_laws:
+        type: integer
+      total_terms:
+        type: integer
+      law_grounding_rate:
+        type: string
+        description: "例: 7/8 S0/S1 (87.5%)"
+      term_grounding_rate:
+        type: string
+      mutual_constraint:
+        type: string
+        enum: [PASS, FAIL]
+
+  status:
+    type: string
+    enum: [PASS, FAIL, WARN]
+
+  issues:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [law, term]
+        severity:
+          type: string
+          enum: [S0, S1, S2, S3]
+        status:
+          type: string
+          enum: [PASS, FAIL, WARN]
+        missing:
+          type: array
+          items:
+            type: string
+        recommended_actions:
+          type: array
+          items:
+            type: string
+
+  law_grounding:
+    type: array
+    items:
+      type: object
+      required:
+        - law_id
+        - severity
+        - status
+      properties:
+        law_id:
+          type: string
+        severity:
+          type: string
+          enum: [S0, S1, S2, S3]
+        terms:
+          type: array
+          items:
+            type: string
+        verification:
+          type: object
+          properties:
+            test:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                path:
+                  type: string
+                coverage:
+                  type: string
+            runtime_check:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                type:
+                  type: string
+                  enum: [assert, guard, validation]
+                location:
+                  type: string
+        observability:
+          type: object
+          properties:
+            telemetry:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                metric:
+                  type: string
+            log_event:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                event_name:
+                  type: string
+        status:
+          type: string
+          enum: [PASS, FAIL, WARN]
+        missing:
+          type: array
+          items:
+            type: string
+
+  term_grounding:
+    type: array
+    items:
+      type: object
+      required:
+        - term_id
+        - importance
+        - status
+      properties:
+        term_id:
+          type: string
+        importance:
+          type: string
+          enum: [S0, S1, S2, S3]
+        related_laws:
+          type: array
+          items:
+            type: string
+        boundary_verification:
+          type: object
+          properties:
+            validation:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                method:
+                  type: string
+                location:
+                  type: string
+            normalization:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                method:
+                  type: string
+                location:
+                  type: string
+        observability:
+          type: object
+          properties:
+            observable_fields:
+              type: object
+              properties:
+                exists:
+                  type: boolean
+                fields:
+                  type: array
+                  items:
+                    type: string
+        status:
+          type: string
+          enum: [PASS, FAIL, WARN]
+        missing:
+          type: array
+          items:
+            type: string
+
+  mutual_constraint_check:
+    type: object
+    properties:
+      orphan_laws:
+        type: array
+        items:
+          type: string
+      orphan_terms:
+        type: array
+        items:
+          type: string
+      status:
+        type: string
+        enum: [PASS, FAIL]
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      evidence_ladder_level:
+        type: string
+        enum: [L0, L1, L2, L3, L4]

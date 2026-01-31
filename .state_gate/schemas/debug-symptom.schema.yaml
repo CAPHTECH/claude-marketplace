@@ -1,0 +1,141 @@
+# =================================================================
+# Debug Symptom Observation スキーマ
+# =================================================================
+# eld-debug Sense フェーズの出力。症状観測記録。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - symptom
+  - observations
+  - law_candidates
+
+properties:
+  symptom:
+    type: object
+    required:
+      - phenomenon
+      - reproduction
+    properties:
+      phenomenon:
+        type: string
+        description: 何が起きているか
+      reproduction:
+        type: object
+        properties:
+          conditions:
+            type: string
+            description: 再現条件
+          frequency:
+            type: string
+            enum: [always, intermittent, rare, once]
+          steps:
+            type: array
+            items:
+              type: string
+      impact:
+        type: object
+        properties:
+          users:
+            type: string
+            description: 影響を受けるユーザー
+          features:
+            type: array
+            items:
+              type: string
+          severity:
+            type: string
+            enum: [critical, major, minor, trivial]
+
+  observations:
+    type: array
+    items:
+      type: object
+      required:
+        - variable
+        - actual
+        - expected
+      properties:
+        variable:
+          type: string
+        actual:
+          type: string
+        expected:
+          type: string
+        source:
+          type: string
+          enum: [log, trace, debugger, metric, user_report, git_history]
+
+  evidence_collected:
+    type: array
+    items:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [log, stack_trace, metric, screenshot, recording, git_bisect]
+        description:
+          type: string
+        location:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  law_candidates:
+    type: array
+    items:
+      type: object
+      required:
+        - law_name
+        - category
+      properties:
+        law_name:
+          type: string
+        category:
+          type: string
+          enum: [Invariant, Pre, Post, Policy]
+        relevance:
+          type: string
+          enum: [high, medium, low]
+        notes:
+          type: string
+
+  related_changes:
+    type: object
+    properties:
+      recent_commits:
+        type: array
+        items:
+          type: object
+          properties:
+            sha:
+              type: string
+            message:
+              type: string
+            date:
+              type: string
+              format: date-time
+      recent_deploys:
+        type: array
+        items:
+          type: object
+          properties:
+            version:
+              type: string
+            date:
+              type: string
+              format: date-time
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      reporter:
+        type: string
+      issue_ref:
+        type: string
+        description: 関連Issue/チケットへの参照

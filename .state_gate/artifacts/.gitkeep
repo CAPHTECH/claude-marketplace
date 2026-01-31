@@ -1,0 +1,10 @@
+# このディレクトリには各フェーズの成果物が保存されます
+# 成果物の例:
+# - briefing.yaml
+# - active-context.yaml
+# - law-term-snapshot.yaml
+# - impact-prediction.yaml
+# - change-log.yaml
+# - grounding-report.yaml
+# - record-summary.yaml
+# - uncertainty-register.yaml

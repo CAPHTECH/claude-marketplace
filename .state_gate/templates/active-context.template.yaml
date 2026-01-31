@@ -1,0 +1,63 @@
+# =================================================================
+# Active Context Template
+# =================================================================
+# /eld-sense-activation で作成するアクティブコンテキスト
+# =================================================================
+
+goal: |
+  # タスクの真の目的（3行以内）
+
+
+constraints:
+  # 制約条件（最大5項目）
+  - type: security
+    description:
+  - type: performance
+    description:
+  - type: compatibility
+    description:
+
+references:
+  # 参照すべき情報（最大3ファイル）
+  - path:
+    reason:
+    trust_level: high  # high/medium/low
+
+context:
+  environment:
+  dependencies:
+    -
+  preconditions:
+    -
+
+expected_output:
+  format:
+  quality:
+  validation:
+
+# Issue Contract下書き（eld-sense-requirements-brainstormingで作成）
+issue_contract:
+  goal:
+  invariants:
+    -
+  acceptance_criteria:
+    - criterion:
+      evidence_level: L1  # L0/L1/L2/L3/L4
+  stop_conditions:
+    - 想定外テスト失敗3回
+    - ロールバック不可能な状態
+    - セキュリティ脆弱性発見
+  law_candidates:
+    - id: LAW-xxx
+      description:
+      severity: S1  # S0/S1/S2/S3
+  term_candidates:
+    - id: TERM-yyy
+      description:
+      type: Entity  # Entity/Value/Context/Boundary
+  open_questions:
+    -
+
+metadata:
+  created_at:
+  briefing_ref: .state_gate/artifacts/briefing.yaml

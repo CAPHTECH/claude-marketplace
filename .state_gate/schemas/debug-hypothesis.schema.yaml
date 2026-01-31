@@ -1,0 +1,104 @@
+# =================================================================
+# Debug Hypothesis スキーマ
+# =================================================================
+# eld-debug Model フェーズの出力。法則違反の仮説。
+# =================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - violated_law
+  - hypothesis
+
+properties:
+  violated_law:
+    type: object
+    required:
+      - name
+      - category
+      - logic_formula
+      - natural_language
+    properties:
+      name:
+        type: string
+        description: 破られた法則の名前
+      category:
+        type: string
+        enum: [Invariant, Pre, Post, Policy]
+      logic_formula:
+        type: string
+        description: "論理式（例: ∀x. P(x) → Q(x)）"
+      natural_language:
+        type: string
+        description: 平易な説明
+      severity:
+        type: string
+        enum: [S0, S1, S2, S3]
+      existing_law_id:
+        type: string
+        description: 既存のLaw Card ID（あれば）
+
+  hypothesis:
+    type: object
+    required:
+      - cause
+      - evidence
+      - falsifiable
+    properties:
+      cause:
+        type: string
+        description: なぜ法則が破られたかの推測
+      evidence:
+        type: array
+        items:
+          type: object
+          properties:
+            observation:
+              type: string
+            supports:
+              type: string
+        description: 仮説を支持する観測事実
+      falsifiable:
+        type: object
+        required:
+          - condition
+          - expected_if_wrong
+        properties:
+          condition:
+            type: string
+            description: この仮説が間違っていたら
+          expected_if_wrong:
+            type: string
+            description: 何が観測されるか
+
+  alternative_hypotheses:
+    type: array
+    items:
+      type: object
+      properties:
+        cause:
+          type: string
+        likelihood:
+          type: string
+          enum: [high, medium, low]
+        why_not_primary:
+          type: string
+
+  confidence:
+    type: object
+    properties:
+      level:
+        type: string
+        enum: [high, medium, low, unknown]
+      reasoning:
+        type: string
+
+  metadata:
+    type: object
+    properties:
+      created_at:
+        type: string
+        format: date-time
+      iteration:
+        type: integer
+        description: 仮説形成の反復回数
