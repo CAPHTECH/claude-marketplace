@@ -7,14 +7,18 @@
 # ELD Loop: Sense -> Model -> Predict -> Change -> Ground -> Record
 # =================================================================
 
-process_id: eld-development
-version: "1.1.0"
-description: |
-  Evidence-Loop Development プロセス。
-  対話による要件明確化とエビデンス駆動の開発を統合。
-  証拠で回す統合開発手法をstate_gateで制御。
-
-initial_state: idle
+process:
+  id: eld-process
+  version: "1.1.0"
+  name: ELD Development Process
+  description: |
+    Evidence-Loop Development プロセス。
+    対話による要件明確化とエビデンス駆動の開発を統合。
+    証拠で回す統合開発手法をstate_gateで制御。
+  initial_state: idle
+  initial_context:
+    evidence_level: L0
+    iteration: 0
 
 # =================================================================
 # 状態定義
@@ -30,7 +34,6 @@ states:
 
       タスクが与えられたら、まず `/ai-led-onboarding` で作戦ブリーフを作成してください。
       これにより、最小スキーマ（目的・境界・不変条件・壊れ方・観測・未確定）を構築します。
-    required_artifacts: []
     tool_permissions:
       allow: ["Read", "Glob", "Grep"]
       require_confirmation: ["WebSearch"]
@@ -65,8 +68,7 @@ states:
       - `.state_gate/artifacts/briefing.yaml` が作成されている
       - 人間が6点を説明できる状態
     required_artifacts:
-      - path: ".state_gate/artifacts/briefing.yaml"
-        description: 作戦ブリーフ（最小スキーマ）
+      - briefing
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "WebSearch", "WebFetch"]
       require_confirmation: []
@@ -110,8 +112,7 @@ states:
       - 曖昧な要件がすべて具体化されている
       - 未確定事項が明示されている
     required_artifacts:
-      - path: ".state_gate/artifacts/active-context.yaml"
-        description: アクティブコンテキスト定義
+      - active-context
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "WebSearch", "WebFetch"]
       require_confirmation: []
@@ -149,8 +150,7 @@ states:
       - Link Mapに孤立がない
       - `.state_gate/artifacts/law-term-snapshot.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/law-term-snapshot.yaml"
-        description: 関連Law/Termのスナップショット
+      - law-term-snapshot
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Edit", "Write"]
       require_confirmation: ["Bash"]
@@ -188,15 +188,14 @@ states:
       - `.state_gate/artifacts/impact-prediction.yaml` が作成されている
       - 段階化計画が人間に承認されている
     required_artifacts:
-      - path: ".state_gate/artifacts/impact-prediction.yaml"
-        description: 影響予測レポート
+      - impact-prediction
     tool_permissions:
       allow: ["Read", "Glob", "Grep"]
       require_confirmation: []
       deny: ["Edit", "Write", "Bash"]
 
   # -----------------------------------------------------------------
-  # Test Design: テスト設計フェーズ（新規追加）
+  # Test Design: テスト設計フェーズ
   # -----------------------------------------------------------------
   - name: test_design
     description: |
@@ -209,30 +208,9 @@ states:
 
       ### テスト設計監査（全体フレーム）
       **`/test-design-audit`** - Law/Term駆動のテスト設計監査
-      - Phase 0: コンテキストパック収集 + pce-memory活性化
-      - Phase 1: 要求の棚卸し（REQ-xxx）+ Law/Term対応付け
-      - Phase 2: モデル化（5つのモデル + Law/Term視点）
-      - Phase 3: カバレッジ基準策定 + Evidence Ladder
-      - Phase 4: テスト条件ツリー（TCND-xxx）+ Law Grounding
-      - Phase 5: 監査（複数視点 + Law違反チェック）
-      - Phase 6: テスト項目生成（TEST-xxx）+ Grounding Map連携
-      - Phase 7: トレーサビリティ検証 + Law/Term紐付け
 
       ### 体系的テスト設計（ユニット+PBT）
       **`/systematic-test-design`** - ユニットテストとPBTの統合設計
-      - Phase 1: Law/Termからテスト対象を特定
-      - Phase 2: ユニットテスト設計（典型例・境界例・回帰例）
-      - Phase 3: プロパティ分類（7カテゴリ）
-      - Phase 4: ジェネレータ設計（意地悪レベルL0-L8）
-
-      ### Evidence Ladder対応
-      | Level | 検証内容 | テスト種別 |
-      |-------|----------|------------|
-      | L0 | 静的整合 | 型チェック、Lint |
-      | L1 | 単体での成立 | ユニットテスト、PBT L0-L2 |
-      | L2 | 連携での成立 | 統合テスト、PBT L3-L5 |
-      | L3 | 異常時の維持 | 失敗注入、PBT L6-L7 |
-      | L4 | 実運用での成立 | 本番Telemetry |
 
       ### Law Severity別の必須レベル
       | Severity | 必須レベル |
@@ -242,20 +220,12 @@ states:
       | S2（中程度） | L0 + L1 |
       | S3（低） | L0 |
 
-      ### 成果物
-      - requirements.md: 要求一覧 + Law/Term対応
-      - test-conditions.md: テスト条件ツリー（TCND-xxx）
-      - test-cases.md: テスト項目一覧（TEST-xxx）
-      - properties.yaml: PBTプロパティカタログ
-      - generators/: ジェネレータ群
-
       ### 完了条件
       - 全S0/S1 Lawにテスト条件が対応付けられている
       - Evidence Ladderの必須レベルが設計されている
       - `.state_gate/artifacts/test-design.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/test-design.yaml"
-        description: テスト設計サマリ
+      - test-design
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Edit", "Write"]
       require_confirmation: ["Bash"]
@@ -277,19 +247,10 @@ states:
 
       ### 高リスク変更時
       **`/eld-change-worktree`** - git worktreeで隔離環境を作成
-      - 安全に実験・検証
-      - マージ戦略を事前に決定
 
       ### TDD実践
       **`/eld-ground-tdd-enforcer`** - TDDサイクル強制
-      - **RED**: Test Designで設計したテストを先に書く
-      - **GREEN**: 最小限の実装
-      - **REFACTOR**: リファクタリング
-
       **`/systematic-test-design`** - 必要に応じて追加テスト設計
-      - ユニットテスト: 典型例・境界例
-      - PBT: プロパティ + ジェネレータ
-      - 反例発見時は即座に回帰テスト化
 
       ### 実装ルール
       - 最小単位で変更し、即時検証
@@ -298,19 +259,14 @@ states:
       - **テストなし実装を許さない**
 
       ### 停止反射
-      停止条件に達したら即座に停止し、ユーザーに確認:
-      - 想定外テスト失敗3回以上
-      - セキュリティ脆弱性発見
-      - 重大な設計変更が必要
+      停止条件に達したら即座に停止し、ユーザーに確認
 
       ### 完了条件
       - 全ステップの実装完了
       - 各ステップでテスト通過
-      - 反例があれば回帰テストに回収済み
       - `.state_gate/artifacts/change-log.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/change-log.yaml"
-        description: 変更ログ（各ステップの記録）
+      - change-log
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Edit", "Write", "Bash"]
       require_confirmation: []
@@ -328,47 +284,28 @@ states:
 
       ### 必須スキル
       **`/eld-ground-check`** - Law/Term接地検証
-      - S0/S1は検証手段・観測手段必須
-      - 相互拘束チェック（孤立なし）
-
       **`/eld-ground-evaluate`** - 出力品質評価
-      - Evidence Ladder達成レベル確認
-      - Law遵守チェック
 
-      ### テスト監査（Test Designの検証）
-      **`/test-design-audit`** - テスト設計の監査（Phase 5: 監査）
-      - 全てのLaw/Termに対してテスト条件が存在するか
-      - Law Severityに応じたEvidence Ladderレベルを満たしているか
-      - Law違反時の動作がテストされているか
+      ### テスト監査
+      **`/test-design-audit`** - テスト設計の監査
 
       ### PR準備
       **`/eld-ground-pre-completion`** - 完成前チェックリスト
-      - Evidence Pack完全性
-      - Law/Term孤立チェック
-      - Evidence Ladder達成レベル
-
-      ### オプション
-      - `/eld-ground-tdd-enforcer` - TDDサイクル強制
-      - `/eld-ground-law-monitor` - 実行時Law違反監視
-      - `/eld-ground-pr-review` - PRレビュー
-      - `/systematic-test-design` - 追加テスト（PBT反例回収）
 
       ### 接地要件
       | Severity | 検証手段 | 観測手段 |
       |----------|---------|---------|
-      | S0 | **必須** (Test + Runtime) | **必須** (Telemetry全量) |
-      | S1 | **必須** (Test or Runtime) | **必須** (Telemetry) |
+      | S0 | **必須** | **必須** |
+      | S1 | **必須** | **必須** |
       | S2 | 推奨 | 推奨 |
       | S3 | 任意 | 任意 |
 
       ### 完了条件
       - すべてのS0/S1 Law/Termが接地
       - Evidence Ladder目標レベル達成
-      - 孤立Law/Termなし
       - `.state_gate/artifacts/grounding-report.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/grounding-report.yaml"
-        description: 接地検証レポート
+      - grounding-report
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Bash"]
       require_confirmation: ["Edit", "Write"]
@@ -385,32 +322,17 @@ states:
 
       ### 必須スキル
       **`/eld-record-collection`** - Context Delta収集
-      - 意思決定の痕跡（what/why/alternatives/trade_offs）
-      - エラー解決策（symptom/root_cause/solution/prevention）
-      - パターン発見（name/context/problem/solution）
 
       ### オプション
       - `/eld-record-structuring` - CLAUDE.md/ADR整理
       - `/eld-record-compact` - 長期セッションの圧縮
       - `/eld-record-knowledge-transfer` - 引き継ぎ資料作成
-      - `/eld-record-maintenance` - 既存Claim整理
-      - `/eld-record-memory-collector` - pce-memory収集
-
-      ### 記録先の選択
-      | 知見の種類 | 出力先 |
-      |-----------|--------|
-      | 即時参照が必要 | pce-memory (upsert) |
-      | アーキテクチャ決定 | docs/adr/ |
-      | プロジェクト共通 | ルートCLAUDE.md |
-      | ドメイン固有 | 該当フォルダのCLAUDE.md |
 
       ### 完了条件
       - 重要な意思決定が記録されている
-      - pce-memoryが更新されている
       - `.state_gate/artifacts/record-summary.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/record-summary.yaml"
-        description: 記録サマリ
+      - record-summary
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Edit", "Write"]
       require_confirmation: []
@@ -422,32 +344,16 @@ states:
   - name: blocked
     description: |
       不確実性や未解決の質問によりブロックされた状態。
-      対話を通じて解消する。
     prompt: |
       ## Blockedフェーズ - 不確実性の解消
 
       **必須スキル**: `/resolving-uncertainty` - 不確実性の台帳化と観測計画
 
-      ### 手順
-      1. **Frame the decision**: 決めたいこと・期限・失敗時の損失・制約
-      2. **Itemize uncertainties**: 不確実性を疑問文で列挙（10個まで）
-      3. **Rank**: Priority = Impact × (6-Evidence) × Urgency ÷ Effort
-      4. **Convert to observation tasks**: 上位N（3-5）を観測タスクに
-
-      ### 観測タスク必須要素
-      - **Hypothesis**: 仮説
-      - **Method**: 観測方法（現物/証拠/知識）
-      - **Timebox**: 上限時間
-      - **Decision rule**: 採用/撤回の条件
-      - **Evidence artifact**: ログ/スクショ/計測結果
-
       ### 完了条件
       - 上位N（3-5）の不確実性に対する観測タスクが定義
-      - 観測を実行し、Evidenceを記録
       - `.state_gate/artifacts/uncertainty-register.yaml` が作成されている
     required_artifacts:
-      - path: ".state_gate/artifacts/uncertainty-register.yaml"
-        description: 不確実性台帳
+      - uncertainty-register
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Bash", "WebSearch", "WebFetch"]
       require_confirmation: ["Edit", "Write"]
@@ -458,198 +364,97 @@ states:
   # -----------------------------------------------------------------
   - name: complete
     description: タスク完了
+    is_final: true
     prompt: |
       ## タスク完了
 
       ELDループが正常に完了しました。
 
-      ### 成果物一覧
-      - briefing.yaml: 作戦ブリーフ
-      - active-context.yaml: アクティブコンテキスト
-      - law-term-snapshot.yaml: Law/Termスナップショット
-      - impact-prediction.yaml: 影響予測
-      - change-log.yaml: 変更ログ
-      - grounding-report.yaml: 接地検証レポート
-      - record-summary.yaml: 記録サマリ
-
       ### 次のアクション
       - PR作成: `/create-pr`
       - 新しいタスク: 次のIssueへ
-      - 反復: 改善点があれば再度Senseフェーズへ
-    required_artifacts: []
     tool_permissions:
       allow: ["Read", "Glob", "Grep", "Bash"]
       require_confirmation: ["Edit", "Write"]
       deny: []
 
 # =================================================================
-# 遷移定義
+# イベント定義
 # =================================================================
-transitions:
-  # idle -> onboard
-  - from: idle
-    event: start_task
-    to: onboard
-    guards: []
+events:
+  - name: start_task
+    description: タスクを開始する
+    allowed_roles: [agent, human]
 
-  # onboard -> sense
-  - from: onboard
-    event: briefing_ready
-    to: sense
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/briefing.yaml"
+  - name: briefing_ready
+    description: ブリーフィングが完了した
+    allowed_roles: [agent]
 
-  # sense -> model
-  - from: sense
-    event: context_ready
-    to: model
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/active-context.yaml"
+  - name: context_ready
+    description: コンテキスト構築が完了した
+    allowed_roles: [agent]
 
-  # model -> predict
-  - from: model
-    event: model_ready
-    to: predict
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/law-term-snapshot.yaml"
+  - name: model_ready
+    description: Law/Term定義が完了した
+    allowed_roles: [agent]
 
-  # predict -> test_design (人間の承認が必要)
-  - from: predict
-    event: plan_approved
-    to: test_design
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/impact-prediction.yaml"
-      - type: manual_approval
-        approver: human
+  - name: plan_approved
+    description: 影響予測と計画が承認された
+    allowed_roles: [human]
 
-  # test_design -> change
-  - from: test_design
-    event: test_design_ready
-    to: change
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/test-design.yaml"
+  - name: test_design_ready
+    description: テスト設計が完了した
+    allowed_roles: [agent]
 
-  # change -> ground
-  - from: change
-    event: implementation_done
-    to: ground
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/change-log.yaml"
+  - name: implementation_done
+    description: 実装が完了した
+    allowed_roles: [agent]
 
-  # ground -> record
-  - from: ground
-    event: grounding_passed
-    to: record
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/grounding-report.yaml"
-      - type: custom
-        name: s0_s1_grounded
-        description: S0/S1 Law/Termがすべて接地されているか確認
+  - name: grounding_passed
+    description: 接地検証に合格した
+    allowed_roles: [agent, system]
 
-  # record -> complete
-  - from: record
-    event: record_done
-    to: complete
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/record-summary.yaml"
+  - name: grounding_failed
+    description: 接地検証に失敗した
+    allowed_roles: [agent, system]
 
-  # complete -> sense (反復)
-  - from: complete
-    event: iterate
-    to: sense
-    guards:
-      - type: manual_approval
-        approver: human
+  - name: record_done
+    description: 知識記録が完了した
+    allowed_roles: [agent]
 
-  # -----------------------------------------------------------------
-  # 不確実性発生時の遷移 (任意フェーズ -> blocked)
-  # -----------------------------------------------------------------
-  - from: onboard
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: onboard
+  - name: uncertainty_detected
+    description: 不確実性によりブロックされた
+    allowed_roles: [agent]
 
-  - from: sense
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: sense
+  - name: uncertainty_resolved
+    description: ブロックが解消された
+    allowed_roles: [agent, human]
 
-  - from: model
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: model
+  - name: iterate
+    description: 反復する
+    allowed_roles: [human]
 
-  - from: predict
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: predict
+  - name: stop_condition_hit
+    description: 停止条件に達した
+    allowed_roles: [agent]
 
-  - from: test_design
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: test_design
+  - name: requirements_unclear
+    description: 要件が不明確
+    allowed_roles: [agent]
 
-  - from: change
-    event: uncertainty_detected
-    to: blocked
-    guards: []
-    metadata:
-      return_to: change
+  - name: scope_change_needed
+    description: スコープ変更が必要
+    allowed_roles: [agent]
 
-  # blocked -> 元のフェーズへ復帰
-  - from: blocked
-    event: uncertainty_resolved
-    to: sense  # デフォルト。実際はmetadataのreturn_toを参照
-    guards:
-      - type: artifact_exists
-        path: ".state_gate/artifacts/uncertainty-register.yaml"
-
-  # -----------------------------------------------------------------
-  # 後退遷移（問題発見時）
-  # -----------------------------------------------------------------
-  - from: ground
-    event: grounding_failed
-    to: change
-    guards: []
-
-  - from: change
-    event: stop_condition_hit
-    to: predict
-    guards: []
-
-  - from: model
-    event: requirements_unclear
-    to: sense
-    guards: []
-
-  - from: predict
-    event: scope_change_needed
-    to: sense
-    guards: []
+  - name: override
+    description: 強制遷移（緊急時）
+    allowed_roles: [human]
 
 # =================================================================
 # ロール定義
 # =================================================================
 roles:
-  agent:
+  - name: agent
     description: AI Agent (Claude Code)
     allowed_events:
       - start_task
@@ -666,10 +471,227 @@ roles:
       - scope_change_needed
       - uncertainty_detected
       - uncertainty_resolved
+    can_approve: false
+    can_reject: false
 
-  human:
+  - name: human
     description: Human supervisor
     allowed_events:
+      - start_task
       - plan_approved
       - iterate
-      - override  # 強制遷移（緊急時）
+      - uncertainty_resolved
+      - override
+    can_approve: true
+    can_reject: true
+
+  - name: system
+    description: Automated system (CI)
+    allowed_events:
+      - grounding_passed
+      - grounding_failed
+    can_approve: false
+    can_reject: false
+
+# =================================================================
+# 遷移定義
+# =================================================================
+transitions:
+  # idle -> onboard
+  - from: idle
+    event: start_task
+    to: onboard
+
+  # onboard -> sense
+  - from: onboard
+    event: briefing_ready
+    to: sense
+    guard: artifact_briefing
+
+  # sense -> model
+  - from: sense
+    event: context_ready
+    to: model
+    guard: artifact_active_context
+
+  # model -> predict
+  - from: model
+    event: model_ready
+    to: predict
+    guard: artifact_law_term
+
+  # predict -> test_design (人間の承認が必要)
+  - from: predict
+    event: plan_approved
+    to: test_design
+    guard: artifact_impact
+
+  # test_design -> change
+  - from: test_design
+    event: test_design_ready
+    to: change
+    guard: artifact_test_design
+
+  # change -> ground
+  - from: change
+    event: implementation_done
+    to: ground
+    guard: artifact_change_log
+
+  # ground -> record
+  - from: ground
+    event: grounding_passed
+    to: record
+    guard: artifact_grounding
+
+  # record -> complete
+  - from: record
+    event: record_done
+    to: complete
+    guard: artifact_record
+
+  # complete -> sense (反復)
+  - from: complete
+    event: iterate
+    to: sense
+
+  # -----------------------------------------------------------------
+  # 不確実性発生時の遷移
+  # -----------------------------------------------------------------
+  - from: onboard
+    event: uncertainty_detected
+    to: blocked
+
+  - from: sense
+    event: uncertainty_detected
+    to: blocked
+
+  - from: model
+    event: uncertainty_detected
+    to: blocked
+
+  - from: predict
+    event: uncertainty_detected
+    to: blocked
+
+  - from: test_design
+    event: uncertainty_detected
+    to: blocked
+
+  - from: change
+    event: uncertainty_detected
+    to: blocked
+
+  # blocked -> sense (復帰)
+  - from: blocked
+    event: uncertainty_resolved
+    to: sense
+    guard: artifact_uncertainty
+
+  # -----------------------------------------------------------------
+  # 後退遷移（問題発見時）
+  # -----------------------------------------------------------------
+  - from: ground
+    event: grounding_failed
+    to: change
+
+  - from: change
+    event: stop_condition_hit
+    to: predict
+
+  - from: model
+    event: requirements_unclear
+    to: sense
+
+  - from: predict
+    event: scope_change_needed
+    to: sense
+
+# =================================================================
+# ガード定義
+# =================================================================
+guards:
+  artifact_briefing:
+    type: artifact
+    artifact_type: briefing
+    condition: exists
+
+  artifact_active_context:
+    type: artifact
+    artifact_type: active-context
+    condition: exists
+
+  artifact_law_term:
+    type: artifact
+    artifact_type: law-term-snapshot
+    condition: exists
+
+  artifact_impact:
+    type: artifact
+    artifact_type: impact-prediction
+    condition: exists
+
+  artifact_test_design:
+    type: artifact
+    artifact_type: test-design
+    condition: exists
+
+  artifact_change_log:
+    type: artifact
+    artifact_type: change-log
+    condition: exists
+
+  artifact_grounding:
+    type: artifact
+    artifact_type: grounding-report
+    condition: exists
+
+  artifact_record:
+    type: artifact
+    artifact_type: record-summary
+    condition: exists
+
+  artifact_uncertainty:
+    type: artifact
+    artifact_type: uncertainty-register
+    condition: exists
+
+# =================================================================
+# アーティファクト定義
+# =================================================================
+artifacts:
+  - type: briefing
+    description: 作戦ブリーフ（最小スキーマ）
+    required_in_states: [onboard]
+
+  - type: active-context
+    description: アクティブコンテキスト
+    required_in_states: [sense]
+
+  - type: uncertainty-register
+    description: 不確実性台帳
+    required_in_states: [blocked]
+
+  - type: law-term-snapshot
+    description: Law/Termスナップショット
+    required_in_states: [model]
+
+  - type: impact-prediction
+    description: 影響予測
+    required_in_states: [predict]
+
+  - type: test-design
+    description: テスト設計サマリ
+    required_in_states: [test_design]
+
+  - type: change-log
+    description: 変更ログ
+    required_in_states: [change]
+
+  - type: grounding-report
+    description: 接地検証レポート
+    required_in_states: [ground]
+
+  - type: record-summary
+    description: 知識記録サマリ
+    required_in_states: [record]

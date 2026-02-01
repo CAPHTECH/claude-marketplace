@@ -4,47 +4,21 @@
 # バグ = 法則（Law）からの逸脱として捉え、証拠ループで系統的に解決
 # =================================================================
 
-id: eld-debug
-version: "1.0.0"
-description: |
-  ELD的デバッグプロセス。
-  「なぜ壊れた？」ではなく「どの法則が破られた？」の視点でバグを分析・修正する。
+process:
+  id: eld-debug
+  version: "1.0.0"
+  name: ELD Debug Process
+  description: |
+    ELD的デバッグプロセス。
+    「なぜ壊れた？」ではなく「どの法則が破られた？」の視点でバグを分析・修正する。
+  initial_state: idle
+  initial_context:
+    iteration: 0
+    hypothesis_count: 0
 
-# -----------------------------------------------------------------
-# 設定
-# -----------------------------------------------------------------
-settings:
-  artifact_base: ".state_gate/artifacts/debug"
-  schema_base: ".state_gate/schemas"
-
-# -----------------------------------------------------------------
-# ロール定義
-# -----------------------------------------------------------------
-roles:
-  human:
-    description: 人間（開発者、QA）
-    can_emit:
-      - "*"
-  ai:
-    description: AIアシスタント
-    can_emit:
-      - hypothesis_formed
-      - impact_predicted
-      - fix_applied
-      - verification_complete
-      - knowledge_recorded
-      - hypothesis_rejected
-      - needs_more_evidence
-  system:
-    description: 自動システム
-    can_emit:
-      - artifact_validated
-      - ci_passed
-      - ci_failed
-
-# -----------------------------------------------------------------
-# 状態定義（7状態 + blocked + complete）
-# -----------------------------------------------------------------
+# =================================================================
+# 状態定義
+# =================================================================
 states:
   # 初期状態
   - name: idle
@@ -89,12 +63,8 @@ states:
       - ユーザー報告（エラーレポート、再現手順）
       - 履歴・差分（git bisect、デプロイ履歴）
       - **テスト設計監査**: 既存テストのカバレッジ分析
-
-      ### 成果物
-      `.state_gate/artifacts/debug/symptom-observation.yaml` を作成
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/symptom-observation.yaml"
-        description: 症状観測記録
+      - symptom-observation
 
   # Phase 2: Model（法則違反の仮説形成）
   - name: model
@@ -121,26 +91,8 @@ states:
       - **不変条件プロパティ**: 「常に成り立つべき」法則をPBTで検証
       - **ジェネレータ**: 境界値・異常値を自動生成
       - **反例発見**: PBTが見つけた反例を仮説の根拠に
-
-      ### 成果物
-      `.state_gate/artifacts/debug/hypothesis.yaml` を作成
-
-      ```yaml
-      破られた法則:
-        Law名: <名前>
-        カテゴリ: [Invariant | Pre | Post | Policy]
-        論理式: <∀x. P(x) → Q(x) 形式>
-        自然言語: <平易な説明>
-
-      仮説:
-        原因推測: <なぜ法則が破られたか>
-        根拠: <仮説を支持する観測事実>
-        反証可能性: <この仮説が間違っていたら何が観測されるか>
-        pbt_findings: <PBTで発見した反例（あれば）>
-      ```
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/hypothesis.yaml"
-        description: 法則違反仮説
+      - hypothesis
 
   # Phase 3: Predict（影響予測）
   - name: predict
@@ -162,12 +114,8 @@ states:
 
       ### 停止条件を設定
       「このサインが出たら修正アプローチを見直す」を明確に定義
-
-      ### 成果物
-      `.state_gate/artifacts/debug/fix-prediction.yaml` を作成
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/fix-prediction.yaml"
-        description: 修正影響予測
+      - fix-prediction
 
   # Phase 4: Change（法則復元）
   - name: change
@@ -196,12 +144,8 @@ states:
 
       ### PBT反例コーパス
       Modelフェーズで発見した反例をリグレッションテストに変換
-
-      ### 成果物
-      `.state_gate/artifacts/debug/fix-log.yaml` を作成
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/fix-log.yaml"
-        description: 修正ログ
+      - fix-log
 
   # Phase 5: Ground（証拠による検証）
   - name: ground
@@ -236,12 +180,8 @@ states:
       - **成功**: 法則が復元された（最低L1以上）+ テストカバレッジ確保
       - **部分的**: 一部の法則のみ復元
       - **失敗**: 仮説が間違っていた → Senseに戻る
-
-      ### 成果物
-      `.state_gate/artifacts/debug/verification-report.yaml` を作成
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/verification-report.yaml"
-        description: 検証レポート
+      - verification-report
 
   # Phase 6: Record（知識の蓄積）
   - name: record
@@ -264,12 +204,8 @@ states:
 
       ### Law/Term更新
       必要に応じてLaw/Term Cardを更新または新規作成
-
-      ### 成果物
-      `.state_gate/artifacts/debug/bug-pattern.yaml` を作成
     required_artifacts:
-      - path: ".state_gate/artifacts/debug/bug-pattern.yaml"
-        description: バグパターン記録
+      - bug-pattern
 
   # 仮説却下状態
   - name: hypothesis_rejected
@@ -291,6 +227,7 @@ states:
   # 完了状態
   - name: complete
     description: デバッグ完了
+    is_final: true
     prompt: |
       ## デバッグ完了
 
@@ -302,111 +239,251 @@ states:
       - [ ] バグパターンが記録されている
       - [ ] 必要に応じてLaw/Term Cardが更新されている
 
-# -----------------------------------------------------------------
+# =================================================================
+# イベント定義
+# =================================================================
+events:
+  - name: start_debug
+    description: デバッグを開始する
+    allowed_roles: [agent, human]
+
+  - name: observation_complete
+    description: 症状観測が完了した
+    allowed_roles: [agent]
+
+  - name: needs_more_evidence
+    description: 追加観測が必要
+    allowed_roles: [agent]
+
+  - name: hypothesis_formed
+    description: 仮説が形成された
+    allowed_roles: [agent]
+
+  - name: impact_predicted
+    description: 影響予測が完了した
+    allowed_roles: [agent]
+
+  - name: fix_applied
+    description: 修正が適用された
+    allowed_roles: [agent]
+
+  - name: verification_passed
+    description: 検証に合格した
+    allowed_roles: [agent, system]
+
+  - name: verification_failed
+    description: 検証に失敗した（仮説が間違い）
+    allowed_roles: [agent, system]
+
+  - name: restart_observation
+    description: 追加観測から再開する
+    allowed_roles: [agent]
+
+  - name: revise_hypothesis
+    description: 新しい仮説を形成する
+    allowed_roles: [agent]
+
+  - name: knowledge_recorded
+    description: 知識が記録された
+    allowed_roles: [agent]
+
+  - name: reset
+    description: 新しいデバッグセッションを開始する
+    allowed_roles: [human]
+
+  - name: abort
+    description: デバッグを中止する
+    allowed_roles: [human]
+
+# =================================================================
+# ロール定義
+# =================================================================
+roles:
+  - name: agent
+    description: AI Agent (Claude Code)
+    allowed_events:
+      - start_debug
+      - observation_complete
+      - needs_more_evidence
+      - hypothesis_formed
+      - impact_predicted
+      - fix_applied
+      - verification_passed
+      - verification_failed
+      - restart_observation
+      - revise_hypothesis
+      - knowledge_recorded
+    can_approve: false
+    can_reject: false
+
+  - name: human
+    description: Human supervisor
+    allowed_events:
+      - start_debug
+      - reset
+      - abort
+    can_approve: true
+    can_reject: true
+
+  - name: system
+    description: Automated system (CI)
+    allowed_events:
+      - verification_passed
+      - verification_failed
+    can_approve: false
+    can_reject: false
+
+# =================================================================
 # 遷移定義
-# -----------------------------------------------------------------
+# =================================================================
 transitions:
   # idle → sense
   - from: idle
-    to: sense
     event: start_debug
-    description: デバッグ開始
+    to: sense
 
   # sense → model
   - from: sense
-    to: model
     event: observation_complete
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/symptom-observation.yaml"
+    to: model
+    guard: artifact_symptom
 
   # sense → hypothesis_rejected (追加観測が必要)
   - from: sense
-    to: hypothesis_rejected
     event: needs_more_evidence
-    description: 観測不足で仮説形成できない
+    to: hypothesis_rejected
 
   # model → predict
   - from: model
-    to: predict
     event: hypothesis_formed
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/hypothesis.yaml"
+    to: predict
+    guard: artifact_hypothesis
 
   # predict → change
   - from: predict
-    to: change
     event: impact_predicted
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/fix-prediction.yaml"
+    to: change
+    guard: artifact_prediction
 
   # change → ground
   - from: change
-    to: ground
     event: fix_applied
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/fix-log.yaml"
+    to: ground
+    guard: artifact_fix_log
 
   # ground → record (成功時)
   - from: ground
-    to: record
     event: verification_passed
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/verification-report.yaml"
-      - type: custom
-        config:
-          script: |
-            # verification-reportのstatusがPASSまたはWARNであること
-            grep -q "status: PASS\|status: WARN" .state_gate/artifacts/debug/verification-report.yaml
+    to: record
+    guard: artifact_verification
 
   # ground → hypothesis_rejected (失敗時)
   - from: ground
-    to: hypothesis_rejected
     event: verification_failed
-    description: 仮説が間違っていた
+    to: hypothesis_rejected
 
   # hypothesis_rejected → sense
   - from: hypothesis_rejected
-    to: sense
     event: restart_observation
-    description: 追加観測から再開
+    to: sense
 
   # hypothesis_rejected → model
   - from: hypothesis_rejected
-    to: model
     event: revise_hypothesis
-    description: 新しい仮説を形成
+    to: model
 
   # record → complete
   - from: record
-    to: complete
     event: knowledge_recorded
-    guards:
-      - type: artifact_exists
-        config:
-          path: ".state_gate/artifacts/debug/bug-pattern.yaml"
+    to: complete
+    guard: artifact_bug_pattern
 
   # complete → idle
   - from: complete
-    to: idle
     event: reset
-    description: 新しいデバッグセッションを開始
+    to: idle
 
   # 任意の状態から中断
-  - from: "*"
-    to: idle
+  - from: sense
     event: abort
-    description: デバッグを中止
-    guards:
-      - type: role
-        config:
-          required: human
+    to: idle
+  - from: model
+    event: abort
+    to: idle
+  - from: predict
+    event: abort
+    to: idle
+  - from: change
+    event: abort
+    to: idle
+  - from: ground
+    event: abort
+    to: idle
+  - from: record
+    event: abort
+    to: idle
+  - from: hypothesis_rejected
+    event: abort
+    to: idle
+
+# =================================================================
+# ガード定義
+# =================================================================
+guards:
+  artifact_symptom:
+    type: artifact
+    artifact_type: symptom-observation
+    condition: exists
+
+  artifact_hypothesis:
+    type: artifact
+    artifact_type: hypothesis
+    condition: exists
+
+  artifact_prediction:
+    type: artifact
+    artifact_type: fix-prediction
+    condition: exists
+
+  artifact_fix_log:
+    type: artifact
+    artifact_type: fix-log
+    condition: exists
+
+  artifact_verification:
+    type: artifact
+    artifact_type: verification-report
+    condition: exists
+
+  artifact_bug_pattern:
+    type: artifact
+    artifact_type: bug-pattern
+    condition: exists
+
+# =================================================================
+# アーティファクト定義
+# =================================================================
+artifacts:
+  - type: symptom-observation
+    description: 症状観測記録
+    required_in_states: [sense]
+
+  - type: hypothesis
+    description: 法則違反仮説
+    required_in_states: [model]
+
+  - type: fix-prediction
+    description: 修正影響予測
+    required_in_states: [predict]
+
+  - type: fix-log
+    description: 修正ログ
+    required_in_states: [change]
+
+  - type: verification-report
+    description: 検証レポート
+    required_in_states: [ground]
+
+  - type: bug-pattern
+    description: バグパターン記録
+    required_in_states: [record]
