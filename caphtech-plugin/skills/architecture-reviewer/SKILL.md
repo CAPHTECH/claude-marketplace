@@ -4,10 +4,13 @@ context: fork
 description: |
   3種類のアーキテクチャ分析を並行実行し、単体・相互作用・横断的観点から問題を検出するスキル。
   「単体は良いのに全体として成立しない」問題を防ぐため、必ず3視点を同時に適用する。
+  設計整合性チェック（テスト網羅性・スキーマ一致・障害モード網羅性）も統合。
 
   使用タイミング:
   - 「アーキテクチャレビューして」「設計をレビューして」
   - 「コンポーネント分析して」「依存関係を分析して」
+  - 「設計の整合性をチェックして」「設計をチェックして」「design consistency check」
+  - 「設計と実装の整合性を確認して」「スキーマと実装が一致しているか確認して」
   - component-dossiers/*.yaml と system-map/invariants.yaml が存在する時
   - PR前の設計確認、リファクタリング前の影響分析
 ---
@@ -20,6 +23,8 @@ description: |
 
 ## 前提条件
 
+### Full Mode（デフォルト）
+
 必須:
 - `system-map/invariants.yaml` - 不変条件
 - `component-dossiers/*.yaml` - コンポーネントカード
@@ -27,6 +32,16 @@ description: |
 推奨:
 - `system-map/dependencies.yaml` - 依存グラフ
 - `system-map/boundaries.yaml` - 境界定義
+
+### Lightweight Mode
+
+system-map が存在しない場合、`scripts/collect_artifacts.py` でプロジェクトをスキャンし、設計整合性チェック（D2/D3/D5）のみを実行する。
+
+```bash
+python3 scripts/collect_artifacts.py <project_root> -o /tmp/dcc-manifest.json
+```
+
+出力マニフェストから設計文書・スキーマ・テスト・ソースファイルを特定し、D2/D3/D5 の検証を行う。
 
 ## 3種類の分析
 
@@ -53,6 +68,8 @@ description: |
 | データ所有 | owned_data以外を直接書き込んでいないか |
 | 例外設計 | 例外の握りつぶし、過剰なcatch-allはないか |
 | テスト可能性 | 依存注入、モック可能性は確保されているか |
+| テスト網羅性(D2) | 各不変条件・状態遷移・境界条件にテストがあるか |
+| 障害モード網羅性(D5) | 各障害モードに処理コードとリカバリ戦略があるか |
 
 ### 評価基準
 
@@ -72,6 +89,7 @@ component_findings:
       line: 45
       code: "await paymentService.chargeInternal(amount)"
     violated_invariant: INV-ARCH-002  # 関連する不変条件
+    verdict: FAIL  # PASS|WARN|FAIL
     recommendation: PaymentServiceの公開APIを使用する
 ```
 
@@ -89,6 +107,7 @@ component_findings:
 | 順序性 | イベント順序の前提、順序逆転時の挙動 |
 | 整合モデル | 結果整合/強整合の前提が一致しているか |
 | セキュリティ | 認証・認可・秘密情報の境界超え |
+| スキーマ実装一致(D3) | データスキーマとコードの型・フィールド・制約が一致しているか |
 
 ### 評価方法
 
@@ -115,6 +134,7 @@ interaction_findings:
         field: non_functional.performance.timeout
         value: "30s"
     violated_invariant: INV-IDEM-001
+    verdict: FAIL  # PASS|WARN|FAIL
     recommendation: |
       1. order-serviceのタイムアウトをpayment-serviceより長くする
       2. または冪等キーを導入して二重課金を防止
@@ -162,6 +182,7 @@ crosscutting_findings:
         field: non_functional.security
         note: "JWT認証必須"とあるが認可ロジックが未記載
     violated_invariant: INV-SEC-001
+    verdict: FAIL  # PASS|WARN|FAIL
     recommendation: |
       各サービスで所有権チェックを実装、または認可サービスを導入
 ```
@@ -175,6 +196,7 @@ crosscutting_findings:
 ```yaml
 id: architecture-review
 reviewed_at: "2024-01-21T10:00:00+09:00"
+mode: full  # full | lightweight
 reviewed_scope:
   components: 15
   interactions: 23
@@ -192,6 +214,17 @@ summary:
     medium: 5
     low: 1
 
+verification_summary:
+  verdict: NEEDS_ATTENTION  # PASS | PASS_WITH_WARNINGS | NEEDS_ATTENTION | FAIL
+  by_verdict:
+    pass: 18
+    warn: 4
+    fail: 2
+  dimensions_checked:
+    - D2_test_coverage
+    - D3_schema_match
+    - D5_failure_modes
+
 component_findings:
   - ...
 
@@ -208,6 +241,13 @@ crosscutting_findings:
 - **不変条件に拘束**: 評価基準は invariants.yaml から導出
 - **推測禁止**: 根拠がない指摘はしない。evidenceを必ず記載
 - **severity は客観的に**: 影響範囲と発生確率で判定
+
+## 参照
+
+- [references/crosscutting-checklist.md](references/crosscutting-checklist.md) - クロスカッティング分析の詳細チェックリスト
+- [references/verification-dimensions.md](references/verification-dimensions.md) - D2/D3/D5 検証次元の詳細
+- [references/report-verdicts.md](references/report-verdicts.md) - PASS/WARN/FAIL 判定基準
+- `scripts/collect_artifacts.py` - Lightweight Mode 用アーティファクト収集スクリプト
 
 ## 次のステップ
 

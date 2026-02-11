@@ -336,7 +336,7 @@ Phase 4-6: Analysis & Reporting（分析・報告）
 
 | スキル | Phase | 説明 |
 |--------|-------|------|
-| `architecture-reviewer` | 4 | 3種類の分析を並行実行。コンポーネント内（ノード）、インタラクション（エッジ）、クロスカッティング（縦串）の3視点で問題検出 |
+| `architecture-reviewer` | 4 | 3種類の分析を並行実行。コンポーネント内（ノード）、インタラクション（エッジ）、クロスカッティング（縦串）の3視点で問題検出。設計整合性チェック（テスト網羅性D2/スキーマ実装一致D3/障害モード網羅性D5）も統合。system-mapなしでもLightweight Modeで実行可能 |
 | `synthesis-analyzer` | 5 | 矛盾検出と優先順位付け。4類型の矛盾（改善案間/前提破壊/不変条件/ADR）を検出し、プロジェクト特性に基づきP0-P4で優先順位付け |
 | `review-report-generator` | 6 | 意思決定用レポート生成。scope/failure_mode/trigger_conditions/evidence/options/priority/implementation/acceptance_criteriaを含む標準形式 |
 

@@ -36,11 +36,16 @@ Phase 4: Architecture Review（3種類の分析を並行実行）
      入力: component-dossiers/*.yaml, system-map/invariants.yaml
      出力: architecture-review/{timestamp}/findings.yaml
 
+     【Full Mode】system-map + component-dossiers が存在する場合
+     【Lightweight Mode】system-map なしの場合、collect_artifacts.py で D2/D3/D5 のみ実行
+
      ① コンポーネント内レビュー（ノード）
         - 責務、境界、データ所有、例外設計、テスト可能性
+        - テスト網羅性(D2)、障害モード網羅性(D5)
 
      ② インタラクションレビュー（エッジ）
         - 契約整合、エラー伝播、冪等性、順序性、整合モデル、セキュリティ
+        - スキーマ実装一致(D3)
 
      ③ クロスカッティングレビュー（縦串）
         - セキュリティ、信頼性、観測性、変更容易性
@@ -73,7 +78,7 @@ Phase 6: Report Generation（レポート生成）
 
 | Phase | 前提条件 | 出力検証 |
 |-------|----------|----------|
-| 4 | component-dossiers/*.yaml, invariants.yaml存在 | findings.yamlに3カテゴリの指摘 |
+| 4 | component-dossiers/*.yaml, invariants.yaml存在（Lightweight: collect_artifacts.pyで代替可） | findings.yamlに3カテゴリの指摘 + verification_summary |
 | 5 | findings.yaml存在 | synthesis.yamlに矛盾・優先順位 |
 | 6 | synthesis.yaml存在 | report/配下に全ファイル生成 |
 
@@ -98,6 +103,8 @@ Phase 6: Report Generation（レポート生成）
 | データ所有 | owned_data以外を直接書き込んでいないか |
 | 例外設計 | 例外の握りつぶし、過剰なcatch-allはないか |
 | テスト可能性 | 依存注入、モック可能性は確保されているか |
+| テスト網羅性(D2) | 各不変条件・状態遷移・境界条件にテストがあるか |
+| 障害モード網羅性(D5) | 各障害モードに処理コードとリカバリ戦略があるか |
 
 ### 分析2: インタラクションレビュー（エッジ）
 
@@ -111,6 +118,7 @@ Phase 6: Report Generation（レポート生成）
 | 順序性 | イベント順序の前提、順序逆転時の挙動 |
 | 整合モデル | 結果整合/強整合の前提が一致しているか |
 | セキュリティ | 認証・認可・秘密情報の境界超え |
+| スキーマ実装一致(D3) | データスキーマとコードの型・フィールド・制約が一致しているか |
 
 ### 分析3: クロスカッティングレビュー（縦串）
 

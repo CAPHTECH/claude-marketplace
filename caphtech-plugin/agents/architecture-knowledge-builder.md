@@ -146,7 +146,7 @@ knowledge_build_state:
     yaml_syntax_valid: true
     cross_references_valid: true
 
-  next_action: "architecture-reviewerで分析を開始可能"
+  next_action: "architecture-reviewerで分析を開始可能（system-mapなしの場合はLightweight Modeで実行可能）"
 ```
 
 ## 不変条件カテゴリ（Phase 2）
