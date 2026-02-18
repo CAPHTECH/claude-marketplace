@@ -301,6 +301,24 @@ Issue起点の開発ワークフローを支援するスキル群です。
 | `refactoring-discovery` | リファクタリング機会の検出（責務過多・密結合・SOLID違反など） |
 | `refactoring-executor` | テストファースト検証で安全な段階的リファクタリング実行 |
 
+## Research & Investigation
+
+技術情報収集・調査のためのスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `tech-info-gathering` | 技術情報（バグ・ライブラリ・サービス）を体系的に収集。事前調査→リサーチ方法選定→情報収集実行の3フェーズで進める |
+| `general-info-gathering` | 一般的な情報収集・調査を体系的に行う。学術・ビジネス・ジャーナリズム・問題解決・デジタル調査など7カテゴリ20手法を網羅。調査設計→手法選定→実行・統合の3フェーズ |
+
+## Design Skills
+
+UIデザイン・UXデザインを支援するスキル群です。
+
+| スキル | 説明 |
+|--------|------|
+| `web-app-designer` | Webアプリのデザインを体系的に行う。Design Thinking・Atomic Design・グリッドシステム・WCAG 2.1など確立された手法を適用。要件確認→手法選定→実行→アウトプットの4フェーズ |
+| `mobile-app-designer` | iOS/Androidアプリのデザインを体系的に行う。Apple HIG・Material Design 3に準拠し、ナビゲーション・コンポーネント・モーション・アクセシビリティを設計 |
+
 ## Other Skills
 
 その他の開発支援スキル群です。
@@ -435,7 +453,7 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全52スキル）
+## スキル一覧（全56スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
@@ -447,6 +465,8 @@ caphtech-plugin/
 | Testing & Quality | 4 |
 | Refactoring | 2 |
 | Architecture Review | 6 |
+| Research & Investigation | 2 |
+| Design Skills | 2 |
 | Other | 2 |
 
 ## インストール
