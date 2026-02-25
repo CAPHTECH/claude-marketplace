@@ -327,6 +327,7 @@ UIデザイン・UXデザインを支援するスキル群です。
 |--------|------|
 | `app-idea-workshop` | アプリアイデアワークショップ |
 | `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
+| `codex-consultant` | Codex CLI (gpt-5.3-codex) にMCP経由で相談しセカンドオピニオンを得る |
 
 ## Architecture Review
 
@@ -453,7 +454,7 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全56スキル）
+## スキル一覧（全57スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
@@ -467,7 +468,7 @@ caphtech-plugin/
 | Architecture Review | 6 |
 | Research & Investigation | 2 |
 | Design Skills | 2 |
-| Other | 2 |
+| Other | 3 |
 
 ## インストール
 
