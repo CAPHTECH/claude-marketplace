@@ -1,9 +1,8 @@
 ---
 name: eld-model
 context: fork
-argument-hint: "discover | card | full (default: full)"
-description: |
-  コードベースや要件からVocabulary(語彙)とLaw(守るべき条件)を自動発見し、標準フォーマットのTerm Card / Law Cardとして文書化する。「Lawを発見して」「語彙を抽出して」「Term Cardを作成して」「Law Cardを作成して」「ELDモデリングして」と言われた時、新規プロジェクトのVocabulary/Law洗い出し時、既存コードからのLaw/Term抽出時に使用する。
+argument-hint: discover | card | full (default: full)
+description: コードベースや要件からVocabulary(語彙)とLaw(守るべき条件)を自動発見し、標準フォーマットのTerm Card / Law Cardとして文書化する。「Lawを発見して」「語彙を抽出して」「Term Cardを作成して」「Law Cardを作成して」「ELDモデリングして」と言われた時、新規プロジェクトのVocabulary/Law洗い出し時、既存コードからのLaw/Term抽出時に使用する。
 ---
 
 # ELD Model: Discovery + Card
