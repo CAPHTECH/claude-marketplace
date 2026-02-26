@@ -346,7 +346,7 @@ custom_stop_conditions:
 1. [ ] Step 1から順次実行
 2. [ ] 各ステップで検証を実施
 3. [ ] 停止条件をモニタリング
-4. [ ] 完了後 `/eld-ground-check` で接地確認
+4. [ ] 完了後 `/eld-ground-verify` で接地確認
 ```
 
 ## 失敗パターン（必ず回避）
@@ -439,7 +439,6 @@ Claude:
 
 ## 関連スキル
 
-- `/eld-model-law-card` - 関連Lawの確認
-- `/eld-model-term-card` - 関連Termの確認
-- `/eld-ground-check` - 変更後の接地検証
-- `/eld-record-collection` - 変更履歴の記録
+- `/eld-model` - 関連Law/Termの確認・Card作成
+- `/eld-ground-verify` - 変更後の接地検証
+- `/eld-record` - 変更履歴の記録

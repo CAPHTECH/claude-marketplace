@@ -1,153 +1,56 @@
 ---
 name: review-report-generator
 context: fork
-description: |
-  アーキテクチャレビューの結果を意思決定に耐える形式のレポートに整形するスキル。
-  網羅的な指摘リストではなく、優先順位・対応案・受け入れ条件を明確にした実行可能な形式を生成する。
-
-  使用タイミング:
-  - 「レビューレポートを作成して」「報告書を生成して」
-  - 「意思決定用にまとめて」「PRレビュー用にまとめて」
-  - architecture-review/*/synthesis.yaml が存在する時
-  - ステークホルダーへの報告や、PR作成前の確認
+argument-hint: "[chat|file|issue]"
+description: アーキテクチャレビュー結果を意思決定用レポートに整形する。チャット報告・ファイル出力・GitHub Issue作成から出力形式を選択可能。「レビューレポートを作成して」「報告書を生成して」「意思決定用にまとめて」「Issueにして」と言われた時に使用。
 ---
 
 # Review Report Generator
 
 レビュー結果を意思決定に耐える形式のレポートに整形する。
 
-**核心**: 網羅的な指摘より「意思決定に必要な形」を優先。
+**核心**: 網羅的な指摘より「意思決定に必要な形」を優先する。
 
 ## 前提条件
 
 必須:
-- `architecture-review/*/synthesis.yaml` - 統合済み分析結果
+- `architecture-review/*/review.yaml` - architecture-reviewer の統合出力（findings + conflicts + prioritized_actions）
 
 推奨:
-- `architecture-review/*/findings.yaml` - 元の指摘
 - `system-map/invariants.yaml` - 不変条件
 
-## 指摘の標準形式
+## 出力形式の選択
 
-各指摘は以下の形式に固定:
+`$ARGUMENTS` で出力形式を決定する。未指定の場合は `chat` をデフォルトにする。
 
-```yaml
-finding:
-  id: FINDING-001
-  title: payment-serviceタイムアウト不整合
+| 値 | 動作 | 用途 |
+|----|------|------|
+| `chat` | チャットで直接報告 | 素早い確認、口頭報告の下書き |
+| `file` | ファイル群を生成 | チーム共有、ドキュメント保存 |
+| `issue` | GitHub Issueを作成 | バックログ追加、タスク管理 |
 
-  # 1. 影響範囲
-  scope:
-    type: interaction  # component/interaction/crosscutting
-    affected:
-      - order-service -> payment-service
+判定ロジック:
+1. `$ARGUMENTS` が `file` なら file 形式で出力する
+2. `$ARGUMENTS` が `issue` なら issue 形式で出力する
+3. それ以外（空・`chat`・不明な値）は chat 形式で出力する
 
-  # 2. 何が成立しなくなるか
-  failure_mode:
-    description: |
-      order-serviceがタイムアウトしてもpayment-serviceは処理を続行。
-      二重課金が発生する可能性がある。
-    impact:
-      - ユーザーへの影響: 二重請求
-      - ビジネスへの影響: 返金対応コスト、信頼低下
-      - システムへの影響: 不整合データの発生
+## 形式1: chat（チャット報告）
 
-  # 3. 発生条件
-  trigger_conditions:
-    - 高負荷時（>500 RPS）
-    - payment-gateway遅延時（>20s）
-    - ネットワーク不安定時
+チャットにMarkdownで直接報告する。ファイルは生成しない。
 
-  # 4. 根拠（推測禁止）
-  evidence:
-    - source: component-dossiers/order-service.yaml
-      field: failure_modes[0].trigger
-      value: "25s timeout"
-    - source: component-dossiers/payment-service.yaml
-      field: non_functional.performance.timeout
-      value: "30s"
-    - note: order-service(25s) < payment-service(30s) で不整合
+### 出力構成
 
-  # 5. 対応案とトレードオフ
-  options:
-    - id: A
-      action: order-serviceタイムアウトを35sに延長
-      pros:
-        - 実装が簡単（設定変更のみ）
-        - 既存の契約を維持
-      cons:
-        - ユーザー体験悪化（待ち時間増加）
-        - 他の依存先にも影響
-      effort: 小（1日）
+1. **エグゼクティブサマリー** - 優先度別の件数テーブル
+2. **P0/P1 詳細** - 各指摘の問題・推奨案・PR分割・受け入れ条件
+3. **P2以下サマリー** - 件数と主要項目のタイトルのみ
 
-    - id: B
-      action: 冪等キーを導入して二重課金を防止
-      pros:
-        - 根本解決
-        - タイムアウトを短縮可能
-      cons:
-        - 実装コストが高い
-        - payment-serviceの改修も必要
-      effort: 中（1週間）
-
-    - id: C
-      action: 非同期処理に変更（イベント駆動）
-      pros:
-        - スケーラビリティ向上
-        - タイムアウト問題を回避
-      cons:
-        - アーキテクチャの大幅変更
-        - ADR-003との整合性確認が必要
-      effort: 大（2週間）
-
-  # 6. 優先度
-  priority:
-    category: P0  # P0/P1/P2/P3/P4
-    score: 48
-    breakdown:
-      severity: critical (4)
-      likelihood: high (3)
-      detectability: hard (3)
-      quality_weight: reliability (5)
-    rationale: 決済障害はリスク許容度ゼロ
-
-  # 7. 実施単位
-  implementation:
-    recommended_option: B
-    pr_breakdown:
-      - pr: "feat: Add idempotency key to payment request"
-        scope: order-service
-        size: S
-      - pr: "feat: Support idempotency key validation"
-        scope: payment-service
-        size: M
-    adr_needed: true
-    adr_topic: "サービス間タイムアウトと冪等性戦略"
-
-  # 8. 受け入れ条件
-  acceptance_criteria:
-    tests:
-      - 同一リクエストを3回送信して課金が1回のみ
-      - タイムアウト発生時にリトライが正常動作
-    metrics:
-      - 二重課金率 = 0%
-      - payment成功率 >= 99.9%
-    logs:
-      - idempotency_key_duplicate イベントが記録される
-    contract:
-      - OpenAPI に X-Idempotency-Key ヘッダーを追加
-```
-
-## レポート形式
-
-### エグゼクティブサマリー
+### 出力例（サマリー部分）
 
 ```markdown
 # アーキテクチャレビュー報告書
 
 **レビュー日**: 2024-01-21
 **対象**: order-service, payment-service, inventory-service
-**レビュアー**: Claude + 担当者名
 
 ## サマリー
 
@@ -157,88 +60,125 @@ finding:
 | P1 (Critical) | 3 | 今スプリント |
 | P2 (High) | 5 | 次スプリント |
 | P3/P4 | 8 | バックログ |
-
-### 即時対応が必要な項目
-
-1. **FINDING-001**: payment-serviceタイムアウト不整合
-   - 二重課金リスク
-   - 推奨: 冪等キー導入（Option B）
-
-2. **FINDING-002**: 認可チェックの欠落
-   - 他ユーザーデータアクセス可能
-   - 推奨: 所有権チェック追加
 ```
 
-### 詳細セクション
+P0/P1の各指摘には以下を含める:
+- 問題の概要と影響
+- 対応案のテーブル（案・内容・工数・推奨マーク）
+- PR分割（タイトル・スコープ・サイズ）
+- 受け入れ条件（チェックリスト形式）
+- ADR要否
 
-```markdown
-## P0: 即時対応
+## 形式2: file（ファイル出力）
 
-### FINDING-001: payment-serviceタイムアウト不整合
+`architecture-review/{timestamp}/report/` 配下にファイル群を生成する。
 
-**影響**: order-service -> payment-service 間
-
-**問題**:
-order-service(25s) < payment-service(30s) でタイムアウト不整合。
-二重課金のリスクあり。
-
-**発生条件**:
-- 高負荷時（>500 RPS）
-- payment-gateway遅延時
-
-**根拠**:
-- `component-dossiers/order-service.yaml` failure_modes[0].trigger: "25s"
-- `component-dossiers/payment-service.yaml` timeout: "30s"
-
-**対応案**:
-
-| 案 | 内容 | 工数 | 推奨 |
-|----|------|------|------|
-| A | タイムアウト延長 | 小 | |
-| B | 冪等キー導入 | 中 | ✓ |
-| C | 非同期化 | 大 | |
-
-**推奨**: Option B（冪等キー導入）
-
-**PR分割**:
-1. `feat: Add idempotency key to payment request` (order-service, S)
-2. `feat: Support idempotency key validation` (payment-service, M)
-
-**受け入れ条件**:
-- [ ] 同一リクエスト3回で課金1回のテスト
-- [ ] 二重課金率 = 0% のメトリクス確認
-- [ ] OpenAPI更新
-
-**ADR**: 要作成「サービス間タイムアウトと冪等性戦略」
-```
-
-## 出力ファイル
+### ファイル構造
 
 ```
 architecture-review/{timestamp}/
-├── findings.yaml      # Phase 4 の出力
-├── synthesis.yaml     # Phase 5 の出力
-└── report/            # Phase 6 の出力
+├── review.yaml        # architecture-reviewer の統合出力（既存）
+└── report/            # 本スキルの出力
     ├── summary.md     # エグゼクティブサマリー
-    ├── p0-blockers.md # P0詳細
-    ├── p1-critical.md # P1詳細
+    ├── p0-blockers.md # P0詳細（全フィールド）
+    ├── p1-critical.md # P1詳細（全フィールド）
     ├── p2-high.md     # P2詳細
     ├── backlog.md     # P3/P4
     └── adrs-needed.md # 必要なADR一覧
 ```
 
-## フォーマット選択
+### 各ファイルの内容
 
-| 用途 | 推奨フォーマット |
-|------|-----------------|
+| ファイル | 内容 |
+|---------|------|
+| summary.md | 件数テーブル + P0/P1の1行サマリー + 推奨アクション |
+| p0-blockers.md | P0の全指摘。問題・根拠・対応案・PR分割・受け入れ条件 |
+| p1-critical.md | P1の全指摘。p0-blockers.md と同形式 |
+| p2-high.md | P2の全指摘。対応案は推奨のみ記載 |
+| backlog.md | P3/P4。タイトル・スコープ・推奨案・工数の一覧表 |
+| adrs-needed.md | ADRが必要な指摘のリスト。トピック・関連指摘・背景 |
+
+### 用途別の推奨ファイル
+
+| 用途 | 使うファイル |
+|------|------------|
 | ステークホルダー報告 | summary.md のみ |
 | 開発チーム共有 | 全ファイル |
 | PR作成 | p0-blockers.md + PR分割情報 |
 | バックログ追加 | backlog.md をIssue化 |
 
+## 形式3: issue（GitHub Issue作成）
+
+`gh issue create` で指摘をGitHub Issueとして作成する。
+
+### 作成ルール
+
+| 優先度 | Issue数 | ラベル |
+|-------|---------|--------|
+| P0 | 指摘ごとに1つ | `architecture-review`, `P0-blocker` |
+| P1 | 指摘ごとに1つ | `architecture-review`, `P1-critical` |
+| P2以下 | まとめて1つ | `architecture-review` |
+
+### P0/P1 個別Issueの内容
+
+各Issueに以下を含める:
+- タイトル: `[{priority}] {title}`
+- 概要と影響範囲
+- 発生条件
+- 根拠（evidence）
+- 対応案テーブル + 推奨
+- PR分割
+- 受け入れ条件（チェックリスト形式）
+- ADR要否
+
+詳細なテンプレートは [references/issue-template.md](references/issue-template.md) を参照。Issue本文のフォーマットとghコマンド例が記載されている。
+
+### P2以下まとめIssue
+
+1つのIssueに全P2以下の指摘をまとめる:
+- タイトル: `[Architecture Review] P2以下の指摘事項まとめ（{件数}件）`
+- P2は各指摘の概要・推奨案・工数を記載
+- P3/P4はタイトルとスコープのみ
+
+### 実行手順
+
+1. review.yaml から全指摘を読み込む
+2. 指摘を優先度でグルーピングする
+3. P0の指摘から順に `gh issue create` を実行する
+4. P1の指摘を同様に実行する
+5. P2以下をまとめて1つのIssueを作成する
+6. 作成したIssueのURL一覧をチャットに報告する
+
+## 指摘の標準形式
+
+各指摘は以下のフィールドを持つ。詳細なYAML例は [references/finding-format.md](references/finding-format.md) を参照。各フィールドの選択基準や算出方法が記載されている。
+
+| フィールド | 必須 | 内容 |
+|-----------|------|------|
+| id | Yes | FINDING-001 形式の一意ID |
+| title | Yes | 問題の端的な名称 |
+| scope.type | Yes | component / interaction / crosscutting |
+| scope.affected | Yes | 影響を受けるコンポーネント |
+| failure_mode.description | Yes | 何が成立しなくなるか |
+| failure_mode.impact | Yes | ユーザー・ビジネス・システムへの影響 |
+| trigger_conditions | Yes | 発生条件のリスト |
+| evidence | Yes | 根拠（source, field, value） |
+| options | Yes | 対応案のリスト（id, action, pros, cons, effort） |
+| priority.category | Yes | P0 / P1 / P2 / P3 / P4 |
+| priority.score | Yes | severity x likelihood x detectability x quality_weight |
+| priority.rationale | Yes | 優先度判断の理由 |
+| implementation.recommended_option | Yes | 推奨する対応案のID |
+| implementation.pr_breakdown | Yes | PR分割（タイトル, スコープ, サイズ） |
+| implementation.adr_needed | Yes | ADR作成要否 |
+| acceptance_criteria.tests | Yes | テスト条件 |
+| acceptance_criteria.metrics | No | 定量メトリクス |
+| acceptance_criteria.logs | No | ログ確認項目 |
+| acceptance_criteria.contract | No | API契約の変更 |
+
 ## 注意事項
 
-- **推測禁止**: evidence がない指摘は含めない
-- **実行可能な形式**: 「問題がある」だけでなく「何をするか」まで
-- **PR単位まで分割**: 「改善する」ではなく「このPRを作る」
-- **受け入れ条件の明示**: 完了判定ができる形で記載
+- **推測禁止**: evidence がない指摘はレポートに含めない
+- **実行可能な形式**: 「問題がある」だけでなく「何をするか」まで書く
+- **PR単位まで分割**: 「改善する」ではなく「このPRを作る」と具体化する
+- **受け入れ条件の明示**: 完了判定ができる形で記載する
+- **issue形式でのラベル**: 事前に `architecture-review`, `P0-blocker`, `P1-critical` ラベルが存在しない場合は `gh label create` で作成する

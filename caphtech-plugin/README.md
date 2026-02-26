@@ -17,11 +17,11 @@ Sense → Model → Predict → Change → Ground → Record
 | Phase | 内容 | 主要スキル |
 |-------|------|-----------|
 | **Sense** | コードの事実/意図/関係を観測 | `eld-sense-*` |
-| **Model** | 語彙（Term）と関係（Law）を同定 | `eld-model-*` |
+| **Model** | 語彙（Term）と関係（Law）を同定 | `eld-model`, `eld-model-link-map` |
 | **Predict** | 影響を因果タイプ分類、段階化 | `eld-predict-impact` |
 | **Change** | 最小単位で変更、高リスク時は隔離 | `eld-change-worktree` |
 | **Ground** | テスト/Telemetryで接地 | `eld-ground-*` |
-| **Record** | Context Deltaを記録 | `eld-record-*` |
+| **Record** | Context Deltaを記録 | `eld-record`, `eld-record-compact`, `eld-record-maintenance` |
 
 ### スキル一覧
 
@@ -35,37 +35,51 @@ Sense → Model → Predict → Change → Ground → Record
 |--------|------|
 | `eld-sense-requirements-brainstorming` | 要件の曖昧さを対話的に明確化 |
 | `eld-sense-activation` | アクティブコンテキスト構築 |
-| `eld-sense-scope` | タスクスコープの定義 |
-| `eld-sense-task-decomposition` | タスク分解 |
-| `eld-sense-parallel-orchestrator` | 並列実行最適化 |
+| `eld-sense-planning` | タスクスコープ定義・分解・並列実行最適化 |
 
 #### Model（モデル化）
 | スキル | 説明 |
 |--------|------|
-| `eld-model-law-discovery` | Law候補の発見 |
-| `eld-model-law-card` | Law Card作成 |
-| `eld-model-term-card` | Term Card作成 |
+| `eld-model` | Law/Term候補の発見・Card作成 |
 | `eld-model-link-map` | Law↔Term連結表管理 |
 
 #### Ground（接地）
 | スキル | 説明 |
 |--------|------|
 | `eld-ground-tdd-enforcer` | TDDサイクル強制とL1達成 |
-| `eld-ground-check` | 接地状況の検証 |
-| `eld-ground-evaluate` | 成果物評価 |
+| `eld-ground-verify` | 接地状況の検証・成果物評価・PR作成前の完成前検証 |
 | `eld-ground-law-monitor` | Law違反監視 |
 | `eld-ground-pr-review` | PRレビュー |
-| `eld-ground-pre-completion` | PR作成前の完成前検証 |
+
+#### Predict（予測）
+| スキル | 説明 |
+|--------|------|
+| `eld-predict-impact` | 影響を因果タイプで分類し段階化戦略を確定 |
+
+#### Change（変更）
+| スキル | 説明 |
+|--------|------|
+| `eld-change-worktree` | 高リスク変更時にgit worktreeで隔離環境を作成 |
+
+#### Ground（接地）
+| スキル | 説明 |
+|--------|------|
+| `eld-ground-tdd-enforcer` | TDDサイクル強制とL1達成 |
+| `eld-ground-verify` | 接地状況の検証・成果物評価・PR作成前の完成前検証 |
+| `eld-ground-law-monitor` | Law違反監視 |
+| `eld-ground-pr-review` | PRレビュー |
 
 #### Record（記録）
 | スキル | 説明 |
 |--------|------|
-| `eld-record-collection` | Context Delta収集 |
-| `eld-record-structuring` | 知識の構造化 |
+| `eld-record` | Context Delta収集・知識の構造化・メモリ収集・知識転送 |
 | `eld-record-compact` | 履歴圧縮 |
 | `eld-record-maintenance` | 知識メンテナンス |
-| `eld-record-memory-collector` | メモリ収集 |
-| `eld-record-knowledge-transfer` | 知識転送 |
+
+#### Debug（デバッグ）
+| スキル | 説明 |
+|--------|------|
+| `eld-debug` | Law視点でバグを分析・修正（証拠ループで体系的解決） |
 
 ### 使い方
 
@@ -75,9 +89,9 @@ Sense → Model → Predict → Change → Ground → Record
 
 # フェーズ別
 /eld-sense-activation    # Senseフェーズ
-/eld-model-law-discovery # Modelフェーズ
-/eld-ground-check        # Groundフェーズ
-/eld-record-collection   # Recordフェーズ
+/eld-model               # Modelフェーズ
+/eld-ground-verify       # Groundフェーズ
+/eld-record              # Recordフェーズ
 ```
 
 ### ELDの核心原則
@@ -116,10 +130,10 @@ Phase 2: Context（文脈構築）
   └→ /impact-analysis（Major以上）
 
 Phase 3: Uncertainty Resolution（不確実性解消）
-  └→ /resolving-uncertainty（不確実性がある場合）
+  └→ /uncertainty-resolution（不確実性がある場合）
 
 Phase 4: Task Decomposition（タスク分解）
-  └→ /eld-sense-task-decomposition
+  └→ /eld-sense-planning
 
 Phase 5: Implementation（実装）
   └→ /eld + /observation-minimum-set
@@ -146,13 +160,13 @@ Phase 1: Issue（受付）
   - pce.memory.activate で関連知識を活性化
   - Issue Contractを作成（目的/不変条件/物差し/停止条件）
   - Term/Law候補を列挙
-  → スキル: /eld-sense-activation, /eld-model-law-discovery
+  → スキル: /eld-sense-activation, /eld-model
 
 Phase 2: Design（設計）
   - Law/Term Cards作成（相互参照あり、孤立なし）
   - Grounding Plan（必要テスト/Telemetry）
   - Change Plan（微小変更列＋各ステップのチェック）
-  → スキル: /eld-model-law-card, /eld-model-term-card
+  → スキル: /eld-model
 
 Phase 3: Implementation（実装ループ）
   1. Sense   → 触るシンボル/境界/設定の身体図更新
@@ -166,7 +180,7 @@ Phase 4: Review（レビュー）
   - 因果と証拠の整合
   - Law/Term孤立チェック
   - Evidence Ladder達成レベル確認
-  → スキル: /eld-ground-check, /eld-ground-pr-review
+  → スキル: /eld-ground-verify, /eld-ground-pr-review
 
 Phase 5: Ops（運用）
   - Telemetryで Law違反を監視
@@ -200,9 +214,9 @@ Phase 5: Ops（運用）
 # 個別フェーズの実行
 /issue-intake          # Issue初期トリアージ
 /eld-sense-activation  # コンテキスト活性化
-/eld-model-law-card    # Law Card作成
-/eld-ground-check      # 接地状況の検証
-/eld-record-collection # 知識記録
+/eld-model             # Law/Term Card作成
+/eld-ground-verify     # 接地状況の検証
+/eld-record            # 知識記録
 
 # 観測（品質チェック）
 /observation-minimum-set  # 最小観測セット
@@ -247,6 +261,8 @@ Issue起点の開発ワークフローを支援するスキル群です。
 | `issue-intake` | Issue初期トリアージ。severity_score + confidence分離、NeedsInfo分類、uncertainty_flags→next_actions接続 |
 | `issue-workflow-orchestrator` | Issue→PR完了のワークフロー制御。状態機械、artifact契約、stop_conditions、6テンプレート |
 | `impact-analysis` | コード変更の影響範囲分析。8影響面（code/interface/data/external/config/runtime/security/observability）、根拠ベースimpact |
+| `pr-comment-resolver` | PRコメントの収集・分類・優先順位付け・対応実行 |
+| `github-project` | GitHub Projectの管理（アイテム追加・状態変更・フィールド更新） |
 
 ## Onboarding & Knowledge Management
 
@@ -257,8 +273,7 @@ Issue起点の開発ワークフローを支援するスキル群です。
 | `ai-led-onboarding` | AI主導の作業開始オンボーディング。最小スキーマ（因果・境界・不変条件・壊れ方・観測）を短時間で再構築 |
 | `pr-onboarding` | PR作成時のオンボーディング記述。変更の契約（What/Why/不変条件/影響範囲/壊れ方/検証/ロールバック）をPR本文に |
 | `knowledge-validator` | pce-memory活用の5種類の知識検証ワークフロー |
-| `uncertainty-to-law` | 検証済み仮説をLDEのLawに昇格 |
-| `resolving-uncertainty` | 不確実性の解消 |
+| `uncertainty-resolution` | 不確実性の解消・検証済み仮説のLaw昇格 |
 
 ## Documentation & Specification
 
@@ -280,6 +295,7 @@ Issue起点の開発ワークフローを支援するスキル群です。
 | `systematic-test-design` | ユニットテスト＋PBT（Property-Based Testing）の実装スキル。「どうテストを実装するか」を設計 |
 | `llm-eval-designer` | LLM生成システムの検証設計。幻覚・過学習などLLM特有の失敗モードを考慮 |
 | `critical-code-review` | 批判的コードレビュー |
+| `ai-readability-analysis` | AI可読性分析（生成AIがバグ修正時に苦戦する原因を特定） |
 
 ### test-design-audit vs systematic-test-design
 
@@ -298,8 +314,7 @@ Issue起点の開発ワークフローを支援するスキル群です。
 
 | スキル | 説明 |
 |--------|------|
-| `refactoring-discovery` | リファクタリング機会の検出（責務過多・密結合・SOLID違反など） |
-| `refactoring-executor` | テストファースト検証で安全な段階的リファクタリング実行 |
+| `refactoring` | リファクタリング機会の検出・テストファースト検証による安全な段階的実行 |
 
 ## Research & Investigation
 
@@ -307,8 +322,7 @@ Issue起点の開発ワークフローを支援するスキル群です。
 
 | スキル | 説明 |
 |--------|------|
-| `tech-info-gathering` | 技術情報（バグ・ライブラリ・サービス）を体系的に収集。事前調査→リサーチ方法選定→情報収集実行の3フェーズで進める |
-| `general-info-gathering` | 一般的な情報収集・調査を体系的に行う。学術・ビジネス・ジャーナリズム・問題解決・デジタル調査など7カテゴリ20手法を網羅。調査設計→手法選定→実行・統合の3フェーズ |
+| `info-gathering` | 技術・一般情報を体系的に収集・調査。事前調査→手法選定→実行・統合の3フェーズ |
 
 ## Design Skills
 
@@ -327,7 +341,11 @@ UIデザイン・UXデザインを支援するスキル群です。
 |--------|------|
 | `app-idea-workshop` | アプリアイデアワークショップ |
 | `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
+| `claude-md-optimizer` | 既存CLAUDE.mdをベストプラクティスに基づいて分析・適正化 |
 | `codex-consultant` | Codex CLI (gpt-5.3-codex) にMCP経由で相談しセカンドオピニオンを得る |
+| `codex-negotiation` | Claude↔Codexの構造化議論で設計判断の合意形成 |
+| `skill-creator` | Claude Code用Skillの設計・実装・検証ガイド |
+| `skill-extraction-finder` | プロジェクトからSkill化すべきドメイン知識を発見 |
 
 ## Architecture Review
 
@@ -337,39 +355,33 @@ UIデザイン・UXデザインを支援するスキル群です。
 
 ```
 Phase 1-3: Knowledge Building（知識構築）
-  system-map-collector → invariant-extractor → component-dossier-builder
+  system-understanding（システムマップ収集→不変条件抽出→コンポーネントカード作成）
 
 Phase 4-6: Analysis & Reporting（分析・報告）
-  architecture-reviewer → synthesis-analyzer → review-report-generator
+  architecture-reviewer → review-report-generator
 ```
 
 ### Phase 1-3: Knowledge Building
 
 | スキル | Phase | 説明 |
 |--------|-------|------|
-| `system-map-collector` | 1 | システムマップ収集。コンポーネント、依存関係、データフロー、境界、ランタイム、認証フロー、API契約を構造化 |
-| `invariant-extractor` | 2 | 不変条件抽出。システムマップから8カテゴリのInvariants/Global Rulesを抽出（Security/Data/Audit/Idempotency/Architecture/API/Failure/Environment） |
-| `component-dossier-builder` | 3 | コンポーネントカード作成。RAG検索単位となる詳細なコンポーネントカードを生成（purpose/contracts/owned_data/dependencies/failure_modes/state/non_functional/test_strategy/unknowns/assumptions） |
+| `system-understanding` | 1-3 | システムマップ収集・不変条件抽出・コンポーネントカード作成を統合。コンポーネント/依存関係/データフロー/境界/ランタイム/認証フロー/API契約の構造化、8カテゴリのInvariants/Global Rules抽出、RAG検索単位のコンポーネントカード生成を一貫して行う |
 
 ### Phase 4-6: Analysis & Reporting
 
 | スキル | Phase | 説明 |
 |--------|-------|------|
-| `architecture-reviewer` | 4 | 3種類の分析を並行実行。コンポーネント内（ノード）、インタラクション（エッジ）、クロスカッティング（縦串）の3視点で問題検出。設計整合性チェック（テスト網羅性D2/スキーマ実装一致D3/障害モード網羅性D5）も統合。system-mapなしでもLightweight Modeで実行可能 |
-| `synthesis-analyzer` | 5 | 矛盾検出と優先順位付け。4類型の矛盾（改善案間/前提破壊/不変条件/ADR）を検出し、プロジェクト特性に基づきP0-P4で優先順位付け |
+| `architecture-reviewer` | 4-5 | 3種類の分析（ノード/エッジ/縦串）を並行実行し、矛盾検出（4類型）・優先順位付け（P0-P4）まで一貫して行う。設計整合性チェック（D2/D3/D5）も統合。system-mapなしでもLightweight Modeで実行可能 |
 | `review-report-generator` | 6 | 意思決定用レポート生成。scope/failure_mode/trigger_conditions/evidence/options/priority/implementation/acceptance_criteriaを含む標準形式 |
 
 ### 使い方
 
 ```bash
 # Phase 1-3: 知識構築
-/system-map-collector      # システムマップ収集
-/invariant-extractor       # 不変条件抽出
-/component-dossier-builder # コンポーネントカード作成
+/system-understanding      # システムマップ収集→不変条件抽出→コンポーネントカード作成
 
 # Phase 4-6: 分析・報告
-/architecture-reviewer     # 3種類の分析
-/synthesis-analyzer        # 矛盾検出・優先順位付け
+/architecture-reviewer     # 3種類の分析 + 矛盾検出 + 優先順位付け
 /review-report-generator   # レポート生成
 ```
 
@@ -377,21 +389,20 @@ Phase 4-6: Analysis & Reporting（分析・報告）
 
 ```
 system-map/
-├── components.yaml      # Phase 1
-├── dependencies.yaml    # Phase 1
-├── data-flow.yaml       # Phase 1
-├── boundaries.yaml      # Phase 1
-├── runtime.yaml         # Phase 1
-├── auth-flow.yaml       # Phase 1
-├── api-contracts.yaml   # Phase 1
-└── invariants.yaml      # Phase 2
+├── components.yaml      # Phase 1-3 (system-understanding)
+├── dependencies.yaml    # Phase 1-3
+├── data-flow.yaml       # Phase 1-3
+├── boundaries.yaml      # Phase 1-3
+├── runtime.yaml         # Phase 1-3
+├── auth-flow.yaml       # Phase 1-3
+├── api-contracts.yaml   # Phase 1-3
+└── invariants.yaml      # Phase 1-3
 
 component-dossiers/
-└── {component-id}.yaml  # Phase 3
+└── {component-id}.yaml  # Phase 1-3 (system-understanding)
 
 architecture-review/{timestamp}/
-├── findings.yaml        # Phase 4
-├── synthesis.yaml       # Phase 5
+├── review.yaml          # Phase 4-5（分析 + 矛盾検出 + 優先順位付け）
 └── report/              # Phase 6
     ├── summary.md
     ├── p0-blockers.md
@@ -454,21 +465,21 @@ caphtech-plugin/
 └── hooks/            # フック定義
 ```
 
-## スキル一覧（全57スキル）
+## スキル一覧（全54スキル）
 
 | カテゴリ | スキル数 |
 |---------|---------|
-| ELD (Evidence-Loop Development) | 20 |
+| ELD (Evidence-Loop Development) | 16 |
 | Observation | 7 |
-| Issue Workflow | 3 |
-| Onboarding & Knowledge | 5 |
+| Issue Workflow | 5 |
+| Onboarding & Knowledge | 4 |
 | Documentation & Specification | 3 |
-| Testing & Quality | 4 |
-| Refactoring | 2 |
-| Architecture Review | 6 |
-| Research & Investigation | 2 |
+| Testing & Quality | 5 |
+| Refactoring | 1 |
+| Architecture Review | 3 |
+| Research & Investigation | 1 |
 | Design Skills | 2 |
-| Other | 3 |
+| Other | 7 |
 
 ## インストール
 

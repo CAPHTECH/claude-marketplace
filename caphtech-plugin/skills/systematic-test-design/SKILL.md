@@ -490,5 +490,5 @@ L2: 署名不正JWT、期限1ms超過
 |--------|------|
 | `/test-design-audit` | テスト設計の全体フレームワーク（要求→テスト条件） |
 | `/eld-ground-tdd-enforcer` | TDDサイクル強制 |
-| `/eld-ground-check` | Law/Term接地検証 |
+| `/eld-ground-verify` | Law/Term接地検証 |
 | `/boundary-observation` | 境界条件の観測 |

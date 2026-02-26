@@ -1,25 +1,20 @@
 ---
 name: architecture-reviewer
 context: fork
-description: |
-  3種類のアーキテクチャ分析を並行実行し、単体・相互作用・横断的観点から問題を検出するスキル。
-  「単体は良いのに全体として成立しない」問題を防ぐため、必ず3視点を同時に適用する。
-  設計整合性チェック（テスト網羅性・スキーマ一致・障害モード網羅性）も統合。
-
-  使用タイミング:
-  - 「アーキテクチャレビューして」「設計をレビューして」
-  - 「コンポーネント分析して」「依存関係を分析して」
-  - 「設計の整合性をチェックして」「設計をチェックして」「design consistency check」
-  - 「設計と実装の整合性を確認して」「スキーマと実装が一致しているか確認して」
-  - component-dossiers/*.yaml と system-map/invariants.yaml が存在する時
-  - PR前の設計確認、リファクタリング前の影響分析
+description: 3種類のアーキテクチャ分析（ノード/エッジ/縦串）を並行実行し、矛盾検出・優先順位付けまで一貫して行う。「アーキテクチャレビューして」「設計をチェックして」「矛盾を検出して」「優先順位を付けて」「トレードオフを分析して」と言われた時、またはcomponent-dossiers/*.yamlが存在する時に使用。
 ---
 
 # Architecture Reviewer
 
-3種類の分析を並行実行し、アーキテクチャの問題を多角的に検出する。
+3種類の分析を並行実行し、矛盾検出と優先順位付けまで一貫して行う。
 
-**重要**: 3種類すべてを実行すること。単体分析だけで終わらせない。
+**核心**: 単体分析で終わらせない。3視点の分析 → 矛盾検出 → 優先順位付けを必ず通す。
+
+## ワークフロー
+
+```
+1. 3種類の分析（並行）→ 2. 矛盾検出（4類型）→ 3. 優先順位付け → 4. 出力
+```
 
 ## 前提条件
 
@@ -32,34 +27,32 @@ description: |
 推奨:
 - `system-map/dependencies.yaml` - 依存グラフ
 - `system-map/boundaries.yaml` - 境界定義
+- 既存ADR（アーキテクチャ決定記録）
+- プロジェクト特性の定義（品質優先順位）
 
 ### Lightweight Mode
 
-system-map が存在しない場合、`scripts/collect_artifacts.py` でプロジェクトをスキャンし、設計整合性チェック（D2/D3/D5）のみを実行する。
+system-map が存在しない場合、`scripts/collect_artifacts.py` でプロジェクトをスキャンし、D2/D3/D5 の検証のみを実行する。
 
 ```bash
 python3 scripts/collect_artifacts.py <project_root> -o /tmp/dcc-manifest.json
 ```
 
-出力マニフェストから設計文書・スキーマ・テスト・ソースファイルを特定し、D2/D3/D5 の検証を行う。
-
-## 3種類の分析
+## Phase 1: 3種類の分析
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  必ず3つとも実行する（単体だけで終わらせない）           │
 ├─────────────────────────────────────────────────────────┤
-│  ① コンポーネント内レビュー ─ ノード（局所の健全性）    │
-│  ② インタラクションレビュー ─ エッジ（依存の整合性）    │
-│  ③ クロスカッティングレビュー ─ 縦串（横断的品質）      │
+│  (1) コンポーネント内レビュー ─ ノード（局所の健全性）   │
+│  (2) インタラクションレビュー ─ エッジ（依存の整合性）   │
+│  (3) クロスカッティングレビュー ─ 縦串（横断的品質）     │
 └─────────────────────────────────────────────────────────┘
 ```
 
-## 分析1: コンポーネント内レビュー（ノード）
+### 分析1: コンポーネント内レビュー（ノード）
 
-各コンポーネントの局所的な健全性を検証。
-
-### 評価観点
+各コンポーネントの局所的な健全性を検証する。不変条件（invariants.yaml）に照らして評価すること。
 
 | 観点 | チェック内容 |
 |------|-------------|
@@ -71,33 +64,11 @@ python3 scripts/collect_artifacts.py <project_root> -o /tmp/dcc-manifest.json
 | テスト網羅性(D2) | 各不変条件・状態遷移・境界条件にテストがあるか |
 | 障害モード網羅性(D5) | 各障害モードに処理コードとリカバリ戦略があるか |
 
-### 評価基準
+指摘は `component_findings` として出力する。category は responsibility/boundary/data_ownership/exception/testability のいずれか。
 
-**必ず不変条件（invariants.yaml）に照らして評価する。**
+### 分析2: インタラクションレビュー（エッジ）
 
-```yaml
-# 指摘の形式
-component_findings:
-  - component_id: order-service
-    finding_id: COMP-001
-    category: responsibility  # responsibility/boundary/data_ownership/exception/testability
-    severity: high
-    description: |
-      PaymentServiceへの直接依存があり、payment-serviceの内部実装に結合している
-    evidence:
-      file: src/services/order/OrderService.ts
-      line: 45
-      code: "await paymentService.chargeInternal(amount)"
-    violated_invariant: INV-ARCH-002  # 関連する不変条件
-    verdict: FAIL  # PASS|WARN|FAIL
-    recommendation: PaymentServiceの公開APIを使用する
-```
-
-## 分析2: インタラクションレビュー（エッジ）
-
-依存グラフの「辺」ごとに検証。**全体性の本丸。**
-
-### 評価観点
+依存グラフの「辺」ごとに検証する。**全体性の本丸。**
 
 | 観点 | チェック内容 |
 |------|-------------|
@@ -109,52 +80,13 @@ component_findings:
 | セキュリティ | 認証・認可・秘密情報の境界超え |
 | スキーマ実装一致(D3) | データスキーマとコードの型・フィールド・制約が一致しているか |
 
-### 評価方法
+エラー伝播の連鎖分析: A -> B -> C の場合、タイムアウトの大小関係、リトライ連鎖の指数的爆発を確認する。
 
-依存グラフの各辺（A → B）について:
+指摘は `interaction_findings` として出力する。category は contract/error_propagation/idempotency/ordering/consistency/security のいずれか。
 
-```yaml
-# 辺ごとの分析
-interaction_findings:
-  - edge_id: order-service -> payment-service
-    finding_id: EDGE-001
-    category: error_propagation  # contract/error_propagation/idempotency/ordering/consistency/security
-    severity: critical
-    description: |
-      payment-serviceのタイムアウト(30s)がorder-serviceのタイムアウト(25s)より長い。
-      order-serviceがタイムアウトしてもpayment-serviceは処理を続行し、
-      二重課金のリスクがある。
-    evidence:
-      source:
-        file: component-dossiers/order-service.yaml
-        field: failure_modes[0].trigger
-        value: "25s timeout"
-      target:
-        file: component-dossiers/payment-service.yaml
-        field: non_functional.performance.timeout
-        value: "30s"
-    violated_invariant: INV-IDEM-001
-    verdict: FAIL  # PASS|WARN|FAIL
-    recommendation: |
-      1. order-serviceのタイムアウトをpayment-serviceより長くする
-      2. または冪等キーを導入して二重課金を防止
-```
+### 分析3: クロスカッティングレビュー（縦串）
 
-### エラー伝播の連鎖分析
-
-```
-A → B → C の場合：
-- AのタイムアウトはBより長いか？
-- BのタイムアウトはCより長いか？
-- Bが失敗した時、Aはどうリトライするか？
-- リトライの連鎖で指数的爆発は起きないか？
-```
-
-## 分析3: クロスカッティングレビュー（縦串）
-
-システム横断的な品質を検証。
-
-### 評価観点
+システム横断的な品質を検証する。
 
 | 縦串 | チェック内容 |
 |------|-------------|
@@ -163,40 +95,71 @@ A → B → C の場合：
 | 観測性 | ログ・メトリクス・トレースが責務境界と一致 |
 | 変更容易性 | モジュール結合度、影響範囲、ADR整合 |
 
-### 評価方法
+指摘は `crosscutting_findings` として出力する。aspect は security/reliability/observability/changeability のいずれか。
 
-```yaml
-crosscutting_findings:
-  - aspect: security  # security/reliability/observability/changeability
-    finding_id: CROSS-001
-    severity: high
-    description: |
-      認証境界（API Gateway）を超えた後、内部サービス間で認可チェックが
-      行われていない。order-serviceはuser_idの所有権を検証せずに
-      他ユーザーの注文を操作可能。
-    affected_components:
-      - order-service
-      - inventory-service
-    evidence:
-      - file: component-dossiers/order-service.yaml
-        field: non_functional.security
-        note: "JWT認証必須"とあるが認可ロジックが未記載
-    violated_invariant: INV-SEC-001
-    verdict: FAIL  # PASS|WARN|FAIL
-    recommendation: |
-      各サービスで所有権チェックを実装、または認可サービスを導入
+各指摘のYAML例は [references/finding-examples.yaml](references/finding-examples.yaml) を参照。指摘を書くときのテンプレートとして使用する。
+
+## Phase 2: 矛盾検出（4類型）
+
+分析結果の指摘間、および指摘と不変条件/ADR間の矛盾を検出する。**改善案の列挙より矛盾の発見に注力する。**
+
+### 4類型の概要
+
+| 類型 | conflict_type | 内容 |
+|------|---------------|------|
+| 改善案間の矛盾 | improvement_tradeoff | 改善案Aは品質Xを改善するが品質Yを損なう |
+| 前提破壊 | assumption_violation | コンポーネントiの改善が依存先jの前提を破壊 |
+| 不変条件違反 | invariant_violation | 推奨アクションが不変条件と食い違う |
+| ADR矛盾 | adr_inconsistency | 推奨がADRと矛盾、またはADRが欠落 |
+
+### 検出手順
+
+1. 全 findings の recommendation を品質属性でタグ付け
+2. 同じ品質属性に対して逆方向の recommendation がないか走査
+3. 各 recommendation が invariants.yaml の条件に違反しないか確認
+4. 各 recommendation が既存ADRと矛盾しないか確認
+5. 重要な決定にADRがなければ `missing_adrs` として記録
+
+各類型の詳細説明とYAML例は [references/conflict-types.md](references/conflict-types.md) を参照。矛盾を特定する際のパターンマッチに使用する。
+
+## Phase 3: 優先順位付け
+
+### スコアリング
+
+```
+Priority = Severity x Likelihood x Detectability_inv x Quality_Weight
 ```
 
-詳細は [references/crosscutting-checklist.md](references/crosscutting-checklist.md) を参照。
+| 要素 | 説明 | スケール |
+|------|------|---------|
+| Severity | 発生時の影響度 | critical=4, high=3, medium=2, low=1 |
+| Likelihood | 発生確率 | high=3, medium=2, low=1 |
+| Detectability_inv | 検出困難なほど高い | easy=1, medium=2, hard=3 |
+| Quality_Weight | プロジェクト品質優先順位 | 1位=5, 2位=4, 3位=3, 4位=2, 5位=1 |
+
+### 優先順位カテゴリ
+
+| カテゴリ | スコア | 対応 |
+|---------|--------|------|
+| P0 - Blocker | 36+ | 即時対応（リリース不可） |
+| P1 - Critical | 24-35 | 今スプリント内 |
+| P2 - High | 12-23 | 次スプリント |
+| P3 - Medium | 6-11 | バックログ |
+| P4 - Low | 1-5 | 技術的負債 |
+
+プロジェクト特性が未定義の場合、Quality_Weight は全て 3（中央値）として計算する。
+
+スコアリングの詳細計算例とプロジェクト特性の定義例は [references/priority-scoring.md](references/priority-scoring.md) を参照。スコア算出に迷った時に使用する。
 
 ## 出力形式
 
-`architecture-review/{timestamp}/findings.yaml` に出力:
+`architecture-review/{timestamp}/review.yaml` に統合出力する。
 
 ```yaml
 id: architecture-review
 reviewed_at: "2024-01-21T10:00:00+09:00"
 mode: full  # full | lightweight
+
 reviewed_scope:
   components: 15
   interactions: 23
@@ -216,39 +179,67 @@ summary:
 
 verification_summary:
   verdict: NEEDS_ATTENTION  # PASS | PASS_WITH_WARNINGS | NEEDS_ATTENTION | FAIL
-  by_verdict:
-    pass: 18
-    warn: 4
-    fail: 2
-  dimensions_checked:
-    - D2_test_coverage
-    - D3_schema_match
-    - D5_failure_modes
+  by_verdict: { pass: 18, warn: 4, fail: 2 }
+  dimensions_checked: [D2_test_coverage, D3_schema_match, D5_failure_modes]
 
-component_findings:
-  - ...
+# Phase 1 の結果
+component_findings: [...]     # finding-examples.yaml 参照
+interaction_findings: [...]   # finding-examples.yaml 参照
+crosscutting_findings: [...]  # finding-examples.yaml 参照
 
-interaction_findings:
-  - ...
+# Phase 2 の結果
+conflicts:
+  total: 8
+  by_type:
+    improvement_tradeoff: 3
+    assumption_violation: 2
+    invariant_violation: 2
+    adr_inconsistency: 1
+  items:
+    - id: CONF-001
+      type: improvement_tradeoff
+      findings: [COMP-001, EDGE-003]
+      description: 抽象化 vs 直接通信のトレードオフ
+      resolution:
+        decision: performance優先（EDGE-003採用）
+        rationale: プロジェクト特性でperformance > changeability
+        deferred_action: COMP-001は技術的負債として記録
 
-crosscutting_findings:
-  - ...
+# Phase 3 の結果
+prioritized_actions:
+  - priority: P0
+    items:
+      - finding_id: EDGE-001
+        score: 180
+        action: payment-serviceタイムアウト整合
+
+deferred_items:
+  - finding_id: COMP-001
+    reason: 優先度が低い（changeability）
+    revisit: リリース後のスプリント1
+
+missing_adrs:
+  - topic: サービス間タイムアウト戦略
+    related_findings: [EDGE-001, EDGE-003]
+    recommendation: ADR作成を推奨
 ```
 
 ## 注意事項
 
 - **3種類すべてを実行**: 単体分析だけで終わらせると全体性を見落とす
+- **矛盾検出が本丸**: 改善案の列挙より、矛盾の発見と解決に注力
 - **不変条件に拘束**: 評価基準は invariants.yaml から導出
-- **推測禁止**: 根拠がない指摘はしない。evidenceを必ず記載
+- **プロジェクト特性を必ず適用**: 同じ問題でも優先順位が変わる
+- **推測禁止**: 根拠がない指摘はしない。evidence を必ず記載
 - **severity は客観的に**: 影響範囲と発生確率で判定
+- **ADR欠落の検出**: 重要な決定にADRがなければ指摘
 
 ## 参照
 
-- [references/crosscutting-checklist.md](references/crosscutting-checklist.md) - クロスカッティング分析の詳細チェックリスト
-- [references/verification-dimensions.md](references/verification-dimensions.md) - D2/D3/D5 検証次元の詳細
-- [references/report-verdicts.md](references/report-verdicts.md) - PASS/WARN/FAIL 判定基準
+- [references/finding-examples.yaml](references/finding-examples.yaml) - 3種類の分析指摘のYAML例。指摘を書くときのテンプレートとして使用
+- [references/conflict-types.md](references/conflict-types.md) - 矛盾の4類型の詳細説明とYAML例。矛盾を特定する際に使用
+- [references/priority-scoring.md](references/priority-scoring.md) - スコアリング詳細とプロジェクト特性の定義例。スコア算出時に使用
+- [references/crosscutting-checklist.md](references/crosscutting-checklist.md) - クロスカッティング分析の詳細チェックリスト。縦串分析時に使用
+- [references/verification-dimensions.md](references/verification-dimensions.md) - D2/D3/D5 検証次元の詳細。設計整合性チェック時に使用
+- [references/report-verdicts.md](references/report-verdicts.md) - PASS/WARN/FAIL 判定基準。verdict 付与時に使用
 - `scripts/collect_artifacts.py` - Lightweight Mode 用アーティファクト収集スクリプト
-
-## 次のステップ
-
-分析結果は `synthesis-analyzer` スキルで矛盾検出・優先順位付けを行う。

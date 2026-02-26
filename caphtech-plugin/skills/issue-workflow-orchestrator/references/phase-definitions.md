@@ -84,7 +84,7 @@ phase:
 ```yaml
 phase:
   id: "uncertainty"
-  skill: "/resolving-uncertainty"
+  skill: "/uncertainty-resolution"
   purpose: "不確実性の台帳化と優先順位付け、観測タスク化"
 
   entry_criteria:
@@ -111,7 +111,7 @@ phase:
 ```yaml
 phase:
   id: "task_decomposition"
-  skill: "/eld-sense-task-decomposition"
+  skill: "/eld-sense-planning"
   purpose: "タスクを分解し、実装計画を策定"
 
   entry_criteria:

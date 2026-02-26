@@ -50,7 +50,7 @@ Issue分析時に検出する不確実性フラグの標準定義。
 | `missing_environment` | 環境情報の追加依頼を検討 |
 | `needs_clarification` | 報告者への質問を検討 |
 | `potential_duplicate` | 既存Issue検索を実施 |
-| 複数フラグ | `/resolving-uncertainty` |
+| 複数フラグ | `/uncertainty-resolution` |
 
 ## confidence への影響
 

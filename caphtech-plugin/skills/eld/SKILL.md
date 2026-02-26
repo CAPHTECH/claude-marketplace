@@ -104,7 +104,7 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 3. Issue Contractを作成（`issue-template.md`使用）
 4. Term/Law候補を列挙
 
-使用スキル: `/eld-sense-requirements-brainstorming` (新機能時), `/eld-sense-activation`, `/eld-model-law-discovery`
+使用スキル: `/eld-sense-requirements-brainstorming` (新機能時), `/eld-sense-activation`, `/eld-model`
 
 ### Phase 2: Design（設計）
 
@@ -122,7 +122,7 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 4. 影響予測と段階化計画
 5. **Grounding Plan策定**（`/test-design-audit`でテスト設計）
 
-使用スキル: `/eld-model-law-card`, `/eld-model-term-card`, `/test-design-audit`
+使用スキル: `/eld-model`, `/test-design-audit`
 
 ### Phase 3: Implementation（実装ループ）
 
@@ -150,7 +150,7 @@ Sense → Model → Predict → Change → Ground → Commit → Record
 - RED（失敗テスト）→ GREEN（最小実装）→ REFACTOR（品質改善）サイクル
 - テストなし実装を許さず、コミット前にEvidence L1確認
 
-使用スキル: `/eld-change-worktree`, `/eld-ground-tdd-enforcer`, `/eld-predict-impact`, `/eld-record-collection`
+使用スキル: `/eld-change-worktree`, `/eld-ground-tdd-enforcer`, `/eld-predict-impact`, `/eld-record`
 
 **停止条件チェック**:
 - 予測と現実の継続的乖離
@@ -167,7 +167,7 @@ Sense → Model → Predict → Change → Ground → Commit → Record
   - Evidence Ladder達成レベル
 ```
 
-使用スキル: `/eld-ground-check`
+使用スキル: `/eld-ground-verify`
 
 PR作成: `pr-template.md` 使用
 
@@ -316,17 +316,12 @@ ELDループ内で使用する補助スキル:
 | スキル | 用途 |
 |--------|------|
 | `/eld-sense-activation` | アクティブコンテキスト構築 |
-| `/eld-sense-scope` | タスクスコープの定義 |
-| `/eld-sense-task-decomposition` | タスク分解 |
-| `/eld-sense-parallel-orchestrator` | 並列実行最適化 |
+| `/eld-sense-planning` | タスクスコープ定義・タスク分解・並列実行最適化 |
 
 ### Model（モデル化）
 | スキル | 用途 |
 |--------|------|
-| `/eld-model-law-discovery` | Law候補の発見 |
-| `/eld-model-law-card` | Law Card作成 |
-| `/eld-model-term-card` | Term Card作成 |
-| `/eld-model-link-map` | Link Map管理 |
+| `/eld-model` | Law/Term発見・Card作成・Link Map管理 |
 
 ### Change/Commit（変更・コミット）
 | スキル | 用途 |
@@ -338,21 +333,14 @@ ELDループ内で使用する補助スキル:
 |--------|------|
 | `/test-design-audit` | **テスト設計監査（ELD統合版）** - Law/Term駆動のテスト設計 |
 | `/systematic-test-design` | **体系的テスト設計** - ユニットテスト＋PBT統合 |
-| `/eld-ground-check` | 接地状況の検証 |
-| `/eld-ground-evaluate` | 成果物評価 |
+| `/eld-ground-verify` | 接地状況の検証・成果物評価・PR作成前検証 |
 | `/eld-ground-law-monitor` | Law違反監視 |
 | `/eld-ground-pr-review` | PRレビュー |
-| `/eld-ground-pre-completion` | PR作成前検証 |
 
 ### Record（記録）
 | スキル | 用途 |
 |--------|------|
-| `/eld-record-collection` | Context Delta収集 |
-| `/eld-record-structuring` | 知識の構造化 |
-| `/eld-record-compact` | 履歴圧縮 |
-| `/eld-record-maintenance` | 知識メンテナンス |
-| `/eld-record-memory-collector` | メモリ収集 |
-| `/eld-record-knowledge-transfer` | 知識転送 |
+| `/eld-record` | Context Delta収集・検証・構造化・知識移転・履歴圧縮・知識メンテナンス |
 
 ### Debug（デバッグ）
 | スキル | 用途 |

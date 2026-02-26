@@ -114,7 +114,7 @@ pce_memory_activate({
 |--------------|------|
 | REQ → Law | 要求が既存Lawの検証に対応 |
 | REQ → Term | 要求がTermの境界検証に対応 |
-| REQ → 新Law候補 | 新しいLawの発見（`/eld-model-law-discovery`へ） |
+| REQ → 新Law候補 | 新しいLawの発見（`/eld-model`へ） |
 
 ### 出力フォーマット
 
@@ -140,7 +140,7 @@ pce_memory_activate({
 要求一覧とは別に「**不明点・矛盾・仮定**」セクションを設ける。これがないと仮定が埋め込まれたまま進む。
 
 **Law/Termが未定義の場合**は `(NEW-LAW)` または `(NEW-TERM)` ラベルを付け、
-`/eld-model-law-card` または `/eld-model-term-card` で定義する。
+`/eld-model` で定義する。
 
 ---
 
@@ -333,10 +333,10 @@ Feature A [LAW-feature-a-invariant]
 
 ### ELD統合: Law接地監査
 
-`/eld-ground-check` を使用してLaw/Termの接地状況を検証:
+`/eld-ground-verify` を使用してLaw/Termの接地状況を検証:
 
 ```
-/eld-ground-check LAW-xxx
+/eld-ground-verify LAW-xxx
 
 結果:
 ✅ L0: 型チェック通過
@@ -513,11 +513,8 @@ pce_memory_upsert({
 | スキル | 用途 |
 |--------|------|
 | `/eld` | ELD統合開発手法のメイン |
-| `/eld-model-law-discovery` | 新しいLawの発見 |
-| `/eld-model-law-card` | Law Cardの作成 |
-| `/eld-model-term-card` | Term Cardの作成 |
-| `/eld-ground-check` | Law/Termの接地状況検証 |
-| `/eld-ground-evaluate` | 成果物評価 |
+| `/eld-model` | Law/Term発見・Card作成 |
+| `/eld-ground-verify` | Law/Termの接地状況検証・成果物評価 |
 | `/systematic-test-design` | 体系的テスト設計（ユニットテスト＋PBT統合） |
 
 ---

@@ -65,7 +65,7 @@ Step 2の例をテストコードに変換する。
 
 ## 連携
 
-- **resolving-uncertainty**: 仮定を不確実性台帳（Uncertainty Register）へ連携
+- **uncertainty-resolution**: 仮定を不確実性台帳（Uncertainty Register）へ連携
 - **critical-code-review**: PRレビュー時に仕様との乖離をチェック
 
 ## Outputs

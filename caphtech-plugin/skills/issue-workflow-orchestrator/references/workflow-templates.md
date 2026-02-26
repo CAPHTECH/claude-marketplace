@@ -58,11 +58,11 @@ template:
       required: true
 
     - id: "uncertainty"
-      skill: "/resolving-uncertainty"
+      skill: "/uncertainty-resolution"
       required: false  # リスクがあれば実行
 
     - id: "task_decomposition"
-      skill: "/eld-sense-task-decomposition"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "observation"
@@ -106,11 +106,11 @@ template:
       required: true
 
     - id: "uncertainty"
-      skill: "/resolving-uncertainty"
+      skill: "/uncertainty-resolution"
       required: true
 
     - id: "task_decomposition"
-      skill: "/eld-sense-task-decomposition"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "observation"
@@ -207,11 +207,11 @@ template:
       required: true  # セキュリティ固有
 
     - id: "uncertainty"
-      skill: "/resolving-uncertainty"
+      skill: "/uncertainty-resolution"
       required: true
 
     - id: "task_decomposition"
-      skill: "/eld-sense-task-decomposition"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "observation"
@@ -265,15 +265,15 @@ template:
       required: true
 
     - id: "design"
-      skill: "/eld-model-law-discovery"
+      skill: "/eld-model"
       required: true  # 設計フェーズ
 
     - id: "uncertainty"
-      skill: "/resolving-uncertainty"
+      skill: "/uncertainty-resolution"
       required: true
 
     - id: "task_decomposition"
-      skill: "/eld-sense-task-decomposition"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "observation"

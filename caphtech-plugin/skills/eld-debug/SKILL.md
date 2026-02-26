@@ -319,9 +319,9 @@ L2: 実際のトークンでの統合テスト
 ## 関連スキル
 
 - `/eld-sense-activation` - Senseフェーズの詳細
-- `/eld-model-law-discovery` - 法則発見
-- `/eld-ground-check` - 接地検証
-- `/eld-record-collection` - 知識蓄積
+- `/eld-model` - 法則発見・Card作成
+- `/eld-ground-verify` - 接地検証
+- `/eld-record` - 知識蓄積
 
 ---
 

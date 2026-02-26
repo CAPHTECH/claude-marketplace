@@ -6,7 +6,7 @@ description: |
   使用タイミング: (1) 「PRのコメントに対応して」、(2) 「PR #N のレビュー指摘を修正して」、
   (3) PRレビュー後に指摘事項への一括対応が必要な時、(4) 「レビューフィードバックを解決して」
 tools: Read, Write, Edit, Glob, Grep, Bash
-skills: pr-comment-resolver, eld-ground-check
+skills: pr-comment-resolver, eld-ground-verify
 ---
 
 # PR Comment Resolver Agent

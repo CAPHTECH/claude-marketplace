@@ -125,8 +125,8 @@ phase:
 | 1 | intake | `/issue-intake` | Issue初期トリアージ |
 | 2 | context | `/eld-sense-activation` | コンテキスト活性化 |
 | 3 | onboarding | `/ai-led-onboarding` | 最小スキーマ構築 |
-| 4 | uncertainty | `/resolving-uncertainty` | 不確実性解消 |
-| 5 | task_decomposition | `/eld-sense-task-decomposition` | タスク分解 |
+| 4 | uncertainty | `/uncertainty-resolution` | 不確実性解消 |
+| 5 | task_decomposition | `/eld-sense-planning` | タスク分解 |
 | 6 | observation | `/observation-minimum-set` | 観測計画 |
 | 7 | implementation | `/eld` | 実装ループ |
 | 8 | review | `/eld-ground-pr-review` | PRレビュー |

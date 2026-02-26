@@ -381,7 +381,7 @@ Term:
     - 注文可能な在庫数
 ```
 
-## `/eld-model-law-discovery` への引き継ぎ
+## `/eld-model` への引き継ぎ
 
 要件ブレインストーミングで抽出した候補は、次のスキルでさらに詳細化:
 
@@ -403,7 +403,7 @@ Law/Term候補リスト:
       source: [ユーザーの発言]
 ```
 
-`/eld-model-law-discovery` で以下を追加:
+`/eld-model` で以下を追加:
 
 - Law の論理式化
 - Term の観測写像定義

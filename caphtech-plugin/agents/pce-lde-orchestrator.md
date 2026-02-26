@@ -27,7 +27,7 @@ PCE循環とLDEフェーズ（A-F）を統合し、開発ライフサイクル�
 Phase 0: Issue解析・トリアージ
   → issue-intake（初期トリアージ）
   → impact-analysis（影響範囲分析）
-  → resolving-uncertainty, pce-activation
+  → uncertainty-resolution, pce-activation
 
 Phase 1: Vocabulary/Law同定 (LDE Phase A-B)
   → lde-law-discovery

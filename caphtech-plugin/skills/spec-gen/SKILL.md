@@ -231,6 +231,6 @@ done
 
 ## 連携スキル
 
-- **eld-model-law-card**: 層Bで発見した不変条件をLaw Cardへ昇格
+- **eld-model**: 層Bで発見した不変条件をLaw Cardへ昇格
 - **spec-observation**: specから受入テストを生成
 - **doc-gen**: 層A/Bを開発者ドキュメントに統合

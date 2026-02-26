@@ -1,0 +1,98 @@
+# 分析指摘のYAML例
+# SKILL.md の「出力形式」セクションで参照される具体例。
+# 新規の指摘を書くときのテンプレートとして使用する。
+
+# ── コンポーネント内指摘 ──────────────────────────────
+component_findings:
+  - component_id: order-service
+    finding_id: COMP-001
+    category: responsibility  # responsibility/boundary/data_ownership/exception/testability
+    severity: high
+    description: |
+      PaymentServiceへの直接依存があり、payment-serviceの内部実装に結合している
+    evidence:
+      file: src/services/order/OrderService.ts
+      line: 45
+      code: "await paymentService.chargeInternal(amount)"
+    violated_invariant: INV-ARCH-002
+    verdict: FAIL  # PASS|WARN|FAIL
+    recommendation: PaymentServiceの公開APIを使用する
+
+  - component_id: inventory-service
+    finding_id: COMP-002
+    category: testability
+    severity: medium
+    description: |
+      不変条件 INV-INV-003（在庫数は負にならない）に対応するテストが存在しない
+    evidence:
+      file: component-dossiers/inventory-service.yaml
+      field: invariants[2]
+      note: テストディレクトリに該当テストなし
+    violated_invariant: INV-INV-003
+    verdict: FAIL
+    recommendation: 在庫数が0未満にならないことを検証する境界テストを追加
+
+# ── インタラクション指摘 ──────────────────────────────
+interaction_findings:
+  - edge_id: order-service -> payment-service
+    finding_id: EDGE-001
+    category: error_propagation  # contract/error_propagation/idempotency/ordering/consistency/security
+    severity: critical
+    description: |
+      payment-serviceのタイムアウト(30s)がorder-serviceのタイムアウト(25s)より長い。
+      order-serviceがタイムアウトしてもpayment-serviceは処理を続行し、
+      二重課金のリスクがある。
+    evidence:
+      source:
+        file: component-dossiers/order-service.yaml
+        field: failure_modes[0].trigger
+        value: "25s timeout"
+      target:
+        file: component-dossiers/payment-service.yaml
+        field: non_functional.performance.timeout
+        value: "30s"
+    violated_invariant: INV-IDEM-001
+    verdict: FAIL
+    recommendation: |
+      1. order-serviceのタイムアウトをpayment-serviceより長くする
+      2. または冪等キーを導入して二重課金を防止
+
+  - edge_id: order-service -> inventory-service
+    finding_id: EDGE-002
+    category: contract
+    severity: medium
+    description: |
+      order-serviceが送信するリクエストに reservationId フィールドがあるが、
+      inventory-serviceのスキーマでは定義されていない
+    evidence:
+      source:
+        file: src/services/order/InventoryClient.ts
+        line: 22
+        code: '{ itemId, quantity, reservationId }'
+      target:
+        file: schemas/inventory-reserve.json
+        note: reservationId フィールドなし
+    violated_invariant: null
+    verdict: WARN
+    recommendation: スキーマに reservationId を追加するか、送信側から削除
+
+# ── クロスカッティング指摘 ──────────────────────────────
+crosscutting_findings:
+  - aspect: security  # security/reliability/observability/changeability
+    finding_id: CROSS-001
+    severity: high
+    description: |
+      認証境界（API Gateway）を超えた後、内部サービス間で認可チェックが
+      行われていない。order-serviceはuser_idの所有権を検証せずに
+      他ユーザーの注文を操作可能。
+    affected_components:
+      - order-service
+      - inventory-service
+    evidence:
+      - file: component-dossiers/order-service.yaml
+        field: non_functional.security
+        note: "JWT認証必須"とあるが認可ロジックが未記載
+    violated_invariant: INV-SEC-001
+    verdict: FAIL
+    recommendation: |
+      各サービスで所有権チェックを実装、または認可サービスを導入

@@ -7,7 +7,7 @@ description: |
   使用タイミング: (1) 「アーキテクチャの知識を構築して」、(2) 「システムマップを作成して」、
   (3) 「コンポーネントカードを作成して」、(4) アーキテクチャレビューの準備段階
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-skills: system-map-collector, invariant-extractor, component-dossier-builder
+skills: system-understanding
 ---
 
 # Architecture Knowledge Builder Agent
@@ -29,7 +29,7 @@ skills: system-map-collector, invariant-extractor, component-dossier-builder
 
 ```
 Phase 1: System Map Collection
-  └→ system-map-collector
+  └→ system-understanding（システムマップ収集モード）
      出力: system-map/*.yaml
      - components.yaml（コンポーネント一覧）
      - dependencies.yaml（依存グラフ）
@@ -40,7 +40,7 @@ Phase 1: System Map Collection
      - api-contracts.yaml（API契約）
 
 Phase 2: Invariant Extraction
-  └→ invariant-extractor
+  └→ system-understanding（不変条件抽出モード）
      入力: system-map/*.yaml
      出力: system-map/invariants.yaml
      - 8カテゴリの不変条件を抽出
@@ -48,7 +48,7 @@ Phase 2: Invariant Extraction
      - 信頼度を明示
 
 Phase 3: Component Dossier Building
-  └→ component-dossier-builder
+  └→ system-understanding（コンポーネントカード作成モード）
      入力: system-map/components.yaml, invariants.yaml
      出力: component-dossiers/{component-id}.yaml
      - 各コンポーネントの詳細カードを生成
@@ -87,20 +87,20 @@ ls -la component-dossiers/ 2>/dev/null || echo "component-dossiers未作成"
 
 ### Step 2: Phase 1実行（システムマップ収集）
 
-system-map-collectorスキルを起動:
+system-understandingスキルを起動（システムマップ収集）:
 - コードベースを探索
 - 7種類のYAMLファイルを生成
 - 探索ベースで事実を収集（推測禁止）
 
 ### Step 3: Phase 2実行（不変条件抽出）
 
-invariant-extractorスキルを起動:
+system-understandingスキルを起動（不変条件抽出）:
 - system-map/*.yamlから8カテゴリの不変条件を抽出
 - 各不変条件に検証タイプと信頼度を付与
 
 ### Step 4: Phase 3実行（コンポーネントカード作成）
 
-component-dossier-builderスキルを起動:
+system-understandingスキルを起動（コンポーネントカード作成）:
 - 各コンポーネントの詳細カードを生成
 - unknowns/assumptionsを明示的に記録
 

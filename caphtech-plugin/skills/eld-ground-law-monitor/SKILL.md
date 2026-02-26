@@ -217,7 +217,7 @@ Claude:
 2. Lawに並行制御要件を追加
 
 → pce-memoryに分析結果を記録しました
-→ /uncertainty-to-law で新Law候補を生成しますか？
+→ /uncertainty-resolution で新Law候補を生成しますか？
 ```
 
 ---

@@ -37,7 +37,7 @@ ELD Model → Law/Term Cards → test-design-audit Phase 1
 対応パターン:
   - REQ-001 → LAW-auth-valid-credential（既存Law）
   - REQ-002 → TERM-password（既存Term）
-  - REQ-003 → (NEW-LAW) → /eld-model-law-discoveryで発見
+  - REQ-003 → (NEW-LAW) → /eld-modelで発見
 ```
 
 **新しいLaw/Termの発見**:
@@ -74,10 +74,10 @@ laws:
 
 ### 5. Phase 5: Law接地監査
 
-監査フェーズで`/eld-ground-check`を使用してLaw/Termの接地状況を検証する。
+監査フェーズで`/eld-ground-verify`を使用してLaw/Termの接地状況を検証する。
 
 ```
-/eld-ground-check LAW-auth-valid-credential
+/eld-ground-verify LAW-auth-valid-credential
 
 結果:
 ✅ L0: 型チェック通過
@@ -109,37 +109,33 @@ test-design-audit → Grounding Map → ELD Record → pce-memory
 
 | スキル | 提供情報 |
 |--------|----------|
-| `/eld-model-law-card` | Law Cardの詳細（Severity、論理式、関連Term） |
-| `/eld-model-term-card` | Term Cardの詳細（境界、観測写像） |
-| `/eld-model-link-map` | Law ↔ Term の相互参照 |
+| `/eld-model` | Law/Term Cardの詳細（Severity、論理式、関連Term、境界、観測写像）、Law ↔ Term の相互参照 |
 
 ### 出力スキル（Groundフェーズ）
 
 | スキル | 受け取る情報 |
 |--------|--------------|
-| `/eld-ground-check` | テスト条件とGrounding Mapの検証 |
-| `/eld-ground-evaluate` | テスト設計全体の評価 |
+| `/eld-ground-verify` | テスト条件とGrounding Mapの検証・テスト設計全体の評価 |
 
 ## 使用例
 
 ### 例1: 新機能のテスト設計
 
 ```
-1. /eld-model-law-discovery で機能のLaw/Termを発見
-2. /eld-model-law-card, /eld-model-term-card でカード化
-3. /test-design-audit でテスト設計
+1. /eld-model で機能のLaw/Termを発見・カード化
+2. /test-design-audit でテスト設計
    - Phase 1: REQとLaw/Termを対応付け
    - Phase 3: Evidence Ladderでカバレッジ基準設定
    - Phase 4-6: テスト条件・項目作成
-   - Phase 5: /eld-ground-check で接地監査
+   - Phase 5: /eld-ground-verify で接地監査
 4. Grounding Mapを更新
-5. /eld-record-collection で知識を記録
+5. /eld-record で知識を記録
 ```
 
 ### 例2: 既存機能のテスト改善
 
 ```
-1. /eld-ground-check で現在の接地状況を確認
+1. /eld-ground-verify で現在の接地状況を確認
 2. 未達成のEvidence Ladderレベルを特定
 3. /test-design-audit で追加テストを設計
    - Phase 4: 不足レベル（L2, L3等）のテスト条件を追加

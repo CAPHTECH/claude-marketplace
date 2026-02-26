@@ -86,7 +86,7 @@ issue_intake:
     - "auth_failure"             # 分類タグ
   recommended_workflow: "standard" # emergency/standard/lightweight
   next_actions:
-    - "/resolving-uncertainty"
+    - "/uncertainty-resolution"
     - "/eld-sense-activation"
 ```
 
@@ -168,7 +168,7 @@ Issue本文から以下を抽出:
 next_actions は**別スキル参照のみ**。理由は severity_rationale 側に記載。
 
 **デフォルト**:
-- `/resolving-uncertainty`
+- `/uncertainty-resolution`
 - `/eld-sense-activation`
 
 **条件分岐**:
@@ -217,7 +217,7 @@ issue_intake:
   recommended_workflow: "standard"
   next_actions:
     - "/eld-sense-activation"
-    - "/resolving-uncertainty"
+    - "/uncertainty-resolution"
 ```
 
 ## リファレンス

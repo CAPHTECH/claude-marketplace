@@ -2,12 +2,12 @@
 name: issue-workflow-orchestrator-agent
 description: |
   Issue起点のワークフロー全体を制御するエージェント。issue-intakeによるトリアージ、
-  impact-analysisによる影響分析、ai-led-onboardingによる文脈構築、eld-sense-task-decompositionに
+  impact-analysisによる影響分析、ai-led-onboardingによる文脈構築、eld-sense-planningに
   よるタスク分解を統合し、Issue→PR完了までを一貫して管理する。
   使用タイミング: (1) 「Issue #N を対応して」、(2) 「このIssueを解決して」、
   (3) Issue起点で作業を開始する時、(4) 複数スキルを連携させてIssue対応したい時
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-skills: issue-intake, issue-workflow-orchestrator, impact-analysis, ai-led-onboarding, eld-sense-task-decomposition, resolving-uncertainty
+skills: issue-intake, issue-workflow-orchestrator, impact-analysis, ai-led-onboarding, eld-sense-planning, uncertainty-resolution
 ---
 
 # Issue Workflow Orchestrator Agent
@@ -19,7 +19,7 @@ Issue起点の開発ワークフロー全体を制御し、適切なスキルを
 1. **Issue解析**: issue-intakeでトリアージ、分類、深刻度評価
 2. **影響分析**: impact-analysisで変更の影響範囲を特定
 3. **文脈構築**: ai-led-onboardingで必要な文脈を構築
-4. **タスク分解**: eld-sense-task-decompositionで実行可能なタスクに分解
+4. **タスク分解**: eld-sense-planningで実行可能なタスクに分解
 5. **進捗管理**: ワークフロー全体の進捗と状態を管理
 
 ## ワークフロー
@@ -38,13 +38,13 @@ Phase 2: Context（文脈構築）
      - リスク評価
 
 Phase 3: Uncertainty Resolution（不確実性解消）
-  └→ resolving-uncertainty（uncertainty_flags存在時）
+  └→ uncertainty-resolution（uncertainty_flags存在時）
      - 再現手順確認
      - 期待動作確認
      - 環境情報収集
 
 Phase 4: Task Decomposition（タスク分解）
-  └→ eld-sense-task-decomposition
+  └→ eld-sense-planning
      - 実行可能なタスクに分解
      - 依存関係の特定
 

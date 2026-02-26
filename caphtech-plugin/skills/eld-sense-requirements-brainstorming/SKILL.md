@@ -109,7 +109,7 @@ Issue Contract:
 
 ### Phase 5: Law/Term候補の引き継ぎ
 
-抽出したLaw/Term候補を `/eld-model-law-discovery` に引き継ぎ:
+抽出したLaw/Term候補を `/eld-model` に引き継ぎ:
 - Law候補: 守るべき条件（Invariant/Precondition/Postcondition/Policy）
 - Term候補: ドメイン語彙（Entity/Value Object/Context/Boundary）
 
@@ -235,8 +235,8 @@ Severity判定:
 
 完了後、以下のスキルに引き継ぎ:
 
-1. `/eld-model-law-discovery`: Law/Term候補の詳細化
-2. `/eld-sense-task-decomposition`: タスク分解（Issue Contract をもとに）
+1. `/eld-model`: Law/Term候補の詳細化・Card作成
+2. `/eld-sense-planning`: タスク分解（Issue Contract をもとに）
 
 ## リファレンス
 
