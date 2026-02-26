@@ -1,25 +1,9 @@
 {
   "name": "caphtech-plugin",
   "description": "CAPH TECH marketplace plugin for Claude Code",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "author": {
     "name": "CAPH TECH Inc."
   },
-  "agents": [
-    "./agents/architecture-analysis-reporter.md",
-    "./agents/architecture-knowledge-builder.md",
-    "./agents/grounding-verifier.md",
-    "./agents/issue-workflow-orchestrator-agent.md",
-    "./agents/law-constraint-analyst.md",
-    "./agents/mutual-constraint-validator.md",
-    "./agents/observation-orchestrator.md",
-    "./agents/pce-knowledge-architect.md",
-    "./agents/pce-lde-orchestrator.md",
-    "./agents/pce-memory-analyzer.md",
-    "./agents/pce-memory-orchestrator.md",
-    "./agents/pr-ci-responder.md",
-    "./agents/pr-comment-resolver-agent.md",
-    "./agents/vocabulary-term-analyst.md"
-  ],
   "skills": "./skills/"
 }
