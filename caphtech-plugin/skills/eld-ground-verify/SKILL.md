@@ -1,7 +1,8 @@
 ---
 name: eld-ground-verify
 context: fork
-description: ELD接地検証の統合スキル。Law/Termの接地チェック、生成物の品質・Law整合性評価、Evidence Pack完全性・孤立検出・Evidence Ladder達成確認をPR前に一括実行する。使用タイミング: PR作成前の接地確認、「Grounding Checkして」「品質チェックして」「完成度を確認して」、Law/Term追加後の接地完了確認
+description: |
+  ELD接地検証の統合スキル。Law/Termの接地チェック、生成物の品質・Law整合性評価、Evidence Pack完全性・孤立検出・Evidence Ladder達成確認をPR前に一括実行する。使用タイミング: PR作成前の接地確認、「Grounding Checkして」「品質チェックして」「完成度を確認して」、Law/Term追加後の接地完了確認
 ---
 
 # ELD Ground Verify

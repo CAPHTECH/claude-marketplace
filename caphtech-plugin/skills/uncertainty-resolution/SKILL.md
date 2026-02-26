@@ -1,8 +1,9 @@
 ---
 name: uncertainty-resolution
 context: fork
-description: 不確実性を発見・台帳化し、優先順位付け・観測タスク化を経て、検証済み仮説をLaw（LDE）に昇格させる。使用タイミング: 不確実性/曖昧さ/未知/仮説/検証/調査/リスク/前提/優先順位/観測/意思決定の話題が出たとき、または検証結果のLaw化を求められたとき。
-argument-hint: "register-only" で台帳作成まで、"full" でLaw昇格まで（デフォルト: full）
+description: |
+  不確実性を発見・台帳化し、優先順位付け・観測タスク化を経て、検証済み仮説をLaw（LDE）に昇格させる。使用タイミング: 不確実性/曖昧さ/未知/仮説/検証/調査/リスク/前提/優先順位/観測/意思決定の話題が出たとき、または検証結果のLaw化を求められたとき。
+argument-hint: '"register-only" で台帳作成まで、"full" でLaw昇格まで（デフォルト: full）'
 ---
 
 # Uncertainty Resolution
