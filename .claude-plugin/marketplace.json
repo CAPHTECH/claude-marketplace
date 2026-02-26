@@ -31,6 +31,17 @@
       "category": "development"
     },
     {
+      "name": "codex-plugin",
+      "source": "./codex-plugin",
+      "description": "OpenAI Codex (gpt-5.3-codex) 連携プラグイン。Codex MCP サーバーを提供し、セカンドオピニオン・ペアプログラミング・構造化議論スキルを統合。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["codex", "openai", "pair-programming", "second-opinion", "negotiation"],
+      "category": "development"
+    },
+    {
       "name": "apple-platform-plugin",
       "source": "./apple-platform-plugin",
       "description": "Apple Platform（iOS/macOS/watchOS/tvOS）開発支援プラグイン。Swift/SwiftUI開発、Xcodeプロジェクト管理、テスト・品質保証、デザイン・UI/UX、Simulator自動化を提供。",

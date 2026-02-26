@@ -1,0 +1,10 @@
+{
+  "name": "codex-plugin",
+  "description": "OpenAI Codex (gpt-5.3-codex) 連携プラグイン。Codex MCP サーバーを提供し、セカンドオピニオン・ペアプログラミング・構造化議論スキルを統合。",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

@@ -24,9 +24,9 @@ Claude と Codex (gpt-5.3-codex) が構造化された議論プロトコルに�
 
 Claudeが初期提案を作成し、Codexに批判を求める。
 
-```bash
-codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
-  "以下の提案に対して批判的レビューを行ってください。
+```
+mcp__codex__codex(
+  prompt: "以下の提案に対して批判的レビューを行ってください。
 
 ## 議題
 <議題>
@@ -45,7 +45,10 @@ codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
 ## 指示
 - 提案の弱点・見落としを具体的に指摘
 - 可能なら対案を提示
-- 対案がある場合は同じ評価軸でスコアリング"
+- 対案がある場合は同じ評価軸でスコアリング",
+  model: "gpt-5.3-codex",
+  config: { "model_reasoning_effort": "xhigh" }
+)
 ```
 
 ### Phase 2: 批判への防御/修正（Defense/Revision）
@@ -58,9 +61,10 @@ Codexの批判を受けて、Claudeが防御または提案を修正する。
 
 修正後、再度Codexに評価を依頼:
 
-```bash
-codex exec resume --last \
-  "批判を受けて提案を修正しました。再評価してください。
+```
+mcp__codex__codex-reply(
+  threadId: "<前回のthreadId>",
+  prompt: "批判を受けて提案を修正しました。再評価してください。
 
 ## 修正提案
 <修正内容>
@@ -70,6 +74,7 @@ codex exec resume --last \
 
 ## 残る懸念
 同じ評価軸で再スコアリングし、まだ残る問題があれば指摘してください。"
+)
 ```
 
 ### Phase 3: 収束（Convergence）
@@ -116,9 +121,9 @@ codex exec resume --last \
 
 議題に対して複数の選択肢がある場合:
 
-```bash
-codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
-  "以下の選択肢を比較評価してください。
+```
+mcp__codex__codex(
+  prompt: "以下の選択肢を比較評価してください。
 
 ## 議題
 <議題>
@@ -137,16 +142,19 @@ codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
 各案を以下の軸で0-10でスコアリングし、推奨順位を付けてください:
 - 実装コスト / 保守性 / パフォーマンス / スケーラビリティ / リスク
 
-最も推奨する案とその理由も述べてください。"
+最も推奨する案とその理由も述べてください。",
+  model: "gpt-5.3-codex",
+  config: { "model_reasoning_effort": "xhigh" }
+)
 ```
 
 ### 既存案のブラッシュアップ
 
 既に方針が決まっていて、改善点を探る場合:
 
-```bash
-codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
-  "以下の設計案を改善してください。方向性は維持したまま、弱点を補強する修正を提案してください。
+```
+mcp__codex__codex(
+  prompt: "以下の設計案を改善してください。方向性は維持したまま、弱点を補強する修正を提案してください。
 
 ## 現在の設計
 <設計内容>
@@ -155,7 +163,10 @@ codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
 - <変えられない部分>
 
 ## 改善したい点
-- <具体的な懸念>"
+- <具体的な懸念>",
+  model: "gpt-5.3-codex",
+  config: { "model_reasoning_effort": "xhigh" }
+)
 ```
 
 ### ユーザー参加型
@@ -168,9 +179,11 @@ codex exec -m gpt-5.3-codex -c 'model_reasoning_effort="xhigh"' \
 
 ## 固定パラメータ
 
-- **model**: `-m gpt-5.3-codex` (常に指定)
-- **reasoning**: `-c 'model_reasoning_effort="xhigh"'` (常に指定)
-- **セッション継続**: `codex exec resume --last` でラウンド間の文脈を維持
+| パラメータ | 値 | 説明 |
+|-----------|-----|------|
+| model | `gpt-5.3-codex` | 常に指定 |
+| config.model_reasoning_effort | `xhigh` | 常に指定 |
+| セッション継続 | `mcp__codex__codex-reply` + threadId | ラウンド間の文脈を維持 |
 
 ## 注意事項
 
