@@ -9,14 +9,47 @@
   },
   "plugins": [
     {
-      "name": "caphtech-plugin",
-      "source": "./caphtech-plugin",
-      "description": "CAPH TECH marketplace plugin",
-      "version": "1.2.1",
+      "name": "eld-plugin",
+      "source": "./eld-plugin",
+      "description": "Evidence-Loop Development (ELD) プラグイン。Law/Termモデリング、影響予測、接地検証、知識管理を提供。",
+      "version": "1.0.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
-      "keywords": ["coding", "skill"],
+      "keywords": ["eld", "law", "term", "modeling", "grounding", "pce", "knowledge"],
+      "category": "development"
+    },
+    {
+      "name": "delivery-plugin",
+      "source": "./delivery-plugin",
+      "description": "開発ワークフロープラグイン。Issue管理、PRワークフロー、観測、テスト設計、コードレビューを提供。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["issue", "pr", "observation", "testing", "review", "workflow"],
+      "category": "development"
+    },
+    {
+      "name": "knowledge-plugin",
+      "source": "./knowledge-plugin",
+      "description": "アーキテクチャ・ドキュメント・リサーチプラグイン。システム理解、ドキュメント生成、情報収集を提供。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["architecture", "documentation", "research", "spec", "info-gathering"],
+      "category": "development"
+    },
+    {
+      "name": "creator-plugin",
+      "source": "./creator-plugin",
+      "description": "デザイン・メタツールプラグイン。アプリデザイン、CLAUDE.md管理、スキル作成を提供。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["design", "claude-md", "skill-creator", "app-design"],
       "category": "development"
     },
     {
