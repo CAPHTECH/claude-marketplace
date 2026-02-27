@@ -1,0 +1,9 @@
+{
+  "name": "knowledge-plugin",
+  "description": "Architecture, documentation, and research plugin - System understanding, doc generation, and information gathering",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/"
+}
