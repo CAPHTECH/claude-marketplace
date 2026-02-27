@@ -1,0 +1,9 @@
+{
+  "name": "planning-plugin",
+  "description": "Planning and ideation plugin - App idea workshops and product planning",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/"
+}

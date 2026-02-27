@@ -1,0 +1,9 @@
+{
+  "name": "design-plugin",
+  "description": "UI/UX design plugin - Web and mobile app design with established methodologies",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/"
+}

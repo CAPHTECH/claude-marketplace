@@ -42,14 +42,36 @@
       "category": "development"
     },
     {
-      "name": "creator-plugin",
-      "source": "./creator-plugin",
-      "description": "デザイン・メタツールプラグイン。アプリデザイン、CLAUDE.md管理、スキル作成を提供。",
+      "name": "design-plugin",
+      "source": "./design-plugin",
+      "description": "UI/UXデザインプラグイン。Web・モバイルアプリのデザインを体系的手法で支援。",
       "version": "1.0.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
-      "keywords": ["design", "claude-md", "skill-creator", "app-design"],
+      "keywords": ["design", "ui", "ux", "web", "mobile"],
+      "category": "design"
+    },
+    {
+      "name": "planning-plugin",
+      "source": "./planning-plugin",
+      "description": "企画・計画プラグイン。アプリアイデアワークショップとプロダクト計画を支援。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["planning", "ideation", "workshop", "product"],
+      "category": "development"
+    },
+    {
+      "name": "meta-plugin",
+      "source": "./meta-plugin",
+      "description": "メタツールプラグイン。CLAUDE.md管理とスキル開発を支援。",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["claude-md", "skill-creator", "meta"],
       "category": "development"
     },
     {

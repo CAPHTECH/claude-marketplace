@@ -1,0 +1,9 @@
+{
+  "name": "meta-plugin",
+  "description": "Meta tools plugin - CLAUDE.md management and skill creation",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/"
+}

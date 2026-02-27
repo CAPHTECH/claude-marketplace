@@ -5,7 +5,9 @@
 - `eld-plugin/`: ELD（Evidence-Loop Development）プラグイン。Law/Termモデリング、影響予測、接地検証、知識管理。20スキル、8エージェント。
 - `delivery-plugin/`: 開発ワークフロープラグイン。Issue管理、PRワークフロー、観測、テスト設計、コードレビュー。22スキル、4エージェント。
 - `knowledge-plugin/`: アーキテクチャ・ドキュメント・リサーチプラグイン。10スキル、2エージェント。
-- `creator-plugin/`: デザイン・メタツールプラグイン。アプリデザイン、CLAUDE.md管理、スキル作成。7スキル。
+- `design-plugin/`: UI/UXデザインプラグイン。Web・モバイルアプリデザイン。2スキル。
+- `planning-plugin/`: 企画・計画プラグイン。アプリアイデアワークショップ。1スキル（今後拡張予定）。
+- `meta-plugin/`: メタツールプラグイン。CLAUDE.md管理、スキル開発。4スキル。
 - `webapp-dev-plugin/`: Webアプリ開発支援。`skills/webapp-debugger/`と`webapp-debugger.skill`を同梱。
 - `codex-plugin/`: OpenAI Codex連携。セカンドオピニオン・ペアプログラミング・構造化議論。
 - `apple-platform-plugin/`: Apple Platform開発支援。
@@ -15,7 +17,7 @@
 
 ## Build, Test, and Development Commands
 現状、公式のビルド/テスト/実行コマンドは定義されていません。変更後は以下の軽量チェックを推奨します。
-- `rg -n "^name:|^description:" eld-plugin/skills delivery-plugin/skills knowledge-plugin/skills creator-plugin/skills`（SKILL.mdのフロントマター確認）
+- `rg -n "^name:|^description:" eld-plugin/skills delivery-plugin/skills knowledge-plugin/skills design-plugin/skills planning-plugin/skills meta-plugin/skills`（SKILL.mdのフロントマター確認）
 - `rg -n "references/.*\.md" -g "SKILL.md"`（参照リンクの棚卸し）
 
 ## Coding Style & Naming Conventions
