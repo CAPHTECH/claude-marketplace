@@ -1,7 +1,7 @@
 {
   "name": "eld-plugin",
-  "description": "Evidence-Loop Development (ELD) plugin - Law/Term modeling, impact prediction, grounding, and knowledge management",
-  "version": "1.0.0",
+  "description": "Evidence-Loop Development (ELD) v2.3 plugin - Spec-driven modeling, predict-light gating, 2-axis grounding, context engineering, and knowledge management",
+  "version": "2.3.0",
   "author": {
     "name": "CAPH TECH Inc."
   },

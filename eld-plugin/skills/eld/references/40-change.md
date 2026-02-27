@@ -1,12 +1,15 @@
 # Change（変更）フェーズ
 
-最小単位で変更し、Pure/IO分離を優先する。
+最小単位で変更し、Pure/IO分離を優先する。コミットもこのフェーズに含む。
+
+> v2.3: 旧「Commit」フェーズをChangeに吸収。変更→検証→コミットを一連の流れとして扱う。
 
 ## 目的
 
 - 微小ステップで確実に前進
 - 副作用を局所化してテスト容易性を確保
 - Lawを実装レベルで保証
+- 変更→検証→コミットを一体として管理
 
 ## 変更の原則
 
@@ -66,120 +69,30 @@ async function createOrder(input: OrderInput): Promise<Result<Order, Error>> {
   // Pure: 入力検証
   const qtyResult = validateOrderQuantity(input.quantity);
   if (qtyResult.isErr()) return qtyResult;
-  
+
   // IO: DB保存
   const order = await orderRepository.save({
     quantity: qtyResult.value,
     ...
   });
-  
+
   return Ok(order);
 }
-```
-
-### Term実装パターン
-
-```typescript
-// TERM-order-quantity の実装
-
-// 1. ブランド型で型レベルの区別
-type OrderQuantity = Brand<number, 'OrderQuantity'>;
-
-// 2. スマートコンストラクタで検証
-const OrderQuantity = {
-  of(value: number): Result<OrderQuantity, ValidationError> {
-    if (value < 1 || value > 100) {
-      return Err(new ValidationError('注文数量は1〜100の範囲'));
-    }
-    return Ok(value as OrderQuantity);
-  },
-  
-  // 3. 境界での検証
-  fromInput(input: unknown): Result<OrderQuantity, ValidationError> {
-    const parsed = z.number().min(1).max(100).safeParse(input);
-    if (!parsed.success) {
-      return Err(new ValidationError(parsed.error.message));
-    }
-    return Ok(parsed.data as OrderQuantity);
-  }
-};
 ```
 
 ### 違反時動作パターン
 
 ```typescript
 // 違反分類に応じた処理
-type ViolationType = 
+type ViolationType =
   | 'Bug'           // プログラムエラー → 500 + アラート
   | 'UserError'     // ユーザー入力エラー → 400 + メッセージ
   | 'BusinessException' // ビジネスルール違反 → 422 + 説明
   | 'DataDrift'     // データ整合性崩れ → 500 + 緊急対応
   | 'Compliance'    // コンプライアンス違反 → 500 + 監査ログ
-
-function handleViolation(violation: LawViolation): Response {
-  // ログ記録（すべての違反）
-  logger.error('Law violation', {
-    lawId: violation.lawId,
-    type: violation.type,
-    context: violation.context
-  });
-  
-  // テレメトリ送信（S0/S1）
-  if (violation.severity <= 1) {
-    telemetry.increment(`law.violation.${violation.lawId}`);
-  }
-  
-  // 違反タイプに応じた応答
-  switch (violation.type) {
-    case 'Bug':
-      return internalError('予期せぬエラーが発生しました');
-    case 'UserError':
-      return badRequest(violation.message);
-    case 'BusinessException':
-      return unprocessableEntity(violation.message);
-    case 'DataDrift':
-      alertOps(violation);
-      return internalError('データ整合性エラー');
-    case 'Compliance':
-      auditLog(violation);
-      return internalError('コンプライアンスエラー');
-  }
-}
 ```
 
-## 変更手順テンプレート
-
-```markdown
-## 変更計画
-
-### 前提条件
-- [ ] Predictフェーズの影響分析完了
-- [ ] 関連するLaw/Termの確認完了
-- [ ] テスト環境の準備完了
-
-### Step 1: <変更内容>
-
-**変更ファイル**:
-- `path/to/file.ts`
-
-**変更内容**:
-- <具体的な変更>
-
-**検証**:
-- [ ] 型チェック通過
-- [ ] lint通過
-- [ ] 既存テスト通過
-
-**ロールバック**:
-- `git checkout path/to/file.ts`
-
----
-
-### Step 2: <次の変更内容>
-...
-```
-
-## コミットポイント
+## コミット（v2.3: Changeに統合）
 
 ### 原則
 
@@ -190,7 +103,7 @@ ELDの「最小単位で変更」原則をgitにも適用する。
 ### タイミング
 
 ```
-Change → Ground（検証通過）→ **Commit** → Record
+Change（実装）→ 静的診断通過 → テスト通過 → **Commit** → Record
 ```
 
 以下の条件を満たした時点でコミット:
@@ -226,11 +139,36 @@ Change → Ground（検証通過）→ **Commit** → Record
 - テストが通過する状態
 - 直前のコミットに安全に戻れる
 
-### コミットしないケース
+## 変更手順テンプレート
 
-- 静的診断が通過していない
-- テストが失敗している
-- 論理的に不完全な状態
+```markdown
+## 変更計画
+
+### 前提条件
+- [ ] Predict-Lightゲートの判定完了（P0/P1/P2）
+- [ ] 関連するLaw/Termの確認完了
+- [ ] テスト環境の準備完了
+
+### Step 1: <変更内容>
+
+**変更ファイル**:
+- `path/to/file.ts`
+
+**変更内容**:
+- <具体的な変更>
+
+**検証**:
+- [ ] 型チェック通過
+- [ ] lint通過
+- [ ] 既存テスト通過
+
+**コミット**: `<type>(<scope>): <概要>`
+
+---
+
+### Step 2: <次の変更内容>
+...
+```
 
 ## 禁止パターン
 
@@ -268,38 +206,14 @@ try {
 }
 ```
 
-### 3. 警告の無効化
+### 3. 警告の無効化 / 後方互換性ハック
 
-```typescript
-// ❌ 禁止
-// eslint-disable-next-line
-const result = deprecatedFunction();
-
-// ✅ 代わりに
-// 新しいAPIに移行
-const result = newFunction();
-```
-
-### 4. 後方互換性ハック
-
-```typescript
-// ❌ 禁止（使われていないなら削除）
-const _unusedVar = legacyValue;  // 後方互換性のため
-export { OldName }; // 再エクスポート
-// removed: oldFunction
-
-// ✅ 代わりに
-// 本当に必要なら段階的deprecation
-/** @deprecated Use newFunction instead */
-export function oldFunction() {
-  return newFunction();
-}
-```
+使われていないコードは削除する。本当に必要なら段階的deprecation。
 
 ## チェックリスト
 
 ### 変更前
-- [ ] Predictフェーズの分析結果を確認したか
+- [ ] Predict-Lightゲートの判定結果を確認したか
 - [ ] 関連するLaw/Termを確認したか
 - [ ] 変更計画を作成したか
 
@@ -314,4 +228,4 @@ export function oldFunction() {
 - [ ] lint通過
 - [ ] 既存テスト通過
 - [ ] 新規テスト追加（必要な場合）
-- [ ] コミット実行（`/git-commit`）
+- [ ] コミット実行

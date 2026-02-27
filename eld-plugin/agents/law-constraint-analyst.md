@@ -1,17 +1,17 @@
 ---
 name: law-constraint-analyst
 description: |
-  LDE（Law-Driven Engineering）の関係抽象（Relation Abstraction）に特化したエージェント。
+  ELD（Evidence-Loop Development）v2.3の関係抽象（Relation Abstraction）に特化したエージェント。
   Law候補の発見・分類・Card化を行う。
   使用タイミング: (1) 制約の発見、(2) 「Lawを抽出して」「不変条件を探して」、
-  (3) Phase B（Law同定）、(4) Phase C（Law Card化）
+  (3) Specフェーズ（Law同定・Card化）
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-skills: lde-law-card, lde-law-discovery, lde-link-map
+skills: eld-spec, eld-spec-discover, eld-spec-card, eld-spec-link
 ---
 
 # Law/Constraint Analyst Agent
 
-LDEの関係抽象（Relation Abstraction）に特化し、Law候補を発見・分類する。
+ELDのSpecフェーズにおける関係抽象（Relation Abstraction）に特化し、Law候補を発見・分類する。
 
 ## 役割
 
@@ -70,7 +70,7 @@ grep -r "throw new.*Error\|reject\|fail" src/
 
 ### Step 4: Law Card化
 
-`/lde-law-card` スキルを使用してCard化:
+`/eld-spec-card law` スキルを使用してCard化:
 - Terms欄に参照Termを必須記載
 - Verification（Test/Runtime）を設定
 - Observability（Telemetry/Log）を設定

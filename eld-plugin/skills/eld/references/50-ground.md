@@ -1,26 +1,24 @@
 # Ground（接地）フェーズ
 
-テスト/Telemetry/再現手順でLaw/Termを観測可能にする。
+テスト/Telemetry/再現手順でLaw/Termを観測可能にする。2軸評価（Evidence Level × Evaluator Quality）。
+
+> v2.3: Evidence Level（L0-L4）に加え、Evaluator Quality（E0-E3）軸を追加。
+> Review Hybrid導入（Artifact-Based + 行レビュー必須領域）。
 
 ## 目的
 
 - Lawを検証可能・観測可能にする
 - L0だけで完了扱いしない
+- 検証手段自体の品質を保証する（Evaluator Quality）
 - 本番環境での違反検知を可能にする
 
 ## テスト設計には `/test-design-audit` を使用
 
 体系的なテスト設計には `/test-design-audit` スキルを使用する。
-このスキルはELDと統合されており、以下を提供する：
 
-- **Law/Term → テスト条件への導出**: REQとLaw/Termを対応付け
-- **Evidence Ladder対応**: Severityに応じたカバレッジ基準
-- **Law接地監査**: テスト条件ツリーの監査
-- **Grounding Map連携**: テスト項目とLaw/Termの紐付け
+## 2軸評価モデル（v2.3）
 
-詳細は `/test-design-audit` スキルを参照。
-
-## Evidence Ladder（証拠の梯子）
+### 軸1: Evidence Level（証拠の梯子）L0-L4
 
 | Level | 内容 | 必須条件 | 備考 |
 |-------|------|----------|------|
@@ -30,16 +28,43 @@
 | L3 | 失敗注入/フェイルセーフ | S0 Law | 違反時動作の確認 |
 | L4 | 本番Telemetry | S0/S1 Law | 実運用でのLaw違反検知 |
 
+### 軸2: Evaluator Quality（検証者品質）E0-E3
+
+| Level | 内容 | 説明 |
+|-------|------|------|
+| E0 | テストなし/手動のみ | 再現性のない検証 |
+| E1 | テスト存在（カバレッジ不問） | 自動検証はあるが品質は不明 |
+| E2 | changed-lines coverage ≥ 80% OR mutation score ≥ 60% | 変更行に対する十分なカバレッジ |
+| E3 | E2 + 独立レビュー(別担当/別AIモデル) + 汚染チェック記録 | 最高品質。独立した第三者検証 |
+
+### Severity↔E要件マトリクス
+
+| Severity | 最低E要件 | 備考 |
+|----------|----------|------|
+| S0 + セキュリティ | **E3必須** | 独立レビュー+汚染チェック必須 |
+| S0（非セキュリティ） | E2推奨 | E1は要正当化 |
+| S1 | **E2必須** | changed-lines coverage確認 |
+| S2 | **E1必須** | テスト存在が最低条件 |
+| S3 | **E1必須** | テスト存在が最低条件 |
+
+### 2軸マトリクス表記
+
+```
+Ground結果: L2/E2
+  → Evidence Level 2（統合テスト済み）
+  → Evaluator Quality 2（カバレッジ80%以上）
+```
+
 ## Grounding要件
 
 ### Lawの接地
 
-| Severity | 検証（Verification） | 観測（Observation） |
-|----------|---------------------|---------------------|
-| S0 | Unit + Integration + Runtime | Telemetry + Alert |
-| S1 | Unit + (Integration or Runtime) | Telemetry |
-| S2 | Unit | Log |
-| S3 | (推奨) | (推奨) |
+| Severity | 検証（Verification） | 観測（Observation） | 最低E要件 |
+|----------|---------------------|---------------------|-----------|
+| S0 | Unit + Integration + Runtime | Telemetry + Alert | E2（セキュリティはE3） |
+| S1 | Unit + (Integration or Runtime) | Telemetry | E2 |
+| S2 | Unit | Log | E1 |
+| S3 | (推奨) | (推奨) | E1 |
 
 ### Termの接地
 
@@ -58,13 +83,11 @@ Lawの中核ロジックをPure関数としてテスト:
 describe('LAW-order-quantity-range', () => {
   it('should accept valid quantity', () => {
     expect(validateOrderQuantity(1).isOk()).toBe(true);
-    expect(validateOrderQuantity(50).isOk()).toBe(true);
     expect(validateOrderQuantity(100).isOk()).toBe(true);
   });
 
   it('should reject invalid quantity', () => {
     expect(validateOrderQuantity(0).isErr()).toBe(true);
-    expect(validateOrderQuantity(-1).isErr()).toBe(true);
     expect(validateOrderQuantity(101).isErr()).toBe(true);
   });
 
@@ -86,17 +109,10 @@ describe('LAW-order-quantity-range', () => {
 ```typescript
 describe('Order creation flow', () => {
   it('should create order with valid quantity', async () => {
-    // Arrange
     const input = { productId: 'P001', quantity: 5 };
-    
-    // Act
     const result = await orderService.createOrder(input);
-    
-    // Assert
     expect(result.isOk()).toBe(true);
-    expect(result.value.quantity).toBe(5);
-    
-    // DB確認
+
     const saved = await orderRepository.findById(result.value.id);
     expect(saved.quantity).toBe(5);
   });
@@ -105,135 +121,68 @@ describe('Order creation flow', () => {
 
 ### Runtime Assert
 
-実行時の不変条件チェック:
-
-```typescript
-class Inventory {
-  private _available: number;
-  private _reserved: number;
-  
-  // LAW-inventory-balance の実行時検証
-  private assertInvariant(): void {
-    if (this._available < 0) {
-      throw new InvariantViolation('LAW-inventory-balance', 
-        'available must be non-negative');
-    }
-    if (this._reserved < 0) {
-      throw new InvariantViolation('LAW-inventory-balance',
-        'reserved must be non-negative');
-    }
-  }
-  
-  reserve(qty: number): void {
-    this._available -= qty;
-    this._reserved += qty;
-    this.assertInvariant(); // 状態変更後に検証
-  }
-}
-```
+実行時の不変条件チェック（コード例は40-change.mdのLaw実装パターンを参照）。
 
 ## 観測手段（Observation）
 
 ### Telemetry
 
-メトリクスで違反を追跡:
-
 ```typescript
-// 違反カウンター
 telemetry.increment('law.violation', {
   lawId: 'LAW-order-quantity-range',
   severity: 'S0',
   type: 'UserError'
 });
-
-// 値分布
-telemetry.histogram('order.quantity', quantity, {
-  lawId: 'LAW-order-quantity-range'
-});
-
-// レート制限チェック
-telemetry.gauge('rate_limit.remaining', remaining, {
-  userId: user.id
-});
 ```
 
 ### Structured Logging
 
-構造化ログで追跡可能に:
-
 ```typescript
 logger.info('Order created', {
   orderId: order.id,
-  quantity: order.quantity,
   lawChecks: [
-    { lawId: 'LAW-order-quantity-range', passed: true },
-    { lawId: 'LAW-inventory-available', passed: true }
+    { lawId: 'LAW-order-quantity-range', passed: true }
   ]
-});
-
-logger.warn('Law violation', {
-  lawId: 'LAW-order-quantity-range',
-  severity: 'S1',
-  input: { quantity: 150 },
-  message: 'Quantity exceeds maximum'
 });
 ```
 
 ### Alert
 
-S0違反は即時アラート:
+S0違反は即時アラート。
 
-```typescript
-// S0違反は即時通知
-if (violation.severity === 0) {
-  alerting.critical('S0 Law Violation', {
-    lawId: violation.lawId,
-    context: violation.context,
-    timestamp: new Date().toISOString(),
-    runbook: `https://docs.example.com/runbook/${violation.lawId}`
-  });
-}
+## Review Hybrid（v2.3新設）
+
+PRレビューを2つの方式の組み合わせで行う:
+
+### Artifact-Based Review（デフォルト）
+
+Evidence Packの完全性で判断:
+- [ ] 証拠の梯子の達成レベルが適切か
+- [ ] Evaluator Qualityが要件を満たすか
+- [ ] Law/Termの孤立がないか
+- [ ] テスト結果が全て通過しているか
+- [ ] カバレッジが要件を満たすか
+
+### 行レビュー必須領域
+
+以下の領域はArtifact-Basedに加え、コード行単位の詳細レビューが**必須**:
+
+| 領域 | 理由 | チェック観点 |
+|------|------|-------------|
+| セキュリティ | インジェクション、認証バイパス | 入力検証、エスケープ、権限チェック |
+| 並行処理 | デッドロック、レースコンディション | ロック順序、トランザクション分離 |
+| 永続化 | データ損失、不整合 | マイグレーション安全性、ロールバック |
+| 認証 | 認証バイパス、セッション固定 | トークン検証、セッション管理 |
+| マイグレーション | データ移行失敗、後方互換 | 段階的移行、フォールバック |
+| 課金 | 金額計算誤り | 丸め処理、通貨換算、冪等性 |
+
+### レビュー方式の決定
+
 ```
-
-## 失敗注入（Failure Injection）
-
-### 違反時動作の確認
-
-```typescript
-describe('LAW-order-quantity-range violation handling', () => {
-  it('should return 400 for user error', async () => {
-    const result = await request(app)
-      .post('/orders')
-      .send({ productId: 'P001', quantity: 999 });
-    
-    expect(result.status).toBe(400);
-    expect(result.body.error).toContain('注文数量');
-  });
-
-  it('should log violation', async () => {
-    await request(app)
-      .post('/orders')
-      .send({ productId: 'P001', quantity: 999 });
-    
-    expect(logger.warn).toHaveBeenCalledWith(
-      'Law violation',
-      expect.objectContaining({
-        lawId: 'LAW-order-quantity-range'
-      })
-    );
-  });
-
-  it('should increment telemetry counter', async () => {
-    await request(app)
-      .post('/orders')
-      .send({ productId: 'P001', quantity: 999 });
-    
-    expect(telemetry.increment).toHaveBeenCalledWith(
-      'law.violation',
-      expect.objectContaining({ lawId: 'LAW-order-quantity-range' })
-    );
-  });
-});
+if 変更が行レビュー必須領域に該当:
+  → Artifact-Based + 行レビュー
+else:
+  → Artifact-Based のみ
 ```
 
 ## Grounding Map
@@ -245,63 +194,18 @@ Law/Term → Test/Telemetry の対応表:
 laws:
   LAW-order-quantity-range:
     severity: S0
+    evidence_level: L2
+    evaluator_quality: E2
     verification:
       unit:
         - test_order_quantity_validation
-        - test_order_quantity_property
       integration:
         - test_order_creation_flow
-      runtime:
-        - OrderQuantity.of
     observation:
       telemetry:
         - law.violation{lawId="LAW-order-quantity-range"}
-        - order.quantity
-      log:
-        - "Order created"
-        - "Law violation"
       alert:
         - s0_law_violation
-
-  LAW-inventory-balance:
-    severity: S0
-    verification:
-      unit:
-        - test_inventory_balance_invariant
-      runtime:
-        - Inventory.assertInvariant
-    observation:
-      telemetry:
-        - inventory.balance
-      alert:
-        - inventory_invariant_violation
-
-terms:
-  TERM-order-quantity:
-    severity: S1
-    boundary_validation:
-      input: OrderSchema.quantity
-      output: OrderResponse.quantity
-    observable_fields:
-      - order.quantity
-```
-
-## `/lde-grounding-check` 使用
-
-接地状況を検証:
-
-```
-/lde-grounding-check LAW-order-quantity-range
-
-結果:
-✅ L0: 型チェック通過
-✅ L1: Unit Test (3/3)
-✅ L2: Integration Test (1/1)
-❌ L3: 失敗注入テストなし
-✅ L4: Telemetry設定済み
-
-推奨アクション:
-- 失敗注入テストを追加してください
 ```
 
 ## チェックリスト
@@ -317,10 +221,15 @@ terms:
 - [ ] S0 Law は Alert が設定されている
 - [ ] S0/S1 Term は Observable Fields が定義されている
 
-### 失敗注入
-- [ ] S0 Law は違反時動作がテストされている
-- [ ] エラー応答が適切か確認されている
-- [ ] ログ/テレメトリが記録されるか確認されている
+### Evaluator Quality（v2.3）
+- [ ] Severity↔E要件マトリクスを満たしている
+- [ ] S0+セキュリティはE3を達成している
+- [ ] changed-lines coverageを確認している（E2要件時）
+
+### Review Hybrid（v2.3）
+- [ ] 行レビュー必須領域を特定している
+- [ ] Artifact-Based Reviewのチェックを完了している
+- [ ] 必須領域の行レビューを完了している
 
 ### ドキュメント
 - [ ] Grounding Map が更新されている

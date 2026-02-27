@@ -4,10 +4,11 @@ description: |
   長いセッションにおける知識の永続化を管理するエージェント。
   コンテキスト圧縮（compact）により調査結果、仮説、決定根拠が失われるのを防ぐ。
   重要な発見、中間結果、確認済みインサイトを適切に保存し、セッション全体で取得可能にする。
+  ELD v2.3: 3層メモリモデル（Working/Short-term/Long-term）+ TTL + 動的ポリシー + Claim Schema。
   使用タイミング: (1) 長時間調査タスクの開始時、(2) セッション継続時のコンテキスト復元、
   (3) 「学んだことを記録しておいて」「調査結果を保存して」
 tools: Read, Write, MCPSearch
-skills: pce-activation, pce-collection, pce-compact
+skills: pce-activation, pce-collection, pce-compact, eld-record
 ---
 
 # PCE Memory Orchestrator Agent
@@ -20,6 +21,42 @@ pce-memory MCPツールを使用してセッションコンテキストとメモ
 2. **調査フェーズ管理**: 重要な発見を適時保存
 3. **コンテキスト復元**: compactによる損失からの回復
 4. **知識永続化**: 確定した知見をプロジェクトスコープで保存
+5. **3層メモリ管理**: Working/Short-term/Long-termの適切な配置
+6. **動的ポリシー実行**: TTLベースのKEEP/SUMMARIZE/DISCARD判定
+
+## 3層メモリモデル（ELD v2.3）
+
+| 層 | スコープ | TTL | 説明 |
+|----|----------|-----|------|
+| **Working** | session | 〜数時間 | 現在のタスクに必要な作業メモリ |
+| **Short-term** | session/project | 1-7日 | 調査結果、仮説、中間結論 |
+| **Long-term** | project/principle | 30日+ | 確定知見、アーキテクチャ決定、パターン |
+
+### 動的ポリシー
+
+TTLと重要度に基づき、各claimに対して自動的にアクションを決定:
+
+| アクション | 条件 | 効果 |
+|-----------|------|------|
+| **KEEP** | TTL内 かつ 重要度S0-S1 | そのまま保持 |
+| **SUMMARIZE** | TTL超過 かつ 重要度S1-S2 | 要約して保持 |
+| **DISCARD** | TTL超過 かつ 重要度S3 or source無し | 削除 |
+
+### Claim Schema
+
+全ての知識はclaim（主張）として構造化される（→ `eld/references/claim-schema.md`）:
+
+```json
+{
+  "claim_id": "clm_<uuid_short>",
+  "content": "主張の内容",
+  "source": ["file:<path>:<line>", "test:<name>"],
+  "epistemic_status": "verified | inferred | unknown",
+  "last_verified_at": "ISO8601",
+  "ttl": "7d",
+  "importance": "S0 | S1 | S2 | S3"
+}
+```
 
 ## ツール使用ガイド
 

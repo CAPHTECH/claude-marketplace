@@ -1,12 +1,24 @@
-# Model（モデル化）フェーズ
+# Spec（仕様化）フェーズ
 
-語彙（Term）と関係（Law）を同定し、カードに落とす。
+語彙（Term）と関係（Law）を同定し、仕様としてカードに落とす。
+
+> v2.3: 旧「Model」フェーズ。SDD（Spec-Driven Development）概念を統合。
+> 影響予測の概念は Predict-Light ゲートに移行。
 
 ## 目的
 
 - ドメインの語彙を運用可能に固定
 - ビジネス上の「守るべき条件」を明文化
 - Law ↔ Term の相互拘束を確立
+- 仕様をAIエージェントが参照可能な形式で構造化（SDD）
+
+## SDD（Spec-Driven Development）統合
+
+Specフェーズは単なるモデリングではなく、**仕様駆動**で実装を導く:
+
+1. **仕様が先、実装が後**: Law/Term Cardが実装の入力仕様となる
+2. **機械可読性**: Card形式はAIエージェントが直接参照・検証可能
+3. **仕様変更の追跡**: Card更新がトリガーとなり影響分析が走る
 
 ## 二つの抽象
 
@@ -89,48 +101,8 @@
 ### 完了条件
 - 各Lawに Terms が紐づいている
 
-### Law Card構成
-
-```markdown
-# LAW-{domain}-{name}
-
-## 基本情報
-- **ID**: LAW-{domain}-{name}
-- **Type**: Pre | Post | Invariant | Policy
-- **Severity**: S0 | S1 | S2 | S3
-- **Created**: YYYY-MM-DD
-
-## Statement（自然言語）
-<!-- 日本語での記述 -->
-
-## Formal（疑似式）
-例: 1 ≤ orderQty ≤ 100
-例: ∀t: token.expiry > now → token.valid
-
-## Scope（適用範囲）
-- モジュール:
-- 関数/メソッド:
-- レイヤー:
-
-## Terms（参照する語彙）
-<!-- このLawが参照するTerm。孤立禁止 -->
-- TERM-xxx
-- TERM-yyy
-
-## Exceptions（例外）
-<!-- Lawが適用されないケース -->
-
-## Violation Behavior（違反時動作）
-- エラー種別:
-- 回復戦略:
-- 通知先:
-
-## Grounding（接地）
-<!-- 50-ground.mdで詳細化 -->
-```
-
-→ `/lde-law-card` スキルを使用
-→ `/lde-link-map` を同時更新
+→ `/eld-spec-card law` スキルを使用
+→ `/eld-spec-link` を同時更新
 
 ## Term Card化（Phase D）
 
@@ -140,53 +112,7 @@
 ### 完了条件
 - 重要Termに Related Laws が紐づいている
 
-### Term Card構成
-
-```markdown
-# TERM-{domain}-{name}
-
-## 基本情報
-- **ID**: TERM-{domain}-{name}
-- **Type**: Entity | Value | Context | Boundary
-- **Severity**: S0 | S1 | S2 | S3
-- **Created**: YYYY-MM-DD
-
-## Meaning（意味）
-<!-- このTermが表すもの -->
-
-## Synonyms（同義語）
-<!-- 同じ意味で使われる別の言葉 -->
-
-## Boundary（境界）
-- 使用モジュール:
-- 使用レイヤー:
-- 使用インターフェース:
-
-## Type/Shape（型表現）
-```typescript
-type OrderQuantity = Brand<number, 'OrderQuantity'>;
-z.number().min(1).max(100)
-```
-
-## Observable Fields（観測写像）
-| フィールド | 型 | 説明 |
-|-----------|-----|------|
-
-## I/O Boundaries（境界での扱い）
-### 入力時
-- 検証:
-- 正規化:
-
-### 出力時
-- シリアライズ:
-
-## Related Laws（関連Law）
-<!-- S0/S1は必須 -->
-- LAW-xxx
-- LAW-yyy
-```
-
-→ `/lde-term-card` スキルを使用
+→ `/eld-spec-card term` スキルを使用
 
 ## Link Map（連結表）
 
@@ -208,6 +134,17 @@ terms:
       input: OrderSchema.quantity
       output: OrderResponse.quantity
 ```
+
+## Spec Gate（仕様ゲート）
+
+Specフェーズの完了を判定するゲート:
+
+- [ ] Vocabulary Catalog v0 がある（同義語と境界が書かれている）
+- [ ] Law Catalog v0 がある（壊れ方が列挙されている）
+- [ ] S0/S1 Law は Law Card化され、Terms が紐づいている
+- [ ] S0/S1 Term は Term Card化され、Related Laws が紐づいている
+- [ ] Link Map が更新され、孤立Law/孤立Termがない
+- [ ] 各CardがSDD形式（機械可読）で記述されている
 
 ## 孤立チェック
 
@@ -233,10 +170,6 @@ terms:
 - **症状**: Brand/Newtypeがあるが境界検証が薄い
 - **対策**: Term CardにIO BoundaryとValidationを必須化
 
-## チェックリスト
-
-- [ ] Vocabulary Catalog v0 がある（同義語と境界が書かれている）
-- [ ] Law Catalog v0 がある（壊れ方が列挙されている）
-- [ ] S0/S1 Law は Law Card化され、Terms が紐づいている
-- [ ] S0/S1 Term は Term Card化され、Related Laws が紐づいている
-- [ ] Link Map が更新され、孤立Law/孤立Termがない
+### 仕様のドリフト
+- **症状**: Card上の仕様と実装が乖離する
+- **対策**: claim schemaで鮮度を追跡、自動降格で検知

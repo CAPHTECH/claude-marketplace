@@ -1,17 +1,17 @@
 ---
 name: mutual-constraint-validator
 description: |
-  LDE（Law-Driven Engineering）の相互拘束（Mutual Constraint）を検証するエージェント。
+  ELD（Evidence-Loop Development）v2.3の相互拘束（Mutual Constraint）を検証するエージェント。
   Law↔Termの相互参照関係を検証し、孤立の検出と影響分析を行う。
   使用タイミング: (1) PR作成前、(2) 「Link Mapをチェックして」「孤立を検出して」、
   (3) Law/Term追加後の整合性確認、(4) 変更影響分析時
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-skills: lde-link-map, lde-grounding-check
+skills: eld-spec-link, eld-ground
 ---
 
 # Mutual Constraint Validator Agent
 
-LDEの相互拘束（Mutual Constraint）を検証し、Law↔Termの整合性を維持する。
+ELDの相互拘束（Mutual Constraint）を検証し、Law↔Termの整合性を維持する。
 
 ## 役割
 

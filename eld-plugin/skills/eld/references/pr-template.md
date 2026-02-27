@@ -1,6 +1,6 @@
 # ELD PR Template
 
-ELD (Evidence-Loop Development) のPR & Evidence Pack雛形。
+ELD (Evidence-Loop Development) v2.3 のPR & Evidence Pack雛形。
 
 ## PR Description
 
@@ -19,6 +19,17 @@ closes #XXX
 - [ ] リファクタリング（Refactoring）
 - [ ] ドキュメント（Documentation）
 - [ ] その他:
+```
+
+---
+
+## Predict-Light 要約（v2.3）
+
+```markdown
+## Predict-Light判定
+- レベル: P0 / P1 / P2
+- 判定理由:
+- Manual Override: なし / あり（理由: ）
 ```
 
 ---
@@ -71,13 +82,49 @@ closes #XXX
 
 ---
 
+## Evaluator Quality（v2.3）
+
+```markdown
+## 検証者品質
+- 達成レベル: E0 / E1 / E2 / E3
+- changed-lines coverage: ___%
+- mutation score: ___% (該当する場合)
+- 独立レビュー: なし / あり（レビュアー: ）
+- 汚染チェック: なし / あり
+
+## Severity↔E要件チェック
+- [ ] S0+セキュリティ → E3達成
+- [ ] S1 → E2達成
+- [ ] S2-S3 → E1達成
+```
+
+---
+
+## Review Hybrid分類（v2.3）
+
+```markdown
+## レビュー方式
+- [ ] Artifact-Based Review のみ
+- [ ] Artifact-Based + 行レビュー必須
+
+## 行レビュー必須領域（該当にチェック）
+- [ ] セキュリティ（認証/認可/暗号化）
+- [ ] 並行処理（ロック/トランザクション/競合）
+- [ ] 永続化（DBマイグレーション/スキーマ変更）
+- [ ] 認証（トークン/セッション管理）
+- [ ] マイグレーション（データ移行/後方互換）
+- [ ] 課金（金額計算/決済処理）
+```
+
+---
+
 ## Law/Term整合性チェック
 
 ```markdown
 ## 関連Law
-| Law ID | 接地状況 | 検証手段 |
-|--------|----------|----------|
-| LAW-xxx | 接地済/未接地 | テスト名/Telemetry名 |
+| Law ID | 接地状況 | Evidence Level | Evaluator Quality |
+|--------|----------|----------------|-------------------|
+| LAW-xxx | 接地済/未接地 | L0-L4 | E0-E3 |
 
 
 ## 関連Term
@@ -141,8 +188,10 @@ closes #XXX
 
 ### レビュアー向け
 - [ ] Evidence Packが揃っている（L0以上）
+- [ ] Evaluator Qualityが要件を満たしている
 - [ ] Law/Termの孤立がない
 - [ ] 影響範囲が明確
+- [ ] 行レビュー必須領域を確認した
 - [ ] 意図しない副作用がない
 - [ ] Context Deltaが記録されている
 
@@ -150,3 +199,4 @@ closes #XXX
 - [ ] Issue Contractの物差しを満たしている
 - [ ] テストが追加/更新されている
 - [ ] 停止条件に該当する事象がない
+- [ ] Predict-Light判定が記録されている

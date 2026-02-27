@@ -38,8 +38,6 @@ serenaはLSP機能をMCPサーバーとして提供する。`.serena/project.yml
 - `get_symbols_overview`: ファイル内シンボル一覧
 - `replace_symbol_body`: シンボル単位での置換
 
-**利点**: LSP + シンボル境界を考慮した編集が可能
-
 ### ツール選択フローチャート
 
 ```
@@ -78,9 +76,9 @@ pce.memory.activate({
 ### Step 3: 鮮度チェック
 
 取得した各エントリについて:
-1. `last_verified_commit` を確認
-2. 現在のHEADと比較
-3. 不一致なら Step 4 へ
+1. `last_verified_at` を確認
+2. TTLと比較
+3. 超過なら自動降格（verified→inferred→unknown）
 
 ### Step 4: JIT再解析（必要時のみ）
 
@@ -90,6 +88,11 @@ pce.memory.activate({
 3. 新しい解釈を生成
 4. pce.memory.upsert で更新
 ```
+
+## 次フェーズとの接続
+
+- Sense → **Spec**: 観測結果をSpecフェーズのVocabulary/Law同定に入力
+- Sense → **Predict-Light**: 影響範囲の事前把握がP0/P1/P2判定に活用される
 
 ## 身体図の更新
 
@@ -111,10 +114,6 @@ deps_closure({
 })
 ```
 
-**direction**:
-- `inbound`: このファイルに依存しているファイル（変更の影響先）
-- `outbound`: このファイルが依存しているファイル（変更の影響元）
-
 ## リソース制限
 
 1回の感知に対する上限:
@@ -125,17 +124,6 @@ deps_closure({
 | snippets_get 対象ファイル数 | 5ファイル |
 | deps_closure 再帰深度 | 2 |
 | 1ファイルあたりの読み取り行数 | 200行 |
-
-上限に達した場合:
-
-```markdown
-**調査範囲の制限に達しました**
-
-より詳細な調査が必要な場合は、以下を指定してください:
-- 特定のファイルパス
-- 特定の関数/クラス名
-- 調査の優先順位
-```
 
 ## Epistemic Status の明示
 
@@ -169,42 +157,6 @@ deps_closure({
 - ロジックが複雑すぎて確信が持てない
 - 外部サービスの仕様に依存する部分
 - DI/生成/設定駆動で静的に追跡困難
-
-```markdown
-**この部分は確認が必要です**
-
-コード (`src/payment/Gateway.ts:89-120`) を確認しましたが、
-外部APIの仕様に依存するため正確な動作を断定できません。
-
-確認推奨箇所:
-- `src/payment/Gateway.ts:95` - API呼び出し部分
-- 外部ドキュメント: PaymentProvider API仕様
-```
-
-## 記憶の保存
-
-感知結果は3層構造で保存:
-
-```typescript
-pce.memory.upsert({
-  text: JSON.stringify({
-    entity_id: "src/services/AuthService.ts:login",
-    type: "function",
-    last_verified_commit: "a1b2c3d",
-    facts: { /* 客観的事実 */ },
-    semantics: { /* 意味論的解釈 */ },
-    relations: { /* 構造的結合 */ }
-  }),
-  kind: "fact",
-  scope: "project",
-  boundary_class: "internal",
-  provenance: {
-    at: new Date().toISOString(),
-    actor: "eld-sense",
-    note: "コード調査結果から生成"
-  }
-})
-```
 
 ## チェックリスト
 

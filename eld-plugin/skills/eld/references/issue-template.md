@@ -1,6 +1,6 @@
 # ELD Issue Template
 
-ELD (Evidence-Loop Development) のIssue Contract雛形。
+ELD (Evidence-Loop Development) v2.3 のIssue Contract雛形。
 
 ## Issue Contract
 
@@ -69,7 +69,7 @@ ELD (Evidence-Loop Development) のIssue Contract雛形。
 
 ---
 
-## Term/Law候補（LDE Phase A-B）
+## Term/Law候補（Spec Phase A-B）
 
 ```markdown
 ## Vocabulary候補（Term）
