@@ -1,0 +1,69 @@
+version: 1
+product: ""
+date: ""
+participants: []
+horizon: ""
+mode: ""
+
+vision:
+  target_users: ""
+  desired_outcome: ""
+  current_solution: ""
+  pain_points: ""
+  envisioned_world: ""
+  approach: ""
+  full_statement: ""
+
+rdcl:
+  real_pain:
+    decisions: []
+    evidence: []
+    risks: []
+  design:
+    decisions: []
+    evidence: []
+    risks: []
+  capabilities:
+    decisions: []
+    evidence: []
+    risks: []
+  logistics:
+    decisions: []
+    evidence: []
+    risks: []
+
+prioritization: []
+# Each item:
+#   name: ""
+#   vision_score: 0
+#   survival_score: 0
+#   quadrant: ""
+#   decision: ""
+vision_debt: ""  # L / M / H
+
+ohl: []
+# Each item:
+#   objective: ""
+#   hypothesis: ""
+#   learning_signal: ""
+#   timebox: ""
+#   owner: ""
+
+culture: []
+# Each item:
+#   practice: ""
+#   fulfillment: 0
+#   urgency: 0
+#   quadrant: ""
+#   action: ""
+
+disease_check:
+  hero_syndrome: { risk: "", symptoms: "", mitigation: "" }
+  strategic_swelling: { risk: "", symptoms: "", mitigation: "" }
+  obsessive_sales_disorder: { risk: "", symptoms: "", mitigation: "" }
+  hypermetricemia: { risk: "", symptoms: "", mitigation: "" }
+  locked_in_syndrome: { risk: "", symptoms: "", mitigation: "" }
+  pivotitis: { risk: "", symptoms: "", mitigation: "" }
+  narcissus_complex: { risk: "", symptoms: "", mitigation: "" }
+
+next_30_days: []
