@@ -33,5 +33,8 @@
 - PRには変更目的、影響するスキル/エージェント、`.skill`再生成の有無、`marketplace.json`更新有無を明記する。
 
 ## Security & Configuration Tips
+- プラグインのバージョンは2箇所で管理される。変更時は**必ず両方を同時に更新**すること:
+  - `.claude-plugin/marketplace.json`（マーケットプレイス登録）
+  - `<plugin>/.claude-plugin/plugin.json`（プラグインマニフェスト。`/plugin`コマンドはこちらを参照）
 - `marketplace.json`に新規プラグインを追加する際は`name/source/version`を揃える。
 - スキル本文に機密情報や実運用の秘密鍵を含めない。
