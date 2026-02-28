@@ -23,7 +23,7 @@
       "name": "delivery-plugin",
       "source": "./delivery-plugin",
       "description": "開発ワークフロープラグイン。Issue管理、PRワークフロー、観測、テスト設計、コードレビューを提供。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -45,7 +45,7 @@
       "name": "design-plugin",
       "source": "./design-plugin",
       "description": "UI/UXデザインプラグイン。Web・モバイルアプリのデザインを体系的手法で支援。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
