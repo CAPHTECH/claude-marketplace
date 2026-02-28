@@ -1,7 +1,7 @@
 ---
 name: web-app-designer
 context: fork
-description: "Webアプリのデザインを体系的に行うスキル。デザインプロセス・レイアウト・コンポーネント設計・インタラクション・アクセシビリティなどWebデザインの確立された手法を適用する。Use when: 「Webアプリをデザインして」「UIを設計して」「デザインシステムを作って」「レスポンシブ対応して」「アクセシビリティを改善して」「コンポーネントを設計して」「カラーパレットを決めて」と言われた時。"
+description: "Webアプリの個別画面・コンポーネントのデザインを体系的に行うスキル。デザインプロセス・レイアウト・コンポーネント設計・インタラクション・アクセシビリティなどWebデザインの確立された手法を適用する。デザインシステム全体の構築・運用はdesign-system-builderスキルを使用すること。Use when: 「Webアプリをデザインして」「UIを設計して」「画面をデザインして」「レスポンシブ対応して」「アクセシビリティを改善して」「コンポーネントを設計して」「カラーパレットを決めて」と言われた時。"
 ---
 
 # Web App Designer（Webアプリデザイナー）
@@ -63,12 +63,12 @@ Phase 1: 要件・コンテキスト把握
 
 | 依頼の種類 | 主要手法 | 補助手法 | 参照 |
 |------------|----------|----------|------|
-| 新規プロダクト全体 | Design Thinking | Atomic Design → デザインシステム構築 | references/design-methods.md |
+| 新規プロダクト全体 | Design Thinking | 画面設計 → インタラクション設計（DS未整備なら先にdesign-system-builderで基盤構築） | references/design-methods.md |
 | 特定機能のUI | コンポーネント設計 | 状態設計 → インタラクション設計 | references/layout-system.md |
 | 既存UIの改善 | ヒューリスティック評価 | ユーザビリティテスト → 改善設計 | references/design-methods.md |
 | レスポンシブ対応 | モバイルファースト | ブレークポイント設計 → グリッド設計 | references/layout-system.md |
 | アクセシビリティ改善 | WCAG 2.1 AA準拠 | ヒューリスティック評価 → セマンティックHTML | references/layout-system.md |
-| デザインシステム構築 | Atomic Design | Design Tokens → コンポーネントカタログ | references/design-methods.md |
+| デザインシステム構築 | → **design-system-builderスキルに委譲** | DS全体の構築はdesign-system-builderを使用 | — |
 | ダッシュボード設計 | 情報アーキテクチャ | グリッドレイアウト → データビジュアライゼーション | references/layout-system.md |
 | フォーム設計 | ユーザビリティ原則 | バリデーション設計 → エラー状態設計 | references/layout-system.md |
 | LP・マーケティング | ビジュアルヒエラルキー | CTA設計 → コンバージョン最適化 | references/layout-system.md |
@@ -361,6 +361,7 @@ ASCIIアートまたはHTML構造記述で画面構成を表現する。
 
 | スキル | 連携タイミング |
 |--------|---------------|
+| design-system-builder | デザインシステム全体の構築・運用が必要な場合。本スキルはDS成果物（原則・トークン・コンポーネント仕様）を入力として個別画面を設計する |
 | app-idea-workshop | アイデア段階からの場合、先にワークショップでアイデアを具体化する |
 | spec-gen | デザイン完了後、実装仕様書を生成する |
 | architecture-reviewer | デザインシステムのアーキテクチャをレビューする |
