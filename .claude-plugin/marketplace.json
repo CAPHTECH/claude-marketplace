@@ -12,7 +12,7 @@
       "name": "eld-plugin",
       "source": "./eld-plugin",
       "description": "Evidence-Loop Development (ELD) プラグイン。Law/Termモデリング、影響予測、接地検証、知識管理を提供。",
-      "version": "1.0.0",
+      "version": "2.3.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -56,7 +56,7 @@
       "name": "planning-plugin",
       "source": "./planning-plugin",
       "description": "企画・計画プラグイン。アプリアイデアワークショップとプロダクト計画を支援。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -78,7 +78,7 @@
       "name": "webapp-dev-plugin",
       "source": "./webapp-dev-plugin",
       "description": "Webアプリ開発支援プラグイン。Chrome DevTools MCPを使用したデバッグ、UI操作、ネットワーク分析、パフォーマンス計測を提供。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -89,7 +89,7 @@
       "name": "codex-plugin",
       "source": "./codex-plugin",
       "description": "OpenAI Codex (gpt-5.3-codex) 連携プラグイン。Codex MCP サーバーを提供し、セカンドオピニオン・ペアプログラミング・構造化議論スキルを統合。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -100,7 +100,7 @@
       "name": "apple-platform-plugin",
       "source": "./apple-platform-plugin",
       "description": "Apple Platform（iOS/macOS/watchOS/tvOS）開発支援プラグイン。Swift/SwiftUI開発、Xcodeプロジェクト管理、テスト・品質保証、デザイン・UI/UX、Simulator自動化を提供。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
