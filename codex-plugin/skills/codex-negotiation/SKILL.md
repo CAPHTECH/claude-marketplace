@@ -169,6 +169,25 @@ mcp__codex__codex(
 )
 ```
 
+既存コードを参照しながら議論する場合は、`cwd` とファイルパスを指定してCodexに直接読ませる:
+
+```
+mcp__codex__codex(
+  prompt: "以下の設計案を改善してください。現在の実装は対象ファイルを参照してください。
+
+対象ファイル: src/core/engine.ts, src/core/types.ts
+
+## 改善したい点
+- <具体的な懸念>
+
+## 制約（変更不可）
+- <変えられない部分>",
+  model: "gpt-5.3-codex",
+  config: { "model_reasoning_effort": "xhigh" },
+  cwd: "<絶対パス形式のプロジェクトルート>"
+)
+```
+
 ### ユーザー参加型
 
 ユーザーの意見を途中で取り込む場合:

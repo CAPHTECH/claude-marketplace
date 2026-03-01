@@ -33,16 +33,21 @@ mcp__codex__codex(
 
 ### ファイルコンテキスト付き相談
 
-Read ツールでファイル内容を取得し、prompt に埋め込む:
+ファイルパスを指定し、Codex自身に読ませる（path-first方式）:
 
 ```
 mcp__codex__codex(
-  prompt: "以下のコードについて<質問>:\n\n<ファイル内容>",
+  prompt: "以下のファイルを読んで<質問>に答えてください。
+対象ファイル: src/module.ts
+指摘は file:line 形式で記述してください。",
   model: "gpt-5.3-codex",
   config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>"
 )
 ```
+
+- `cwd` は必ず絶対パスで指定（例: `/Users/name/projects/my-app`）
+- ファイルパスは `cwd` からの相対パスで列挙
 
 ### セッション継続（マルチターン）
 
@@ -119,19 +124,17 @@ Claudeが実装し、Codexがレビュー・改善提案する。
 2. **Codexにレビュー依頼**:
 ```
 mcp__codex__codex(
-  prompt: "Navigatorとしてレビューしてください。以下の実装について:
+  prompt: "Navigatorとしてレビューしてください。以下のファイルを読み、
 - 設計上の問題点
 - エッジケースの見落とし
 - より良い代替案
-を指摘してください。
+を指摘してください。指摘は file:line 形式で。
 
-ファイル: <パス>
-要件: <要件の要約>
-
-<実装コード>",
+対象ファイル: src/feature.ts
+要件: <要件の要約>",
   model: "gpt-5.3-codex",
   config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>"
 )
 ```
 3. **Claudeがフィードバックを反映**: 指摘を取り込んで修正
@@ -139,9 +142,8 @@ mcp__codex__codex(
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
-  prompt: "修正しました。再レビューをお願いします。
-
-<修正後のコード>"
+  prompt: "修正しました。対象ファイルを再読込して再レビューをお願いします。
+修正ファイル: src/feature.ts"
 )
 ```
 
@@ -187,14 +189,12 @@ mcp__codex__codex-reply(
 2. **GREEN - Codexに実装を依頼**:
 ```
 mcp__codex__codex(
-  prompt: "以下のテストを通す最小限の実装を書いてください。テスト以外の変更は不要です。
+  prompt: "以下のテストファイルを読み、テストを通す最小限の実装を書いてください。テスト以外の変更は不要です。
 
-テストファイル: <パス>
-
-<テストコード>",
+テストファイル: tests/feature.test.ts",
   model: "gpt-5.3-codex",
   config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>",
+  cwd: "<絶対パス形式のプロジェクトルート>",
   sandbox: "workspace-write",
   approval-policy: "on-failure"
 )
@@ -242,7 +242,9 @@ mcp__codex__codex-reply(
 2. **Codexに破壊テストを依頼**:
 ```
 mcp__codex__codex(
-  prompt: "以下のコードに対して攻撃的レビューを行ってください:
+  prompt: "以下のファイルを読み、攻撃的レビューを行ってください:
+
+対象ファイル: src/auth/handler.ts, src/auth/middleware.ts
 
 観点:
 - 異常入力・境界値で壊れるケース
@@ -252,13 +254,10 @@ mcp__codex__codex(
 - エラーハンドリングの不備
 
 具体的な攻撃ケース（入力例やシナリオ）を提示してください。
-
-ファイル: <パス>
-
-<実装コード>",
+指摘は file:line 形式で記述してください。",
   model: "gpt-5.3-codex",
   config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>"
 )
 ```
 3. **Claudeが修正**: 発見された脆弱性を修正
@@ -266,12 +265,28 @@ mcp__codex__codex(
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
-  prompt: "以下の修正を行いました。再度攻撃してください。新しい攻撃ベクトルも試してください。
+  prompt: "以下の修正を行いました。修正ファイルを再読込して再度攻撃してください。新しい攻撃ベクトルも試してください。
 
-<修正内容の要約>"
+修正ファイル: src/auth/handler.ts
+修正概要: <修正内容の要約>"
 )
 ```
 5. **収束まで繰り返し**: 新しい脆弱性が見つからなくなるまでループ
+
+## ファイル参照の原則
+
+Codexはエージェントとしてファイル読み取り能力を持つため、**path-first**（パス指定でCodex自身に読ませる）を基本とする。
+
+### path-first（デフォルト）
+- ファイルレビュー、コード相談、ペアプロ、Adversarial Review
+- `cwd` は毎回**絶対パス**で指定（例: `/Users/name/projects/my-app`）
+- ファイルパスは `cwd` からの相対パスで列挙
+- 指摘は `file:line` 形式を要求
+- Codexがファイルを読めなかった場合は即報告させる
+
+### inline（例外）
+- git diff、CIログ、例外スタックトレース等、ファイルとして存在しない情報
+- コードレビューセクションの diff はこの方式
 
 ## 相談パターン
 
@@ -296,6 +311,6 @@ mcp__codex__codex-reply(
 ## 注意事項
 
 - Codexの回答は参考意見として扱い、最終判断はClaudeが行う
-- 大量のコードを渡す場合は要点を絞ってpromptを構成する
+- ファイル参照は path-first を基本とし、promptにコードを埋め込まない（「ファイル参照の原則」参照）
 - `mcp__codex__codex-reply` で threadId を指定し、文脈を維持した深い議論が可能
 - ペアプロモードでは各ラウンドの成果を要約してユーザーに報告する
