@@ -174,4 +174,3 @@ description: "一般・技術の両分野に対応した体系的情報収集ス
 |--------|---------------|
 | uncertainty-resolution | 調査中に不確実性が出てきた時、台帳化して優先順位を付ける |
 | dependency-observation | ライブラリ調査と合わせて依存関係を確認する時 |
-| eld-record | 調査で得た知見をPCEメモリに永続化する時 |

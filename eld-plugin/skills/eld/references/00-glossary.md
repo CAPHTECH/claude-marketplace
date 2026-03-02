@@ -176,27 +176,6 @@ Lawを検証可能・観測可能にする仕組み。
 
 ---
 
-## Context Engineering（v2.3新設）
-
-### 動的メモリポリシー
-3層メモリの管理ポリシー。重要度と鮮度に基づくアクション。
-
-| アクション | 条件 | 対象 |
-|-----------|------|------|
-| **KEEP** | 高重要度 + 高鮮度 | Long-term保持 |
-| **SUMMARIZE** | 高重要度 + 低鮮度 | 要約してLong-term |
-| **DISCARD** | 低重要度 + 低鮮度 | 破棄（S0/S1はDISCARD不可） |
-
-**鮮度**: `last_verified_at`からの経過時間（客観的指標）
-
-### 3層メモリモデル
-
-| Layer | 内容 | TTL | scope |
-|-------|------|-----|-------|
-| **Working** | 現セッションの作業コンテキスト | session終了まで | `session` |
-| **Short-term** | 最近のclaim、まだ検証途中 | 24h | `session` |
-| **Long-term** | 検証済みclaim、ADR、Law/Term | 無期限（鮮度チェック付き） | `project` |
-
 ---
 
 ## Review Hybrid（v2.3新設）
@@ -268,14 +247,6 @@ Issue単位の局所的な契約。
 ---
 
 ## 知識管理概念
-
-### pce-memory 3層構造
-
-| Layer | 内容 | TTL | scope |
-|-------|------|-----|-------|
-| **Working** | 現セッションの作業コンテキスト | session終了まで | `session` |
-| **Short-term** | 最近のclaim、まだ検証途中 | 24h | `session` |
-| **Long-term** | 検証済みclaim、ADR、Law/Term | 無期限（鮮度チェック付き） | `project` |
 
 ### Context Delta（文脈差分）
 作業中に発生した知見・決定の差分。

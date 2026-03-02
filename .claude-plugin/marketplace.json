@@ -12,18 +12,18 @@
       "name": "eld-plugin",
       "source": "./eld-plugin",
       "description": "Evidence-Loop Development (ELD) プラグイン。Law/Termモデリング、影響予測、接地検証、知識管理を提供。",
-      "version": "2.3.0",
+      "version": "3.0.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
-      "keywords": ["eld", "law", "term", "modeling", "grounding", "pce", "knowledge"],
+      "keywords": ["eld", "law", "term", "modeling", "grounding", "knowledge"],
       "category": "development"
     },
     {
       "name": "delivery-plugin",
       "source": "./delivery-plugin",
       "description": "開発ワークフロープラグイン。Issue管理、PRワークフロー、観測、テスト設計、コードレビューを提供。",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -34,7 +34,7 @@
       "name": "knowledge-plugin",
       "source": "./knowledge-plugin",
       "description": "アーキテクチャ・ドキュメント・リサーチプラグイン。システム理解、ドキュメント生成、情報収集を提供。",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "CAPH TECH Inc."
       },

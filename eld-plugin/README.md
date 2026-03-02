@@ -1,6 +1,6 @@
-# ELD Plugin v2.3 (Evidence-Loop Development)
+# ELD Plugin v3 (Evidence-Loop Development)
 
-証拠で回す統合開発手法 ELD v2.3 のコアプラグイン。Spec駆動モデリング、Predict-Lightゲート、2軸接地検証、Context Engineering統合、知識管理を提供します。
+証拠で回す統合開発手法 ELD のコアプラグイン。Spec駆動モデリング、Predict-Lightゲート、2軸接地検証、知識管理を提供します。
 
 ## ELD統合ループ（5+1フェーズ）
 
@@ -16,11 +16,10 @@ Sense → Spec → Change → Ground → Record
 - Model+Predict → Spec（SDD統合）、Predict-Lightゲート新設
 - Commit → Change に吸収
 - Ground 2軸化（Evidence Level × Evaluator Quality）
-- Context Engineering統合（動的メモリポリシー）
-- Epistemic Status強化（自動降格、出典必須化）
+- Epistemic Status強化（出典必須化）
 - Review Hybrid導入
 
-## スキル一覧（16 primary + 3 alias = 19）
+## スキル一覧（15 primary + 8 alias = 23）
 
 ### メイン
 | スキル | 説明 |
@@ -63,36 +62,35 @@ Sense → Spec → Change → Ground → Record
 ### Record（記録）
 | スキル | 説明 |
 |--------|------|
-| `eld-record` | Context Engineering統合。compact/maintenanceサブモード含む |
+| `eld-record` | Context Delta収集・検証・構造化・知識移転 |
 
-### Knowledge
-| スキル | 説明 |
-|--------|------|
-| `knowledge-validator` | pce-memory活用の知識検証・整合性チェック |
+### 後方互換エイリアス（8エイリアス）
+| エイリアス | 転送先 |
+|------------|--------|
+| `eld-model` | → `/eld-spec` |
+| `eld-model-law-card` | → `/eld-spec-card law` |
+| `eld-model-term-card` | → `/eld-spec-card term` |
+| `eld-model-law-discovery` | → `/eld-spec-discover` |
+| `eld-model-link-map` | → `/eld-spec-link` |
+| `eld-ground-pr-review` | → `/eld-ground review` |
+| `eld-ground-verify` | → `/eld-ground verify` |
+| `eld-predict-impact` | → `/eld-predict-light` |
 
-### 後方互換エイリアス
-| エイリアス | 転送先 | 理由 |
-|------------|--------|------|
-| `eld-model` | → `/eld-spec` | delivery-plugin互換 |
-| `eld-ground-pr-review` | → `/eld-ground review` | delivery-plugin互換 |
-| `eld-predict-impact` | → `/eld-predict-light` | 既存ユーザー互換 |
-
-## エージェント（8エージェント）
+## エージェント（6エージェント）
 
 | エージェント | 責務 |
 |-------------|------|
-| `pce-lde-orchestrator` | PCE/LDE統合開発フロー全体の調整 |
+| `pce-lde-orchestrator` | ELDワークフロー統合オーケストレータ（Issue→PR→Record） |
 | `law-constraint-analyst` | Law候補の発見・分類・Card化 |
 | `vocabulary-term-analyst` | Term発見・Card化 |
 | `mutual-constraint-validator` | Law↔Termの相互拘束検証 |
 | `grounding-verifier` | 2軸接地検証（Evidence Level × Evaluator Quality） |
-| `pce-memory-orchestrator` | 3層メモリモデル+動的ポリシー |
-| `pce-memory-analyzer` | メモリの分析・インサイト抽出 |
 | `pce-knowledge-architect` | 知識の収集・構造化・文書化 |
 
 ## クロスプラグイン依存
 
 - **delivery-plugin** が本プラグインの `/eld`, `/eld-sense-*`, `/eld-ground-pr-review`（→`/eld-ground review`エイリアス）, `/eld-model`（→`/eld-spec`エイリアス）を参照します。delivery-pluginとの併用を推奨します。
+- **codex-plugin** の `pce-lde-orchestrator` エージェントが `/codex-consultant`, `/codex-negotiation` を使用します。codex-pluginとの併用を推奨します。
 
 ## インストール
 

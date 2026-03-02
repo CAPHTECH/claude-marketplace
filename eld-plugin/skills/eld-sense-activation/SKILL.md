@@ -56,7 +56,6 @@ active_context:
 - 曖昧な場合はユーザーに確認
 
 ### 2. Constraints収集
-- pce-memoryからプロジェクトルール取得
 - CLAUDE.mdからコーディング規約取得
 
 ### 3. References選択

@@ -75,7 +75,7 @@
    - 時間的な制約
 
 3. **過去の法則を参照**
-   - pce-memoryから関連Law/Termを検索
+   - tasks/lessons.mdから関連パターンを検索
    - 類似バグの記録を確認
 
 ```yaml
@@ -469,30 +469,12 @@ Law:
     - 2024-01-15: 作成（DEBUG-2024-01-15-001の修正時）
 ```
 
-### 6.3 pce-memoryへの記録
+### 6.3 tasks/lessons.mdへの記録
 
-```typescript
-// バグパターンの記録
-await pce.memory.upsert({
-  text: "バグパターン: 並行処理での二重計上 - 複数の状態更新を非原子的に実行すると並行実行時に不整合が発生。対策: トランザクション使用、STM、明示的ロック",
-  kind: "fact",
-  scope: "project",
-  boundary_class: "internal",
-  provenance: {
-    at: new Date().toISOString(),
-    note: "DEBUG-2024-01-15-001の修正から学習"
-  }
-});
+バグパターンと法則をtasks/lessons.mdに記録する:
 
-// 法則の記録
-await pce.memory.upsert({
-  text: "Law: 在庫保存則 - ∀t. stock(t) = available(t) + reserved(t) - 総在庫は利用可能と予約済みの和。接地: Property-based test + メトリクス監視",
-  kind: "fact",
-  scope: "project",
-  boundary_class: "internal",
-  provenance: {
-    at: new Date().toISOString(),
-    note: "inventory-service の中核法則"
-  }
-});
-```
+- バグパターン名と概要
+- 根本原因のカテゴリと詳細
+- 検出方法（静的/動的/監視）
+- 防止策（設計/実装/レビュー）
+- 関連Law/Term Card

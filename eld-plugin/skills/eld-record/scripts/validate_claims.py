@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate pce-memory claims against current file state using hash comparison."""
+"""Validate claims against current file state using hash comparison."""
 
 import argparse
 import hashlib
@@ -83,7 +83,7 @@ def validate_claim(claim: Dict, project_root: Path) -> Tuple[str, str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate pce-memory claims")
+    parser = argparse.ArgumentParser(description="Validate claims")
     parser.add_argument("project_path", help="Path to project root")
     parser.add_argument("--claims", help="JSON file with claims to validate")
     parser.add_argument("--json", action="store_true", help="Output as JSON")

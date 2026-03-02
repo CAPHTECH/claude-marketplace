@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scan project structure and output key files for pce-memory collection."""
+"""Scan project structure and output key files for knowledge collection."""
 
 import argparse
 import hashlib
@@ -104,7 +104,7 @@ def scan_project(project_path: str) -> Dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Scan project for pce-memory collection")
+    parser = argparse.ArgumentParser(description="Scan project for knowledge collection")
     parser.add_argument("project_path", help="Path to project root")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()

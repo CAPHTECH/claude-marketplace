@@ -32,7 +32,6 @@ description: "技術情報（バグ・ライブラリ・サービス利用方法
 
 **1.3 既知情報の棚卸し**
 - 手元のドキュメント・過去のメモを確認
-- pce-memoryに関連するclaimがあれば参照
 - プロジェクト内のCLAUDE.md・ADRを確認
 
 ---
@@ -130,4 +129,3 @@ API動作・バグ再現など、情報のみで確信が持てない場合:
 
 - **resolving-uncertainty**: 調査しても解決しない不確実性は台帳に記録
 - **dependency-observation**: ライブラリ調査と合わせて依存関係を確認
-- **eld-record-collection**: 調査結果をpce-memoryに記録して知見を蓄積

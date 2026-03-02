@@ -325,7 +325,6 @@ states:
 
       ### オプション
       - `/eld-record-structuring` - CLAUDE.md/ADR整理
-      - `/eld-record-compact` - 長期セッションの圧縮
       - `/eld-record-knowledge-transfer` - 引き継ぎ資料作成
 
       ### 完了条件

@@ -104,23 +104,3 @@ law_card_draft:
 -> 追加の観測タスクを作成しますか？
 ```
 
-## pce-memory連携
-
-昇格履歴の記録:
-```
-pce_memory_upsert:
-  category: law_promotion
-  content: |
-    U-001 -> LAW-inv-atomic-update
-    - 昇格日: 2024-12-21
-    - 元仮説: 在庫更新は原子的に行う必要がある
-    - 検証方法: 並行テスト
-    - 証拠: tests/concurrent.test.ts
-  tags: ["law-promotion", "uncertainty", "inventory"]
-```
-
-過去の昇格パターン参照:
-```
-pce_memory_activate:
-  tags: ["law-promotion"]
-```

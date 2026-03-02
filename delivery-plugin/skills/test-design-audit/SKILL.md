@@ -20,7 +20,7 @@ description: |
 テスト設計を体系化する。
 
 ```
-ELD Loop: Sense → Model → Predict → Change → Ground → Record
+ELD Loop: Sense → Spec → Predict-Light → Change → Ground → Record
                                               ↑
                                     test-design-audit
 ```
@@ -46,7 +46,7 @@ ELD Loop: Sense → Model → Predict → Change → Ground → Record
 ## ワークフロー概要
 
 ```
-Phase 0: コンテキストパック収集 + pce-memory活性化
+Phase 0: コンテキストパック収集
     ↓
 Phase 1: 要求の棚卸し（REQ-xxx）+ Law/Term対応付け
     ↓
@@ -62,26 +62,14 @@ Phase 6: テスト項目生成（TEST-xxx）+ Grounding Map連携
     ↓
 Phase 7: トレーサビリティ検証 + Law/Term紐付け
     ↓
-Phase 8: 差分運用 + pce-memory記録
+Phase 8: 差分運用
 ```
 
 ---
 
-## Phase 0: コンテキストパック収集 + pce-memory活性化
+## Phase 0: コンテキストパック収集
 
 AIに渡す情報を固定する。情報が散らばるとモデルが不安定になり抜けが増える。
-
-### ELD統合: pce-memory活性化
-
-```
-pce_memory_activate({
-  q: "テスト対象機能 Law Term 既知バグ",
-  scope: ["project", "principle"],
-  allow: ["*"]
-})
-```
-
-過去の知識（Law/Term、バグパターン、設計決定）を活性化し、テスト設計に反映する。
 
 ### 必須収集項目
 
@@ -444,10 +432,9 @@ laws:
 
 ---
 
-## Phase 8: 差分運用 + pce-memory記録
+## Phase 8: 差分運用
 
 仕様変更時に再発しないための運用。
-**ELD的追加**: 設計決定とパターンをpce-memoryに記録する。
 
 ### 手順
 
@@ -456,33 +443,6 @@ laws:
 3. 影響範囲（どのFeature/State/Data/IF/**Law**に波及するか）を分析
 4. 影響のあるTCND/TESTだけを更新
 5. 対応表を更新して「未対応REQゼロ」「未接地Law/Termゼロ」を維持
-6. **pce-memoryに記録**
-
-### ELD統合: pce-memory記録
-
-テスト設計で発見した知識をpce-memoryに記録:
-
-```
-pce_memory_upsert({
-  text: "認証機能のテスト設計完了。LAW-auth-valid-credentialに対してL1-L2のテストを設計。L3（失敗注入）は次スプリントで対応予定。",
-  kind: "fact",
-  scope: "project",
-  boundary_class: "internal",
-  provenance: {
-    at: "2024-01-15T10:00:00Z",
-    actor: "test-design-audit"
-  }
-})
-```
-
-### 記録すべき内容
-
-| 種類 | 内容 | scope |
-|------|------|-------|
-| テスト設計決定 | カバレッジ基準の選択理由 | project |
-| 未対応項目 | 意図的に除外した項目とその理由 | project |
-| 発見したパターン | 再利用可能なテスト条件パターン | principle |
-| 新Law/Term | テスト設計中に発見した暗黙の法則 | project |
 
 ---
 

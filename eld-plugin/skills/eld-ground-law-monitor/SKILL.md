@@ -2,22 +2,22 @@
 name: eld-ground-law-monitor
 context: fork
 description: |
-  PCE（Process-Context Engine）とLDE（Law-Driven Engineering）を統合した実行時Law違反監視スキル。
-  本番環境でのLaw違反を検知し、pce-memoryにフィードバックして継続的改善を促す。
+  実行時Law違反監視スキル。
+  本番環境でのLaw違反を検知し、分析結果を記録して継続的改善を促す。
   使用タイミング: (1) 本番ログからLaw違反を分析する時、(2) 「Law違反を確認して」、
   (3) 運用中のLaw健全性をチェックする時、(4) 違反パターンから新Lawを発見する時
 ---
 
-# PCE Law Monitor
+# Law Monitor
 
-本番環境でのLaw違反を監視し、pce-memoryにフィードバックする。
+本番環境でのLaw違反を監視し、分析結果を記録する。
 
 ## 監視フロー
 
 ```
-Telemetry/Log → 違反検知 → パターン分析 → pce-memory記録 → 改善提案
-       ↓              ↓             ↓              ↓              ↓
-  law.*.violated   分類・集計    根本原因分析    observe/upsert   Law強化
+Telemetry/Log → 違反検知 → パターン分析 → 記録 → 改善提案
+       ↓              ↓             ↓          ↓          ↓
+  law.*.violated   分類・集計    根本原因分析   lessons.md  Law強化
 ```
 
 ## 監視対象
@@ -87,22 +87,7 @@ violation_analysis:
     - time_window: 10:00-12:00 JST
 ```
 
-### Step 4: pce-memory記録
-
-```
-pce_memory_observe:
-  source_type: telemetry
-  content: |
-    LAW-inv-balance違反パターン検出
-    - 頻度: 47件/3週間
-    - 根本原因候補: 並行処理での競合条件
-    - 影響: /api/orders エンドポイント
-  source_id: law-monitor-2024-12-21
-  ttl_days: 30
-  tags: ["law-violation", "LAW-inv-balance", "concurrency"]
-```
-
-### Step 5: 改善提案
+### Step 4: 改善提案
 
 ```yaml
 recommendations:
@@ -150,8 +135,6 @@ recommendations:
 2. [Law Enhancement] 並行制御要件を明文化
 3. [New Law] LAW-inv-concurrent-update の追加検討
 
-→ pce-memoryに記録済み
-
 ### LAW-pre-order-limit
 - **Violations**: 12
 - **Trend**: 📉 Decreasing
@@ -160,30 +143,6 @@ recommendations:
 
 **Recommended Actions**:
 1. [Bug Fix] バリデーションのエッジケース修正
-```
-
-## pce-memory連携
-
-### 記録する知見
-
-| カテゴリ | 内容 | TTL |
-|---------|------|-----|
-| 違反パターン | 発生頻度・傾向 | 30日 |
-| 根本原因 | 分析結果・仮説 | 90日 |
-| 対応履歴 | 実施した修正 | 永続 |
-| 新Law候補 | 発見した法則 | 永続 |
-
-### 活用方法
-
-```
-# 過去の類似違反を検索
-pce_memory_activate:
-  tags: ["law-violation", "concurrency"]
-
-# 対応履歴を参照
-pce_memory_query_entity:
-  entity_type: law_violation_fix
-  conditions: { law_id: "LAW-inv-balance" }
 ```
 
 ## 使用例
@@ -216,8 +175,8 @@ Claude:
 1. 在庫更新処理にSTMを導入
 2. Lawに並行制御要件を追加
 
-→ pce-memoryに分析結果を記録しました
-→ /uncertainty-resolution で新Law候補を生成しますか？
+→ 分析結果をtasks/lessons.mdに記録しました
+→ 新Law候補を生成しますか？
 ```
 
 ---

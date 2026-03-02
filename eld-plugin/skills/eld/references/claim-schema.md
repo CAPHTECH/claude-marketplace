@@ -125,19 +125,6 @@ verified ──[source変更検知]──→ inferred ──[TTL超過]──→
 | unknown | 手動で再検証 + source付与 | verified |
 | inferred | source付与 + last_verified_at更新 | verified |
 
-## 動的メモリポリシーとの連携
-
-```
-importance × 鮮度 → アクション
-
-鮮度 = now - last_verified_at
-
-高重要度(S0/S1) + 高鮮度(< ttl)  → KEEP
-高重要度(S0/S1) + 低鮮度(≥ ttl)  → SUMMARIZE
-低重要度(S2/S3) + 高鮮度(< ttl)  → KEEP
-低重要度(S2/S3) + 低鮮度(≥ ttl)  → DISCARD
-```
-
 ## 使用例
 
 ### 検証済みclaim

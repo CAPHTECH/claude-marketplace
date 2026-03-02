@@ -100,7 +100,7 @@ test-design-auditの結果をELDのRecordフェーズに渡す。
 - テスト設計決定の記録
 
 ```
-test-design-audit → Grounding Map → ELD Record → pce-memory
+test-design-audit → Grounding Map → ELD Record
 ```
 
 ## ELDスキルとの連携
@@ -162,4 +162,3 @@ test-design-audit → Grounding Map → ELD Record → pce-memory
 
 - [ ] Grounding Mapが更新されているか
 - [ ] 新しく発見したLaw/Termが記録されているか
-- [ ] pce-memoryにテスト設計決定が記録されているか
