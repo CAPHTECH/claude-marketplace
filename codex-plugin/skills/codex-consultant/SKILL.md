@@ -95,6 +95,21 @@ mcp__codex__codex(
 )
 ```
 
+#### レビュー+修正モード
+
+指摘だけでなく、修正可能なものはCodexにその場で直させる場合:
+
+```
+mcp__codex__codex(
+  prompt: "以下の差分をコードレビューし、バグや明確な問題は対象ファイルを読んだ上でその場で修正してください。設計上の問題は指摘のみ行ってください。差分に含まれるファイル以外は編集しないでください。修正した箇所は file:line 形式で報告してください。\n\n<diff出力>",
+  model: "gpt-5.3-codex",
+  config: { "model_reasoning_effort": "xhigh" },
+  cwd: "<絶対パス形式のプロジェクトルート>",
+  sandbox: "workspace-write",
+  approval-policy: "on-failure"
+)
+```
+
 ### 自動実行モード
 
 コード変更を伴う作業を Codex に依頼する場合:
@@ -239,7 +254,7 @@ mcp__codex__codex-reply(
 #### フロー
 
 1. **Claudeが実装**: 通常通りコードを書く
-2. **Codexに破壊テストを依頼**:
+2. **Codexに破壊テスト+修正を依頼**:
 ```
 mcp__codex__codex(
   prompt: "以下のファイルを読み、攻撃的レビューを行ってください:
@@ -253,14 +268,17 @@ mcp__codex__codex(
 - リソースリーク・メモリ問題
 - エラーハンドリングの不備
 
+致命的な問題（セキュリティ脆弱性、データ破壊等）は対象ファイルを読んだ上で直接修正してください。設計レベルの問題は指摘のみ行ってください。対象ファイル以外は編集しないでください。
 具体的な攻撃ケース（入力例やシナリオ）を提示してください。
-指摘は file:line 形式で記述してください。",
+修正・指摘は file:line 形式で記述してください。",
   model: "gpt-5.3-codex",
   config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<絶対パス形式のプロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>",
+  sandbox: "workspace-write",
+  approval-policy: "on-failure"
 )
 ```
-3. **Claudeが修正**: 発見された脆弱性を修正
+3. **Claudeが残りの修正とCodexの修正をレビュー**: 設計レベルの指摘を修正し、Codexによる修正の品質を確認
 4. **再攻撃**:
 ```
 mcp__codex__codex-reply(
