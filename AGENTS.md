@@ -10,7 +10,7 @@
 - `meta-plugin/`: メタツールプラグイン。CLAUDE.md管理、スキル開発。4スキル。
 - `webapp-dev-plugin/`: Webアプリ開発支援。`skills/webapp-debugger/`と`webapp-debugger.skill`を同梱。
 - `codex-plugin/`: OpenAI Codex連携。セカンドオピニオン・ペアプログラミング・構造化議論。
-- `apple-platform-plugin/`: Apple Platform開発支援。
+- `mobile-plugin/`: モバイル開発支援。mobile-mcp によるiOS/Androidデバイス操作・UI自動化、Swift/SwiftUI開発、Xcodeプロジェクト管理。
 - `.claude-plugin/marketplace.json`: マーケットプレイス登録情報。新規プラグイン追加時に更新。
 
 各プラグインの構造: `skills/<skill>/SKILL.md`がソース、`*.skill`が配布アーカイブ。`agents/`にエージェント定義、`commands/`と`hooks/`は予約枠。
