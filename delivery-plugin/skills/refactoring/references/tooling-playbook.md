@@ -4,6 +4,8 @@
 
 This playbook provides concrete examples of using TypeScript tooling for safe refactoring execution. Each tool section includes installation, usage examples, failure diagnostics, and integration patterns.
 
+> **Package manager note**: Examples use `pnpm`. Substitute `npm run` or `yarn` as appropriate for your project. Commands like `pnpm test --run` assume a `test` script is defined in `package.json`.
+
 ---
 
 ## Tool 1: TypeScript Compiler (tsc)
@@ -123,14 +125,14 @@ export class UserValidator {
 pnpm tsc --noEmit && echo "✅ Baseline type check passed"
 
 # After each refactoring step
-pnpm tsc --noEmit && git add . && git commit -m "refactor: ..." || git reset --hard
+pnpm tsc --noEmit && git add . && git commit -m "refactor: ..." || git restore .
 
 # Automated in verify-step.sh
 #!/bin/bash
 pnpm tsc --noEmit
 if [ $? -ne 0 ]; then
   echo "❌ Type check failed - rolling back"
-  git reset --hard HEAD
+  git restore .
   exit 1
 fi
 ```
@@ -157,11 +159,12 @@ pnpm add -D jest ts-jest @types/jest
 
 #### Example 1: Run All Tests
 ```bash
-# Vitest
-pnpm vitest run
+# Via package.json script (recommended — works with any runner)
+pnpm test --run
 
-# Jest
-pnpm jest
+# Direct invocation (if needed for runner-specific flags):
+#   Vitest: pnpm vitest run
+#   Jest:   pnpm jest
 ```
 
 **Success Output**:
@@ -189,13 +192,13 @@ AssertionError: expected 'saved' to equal 'created'
 #### Example 2: Run Specific Tests
 ```bash
 # Run tests matching pattern
-pnpm vitest run user
+pnpm test --run user
 
 # Run single test file
-pnpm vitest run src/user/validator.test.ts
+pnpm test --run src/user/validator.test.ts
 
 # Run tests in changed files only
-pnpm vitest run --changed
+pnpm test --run --changed
 ```
 
 #### Example 3: Watch Mode
@@ -210,10 +213,10 @@ pnpm vitest --ui
 #### Example 4: Coverage Report
 ```bash
 # Generate coverage
-pnpm vitest run --coverage
+pnpm test --run --coverage
 
 # With JSON output for parsing
-pnpm vitest run --coverage --reporter=json > coverage.json
+pnpm test --run --coverage --reporter=json > coverage.json
 ```
 
 **Coverage Output**:
@@ -278,13 +281,13 @@ it('should load user', async () => {
 
 ```bash
 # Pre-refactoring: Capture baseline
-pnpm vitest run --reporter=json > baseline-tests.json
+pnpm test --run --reporter=json > baseline-tests.json
 
 # After each step: Quick validation
-pnpm vitest run --reporter=json --bail > step-tests.json
+pnpm test --run --reporter=json --bail > step-tests.json
 if [ $? -ne 0 ]; then
   echo "❌ Tests failed - rolling back"
-  git reset --hard HEAD
+  git restore .
   exit 1
 fi
 
@@ -420,7 +423,7 @@ STEP_WARNINGS=$(cat step-lint.json | jq '[.[].warningCount] | add')
 
 if [ "$STEP_ERRORS" -gt "$BASELINE_ERRORS" ]; then
   echo "❌ Lint errors increased: $BASELINE_ERRORS → $STEP_ERRORS"
-  git reset --hard HEAD
+  git restore .
   exit 1
 fi
 
@@ -599,14 +602,17 @@ Types: ✅ No errors
 
 #### Example 2: Rollback Last Change
 ```bash
-# Uncommitted changes
-git reset --hard HEAD
+# Uncommitted changes (safe — does not touch untracked files)
+git restore .
 
-# Last commit
-git reset --hard HEAD~1
+# Revert last commit (creates a new undo commit — safe for shared branches)
+git revert HEAD --no-edit
 
-# Specific commit
-git revert <commit-hash>
+# Revert specific commit
+git revert <commit-hash> --no-edit
+
+# ⚠️ Last resort only — discards commits and rewrites history:
+# git reset --hard HEAD~1
 ```
 
 #### Example 3: Create Refactoring Branch
@@ -629,7 +635,7 @@ git push -u origin refactor/extract-user-validator
 
 ```bash
 #!/bin/bash
-set -e
+# NOTE: Do NOT use set -e here — we collect exit codes manually.
 
 STEP_NAME=$1
 OUTPUT_DIR="logs/refactoring"
@@ -640,7 +646,7 @@ echo "🔍 Verifying refactoring step: $STEP_NAME"
 
 # Test
 echo "✅ Running tests..."
-pnpm vitest run --reporter=json > "$OUTPUT_DIR/$STEP_NAME-tests.json"
+pnpm test --run --reporter=json > "$OUTPUT_DIR/$STEP_NAME-tests.json" 2>&1
 TEST_RESULT=$?
 
 # Type check
@@ -650,7 +656,7 @@ TYPE_RESULT=$?
 
 # Lint
 echo "✅ Linting..."
-pnpm eslint src/ --format=json > "$OUTPUT_DIR/$STEP_NAME-lint.json"
+pnpm eslint src/ --format=json > "$OUTPUT_DIR/$STEP_NAME-lint.json" 2>&1
 LINT_RESULT=$?
 
 # Build (optional)
@@ -673,8 +679,8 @@ echo ""
 
 # Exit with failure if critical checks failed
 if [ $TEST_RESULT -ne 0 ] || [ $TYPE_RESULT -ne 0 ] || [ $BUILD_RESULT -ne 0 ]; then
-  echo "❌ Verification failed - rolling back"
-  git reset --hard HEAD
+  echo "❌ Verification failed - rolling back uncommitted changes"
+  git restore .
   exit 1
 fi
 
@@ -707,10 +713,10 @@ git commit -m "refactor: extract validator"
 
 ### Per-Step Validation
 - [ ] Run `pnpm tsc --noEmit` (type check)
-- [ ] Run `pnpm vitest run` (tests)
+- [ ] Run `pnpm test --run` (tests)
 - [ ] Run `pnpm eslint src/` (lint)
 - [ ] Run `pnpm build` (build check)
-- [ ] Commit if all pass, rollback if any fail
+- [ ] Commit if all pass, rollback (`git restore .`) if any fail
 
 ### Post-Refactoring Verification
 - [ ] Full test suite passes

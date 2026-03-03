@@ -4,6 +4,8 @@
 
 This document defines critical safety checkpoints throughout the refactoring process. Each checkpoint must be verified before proceeding to the next stage. Failure to pass any checkpoint triggers a rollback or investigation procedure.
 
+> **Package manager note**: Examples use `pnpm`. Substitute `npm run` or `yarn` as appropriate for your project.
+
 ---
 
 ## Checkpoint Categories
@@ -87,7 +89,7 @@ git status
 2. Commit or stash existing changes
 3. Ensure rollback capability is available
 
-**Rationale**: Clean state enables safe rollback via `git reset --hard`.
+**Rationale**: Clean state enables safe rollback via `git restore .` (uncommitted) or `git revert` (committed).
 
 ---
 
@@ -184,7 +186,7 @@ pnpm test <new-test-files>
 
 **Verification**:
 ```bash
-pnpm test --coverage
+pnpm test --run --coverage
 # Compare coverage to baseline
 ```
 
@@ -221,8 +223,8 @@ pnpm test --run
 **Failure Action**:
 1. **IMMEDIATE ROLLBACK**:
    ```bash
-   git reset --hard HEAD  # If uncommitted
-   git reset --hard HEAD~1  # If committed
+   git restore .              # If uncommitted
+   git revert HEAD --no-edit  # If committed (creates undo commit)
    ```
 2. Investigate failure:
    - Review last change for unintended side effects
@@ -421,7 +423,7 @@ pnpm test:integration --run
 
 **Verification**:
 ```bash
-pnpm test --coverage --json > final-coverage.json
+pnpm test --run --coverage --json > final-coverage.json
 # Compare to baseline
 ```
 
@@ -467,9 +469,9 @@ pnpm test --coverage --json > final-coverage.json
 ```bash
 # Run CI checks locally
 pnpm build
-pnpm test
-pnpm lint
-pnpm type-check
+pnpm test --run
+pnpm eslint src/
+pnpm tsc --noEmit
 ```
 
 **Success Criteria**:
@@ -527,11 +529,14 @@ pnpm type-check
 
 **Immediate Action**:
 ```bash
-# Rollback last commit
-git reset --hard HEAD~1
+# Revert last commit (safe — creates undo commit)
+git revert HEAD --no-edit
 
 # Or revert specific commit
-git revert <commit-hash>
+git revert <commit-hash> --no-edit
+
+# ⚠️ Last resort (rewrites history, unsafe for shared branches):
+# git reset --hard HEAD~1
 ```
 
 **Investigation**:
@@ -546,8 +551,11 @@ git revert <commit-hash>
 
 **Immediate Action**:
 ```bash
-# Rollback to last good state
-git reset --hard HEAD~1
+# Uncommitted changes
+git restore .
+
+# If already committed
+git revert HEAD --no-edit
 ```
 
 **Investigation**:
@@ -583,8 +591,14 @@ pnpm test:performance --prof
 
 **Immediate Action**:
 ```bash
-# Rollback to last stable state
-git reset --hard <last-good-commit>
+# Revert to last stable state
+git revert HEAD --no-edit
+
+# If multiple commits need reverting
+git revert <oldest-bad-commit>^..<latest-bad-commit> --no-edit
+
+# ⚠️ Last resort (rewrites history):
+# git reset --hard <last-good-commit>
 ```
 
 **Investigation**:
@@ -619,21 +633,27 @@ git reset --hard <last-good-commit>
 Create `scripts/verify-checkpoint.sh`:
 ```bash
 #!/bin/bash
-set -e
 
 echo "🔍 Running safety checkpoints..."
 
+FAIL=0
+
 echo "✅ Running tests..."
-pnpm test --run
+pnpm test --run || FAIL=1
 
 echo "✅ Type checking..."
-pnpm tsc --noEmit
+pnpm tsc --noEmit || FAIL=1
 
 echo "✅ Linting..."
-pnpm eslint src/
+pnpm eslint src/ || FAIL=1
 
 echo "✅ Build..."
-pnpm build
+pnpm build || FAIL=1
+
+if [ $FAIL -ne 0 ]; then
+  echo "❌ One or more checkpoints failed"
+  exit 1
+fi
 
 echo "🎉 All checkpoints passed!"
 ```
@@ -656,7 +676,7 @@ Create `.husky/pre-commit`:
 # Run quick validation
 pnpm test --run --changed
 pnpm tsc --noEmit
-pnpm eslint --fix
+pnpm eslint src/ --fix
 ```
 
 ---

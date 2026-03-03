@@ -248,10 +248,81 @@ Separate computation from side effects.
 
 ## Rollback Protocol
 
-- Uncommitted changes: `git restore <file>`
-- Last commit: `git reset --hard HEAD~1`
-- Specific commit range: `git revert <commit-range>`
+- Uncommitted changes: `git restore .` (or `git restore <file>` for a single file)
+- Last commit: `git revert HEAD --no-edit` (creates an undo commit — safe for shared branches)
+- Specific commit range: `git revert <oldest>^..<latest> --no-edit`
 - Always investigate failure cause before re-attempting
+
+> **⚠️ Last resort**: `git reset --hard` rewrites history and can destroy work. Only use when you are certain no one else has pulled the commits and you need to erase them entirely.
+
+---
+
+## Legacy Code Techniques (Feathers)
+
+Techniques from *Working Effectively with Legacy Code* (Michael Feathers) for safely modifying code that lacks tests or has tightly coupled dependencies.
+
+### Seam Identification
+
+A **seam** is a place where you can alter behavior without editing the source. Identify seams before changing legacy code to enable testing without large-scale rewrites.
+
+```typescript
+// Object seam — override via subclass or DI
+class OrderProcessor {
+  constructor(private notifier: Notifier = new EmailNotifier()) {}
+  process(order: Order): void {
+    // ... business logic ...
+    this.notifier.send(order.id);  // ← seam: replaceable via constructor
+  }
+}
+```
+
+### Sprout Method / Sprout Class
+
+Add new behavior in a fresh, fully tested method or class instead of editing untested legacy code.
+
+```typescript
+// Legacy method — untested, risky to modify
+class InvoiceService {
+  generateInvoice(order: Order): Invoice { /* 200 lines of legacy */ }
+
+  // Sprout Method — new logic in isolated, tested function
+  applyDiscount(invoice: Invoice, code: string): Invoice {
+    const discount = DiscountCalculator.resolve(code);
+    return { ...invoice, total: invoice.total - discount };
+  }
+}
+```
+
+**When to use**: New requirement on existing untested code. Write the new logic in a sprout, call it from the legacy method.
+
+### Wrap Method / Wrap Class
+
+Wrap an existing method to add behavior before/after without modifying the original.
+
+```typescript
+// Wrap Method — add logging around legacy call
+class AuditedInvoiceService {
+  constructor(private inner: InvoiceService, private logger: Logger) {}
+
+  generateInvoice(order: Order): Invoice {
+    this.logger.info('Generating invoice', { orderId: order.id });
+    const invoice = this.inner.generateInvoice(order);
+    this.logger.info('Invoice generated', { invoiceId: invoice.id });
+    return invoice;
+  }
+}
+```
+
+### Branch by Abstraction
+
+Gradually replace a dependency by introducing an abstraction layer, migrating callers incrementally.
+
+**Execution steps**:
+1. Create an interface matching the current dependency's API
+2. Implement a wrapper that delegates to the old dependency
+3. Update callers to depend on the interface (one at a time, with tests)
+4. Implement the new dependency behind the same interface
+5. Switch the binding; remove the old dependency when all callers are migrated
 
 ---
 

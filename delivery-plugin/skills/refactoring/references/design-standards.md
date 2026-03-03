@@ -187,6 +187,37 @@ For Assay specifically:
 - **Framework nature**: Public API surface area matters more than internal complexity
 - **Test-driven**: Tests can be more descriptive (longer) than production code
 
+## Deep Analysis: Weighted Priority Scoring
+
+When the simplified 6-metric table in SKILL.md is insufficient (e.g., large codebases with hundreds of findings), use this weighted formula for finer granularity:
+
+**Priority Score = (Impact × Risk Reduction) / Effort**
+
+| Factor | Scale | Components |
+|--------|-------|-----------|
+| Impact | 1-10 | Maintainability effect, bug likelihood, velocity impact |
+| Risk Reduction | 1-10 | Bug history, change frequency, blast radius |
+| Effort | 1-10 | Time, dependency complexity, test requirements |
+
+### Contextual Adjustments
+
+Apply these bonuses to the raw factor scores before calculating:
+
+| Condition | Adjustment |
+|-----------|-----------|
+| Files with past bugs (git blame) | Impact +2 |
+| High churn files (>20 changes/month) | Risk Reduction +1.5 |
+| Coverage < 50% | Risk Reduction +1 |
+| Core/domain modules | Impact +1 |
+
+### Threshold Mapping
+
+| Priority Score | Category |
+|---------------|----------|
+| >= 50 | **Critical** — fix immediately |
+| 20-49 | **Medium** — schedule in next sprint |
+| < 20 | **Low** — backlog candidate |
+
 ## References
 
 Based on industry standards and Codex recommendations, tailored for TypeScript framework projects following modern best practices.

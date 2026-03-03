@@ -60,7 +60,7 @@ git log --format=format: --name-only | grep -v '^$' | sort | uniq -c | sort -rn
 
 **Coverage Correlation**:
 ```bash
-npx vitest run --coverage
+pnpm test --run --coverage
 ```
 
 For each file/module, evaluate:
@@ -73,22 +73,25 @@ For each file/module, evaluate:
 
 ### 1.4 Prioritize
 
-Calculate: **Priority Score = (Impact x Risk Reduction) / Effort**
+Rate each finding on 6 core metrics (1-5 scale), then classify by total score:
 
-- **Impact** (1-10): Maintainability effect, bug likelihood, velocity impact
-- **Risk Reduction** (1-10): Bug history, change frequency, blast radius
-- **Effort** (1-10): Time, dependency complexity, test requirements
+| Metric | What to evaluate |
+|--------|-----------------|
+| Complexity | CC, cognitive complexity, nesting depth |
+| Coupling | Import count, circular deps, instability |
+| Bug Risk | Past bug history, change frequency |
+| Coverage Gap | Test coverage of affected code |
+| Blast Radius | Number of dependents / callers |
+| Effort to Fix | Estimated steps, dependency changes needed |
 
-Contextual adjustments:
-- Files with past bugs: +20 impact
-- High churn files: +15 risk reduction
-- Coverage < 50%: +10 risk reduction
-- Core modules: +10 impact
+**Priority = (Complexity + Coupling + Bug Risk + Coverage Gap + Blast Radius) − Effort**
 
 Categories:
-- **Critical** (Score >= 50): Circular deps, architecture violations, high complexity + low coverage + bug history
-- **Medium** (Score 20-49): SOLID violations, high coupling in stable modules, dead code
-- **Low** (Score < 20): Minor style, moderate complexity, documentation
+- **Critical** (Score >= 16): Circular deps, architecture violations, high complexity + low coverage + bug history
+- **Medium** (Score 10-15): SOLID violations, high coupling in stable modules, dead code
+- **Low** (Score < 10): Minor style, moderate complexity, documentation
+
+For large codebases with many findings, use the weighted 1-10 scale with contextual adjustments in the Deep Analysis section of [design-standards.md](references/design-standards.md) (different scale — thresholds there are 50/20 instead of 16/10).
 
 ### 1.5 Validate Findings
 
@@ -165,9 +168,9 @@ Break refactoring into the smallest possible changes. For each step:
 1. **Apply one refactoring pattern** from [refactoring-patterns.md](references/refactoring-patterns.md)
 2. **Verify** (all must pass):
    ```bash
-   pnpm vitest run --reporter=json
+   pnpm test --run
    pnpm tsc --noEmit
-   pnpm eslint --format=json <affected-files>
+   pnpm eslint <affected-files>
    ```
 3. **If verification fails**: Immediately revert, investigate, re-attempt with smaller step
 4. **If verification passes**: Commit with descriptive message, log results
