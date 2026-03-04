@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="math" tests="5" failures="1" errors="0" skipped="1" time="0.342">
+    <testcase name="adds numbers" classname="math" time="0.05"/>
+    <testcase name="subtracts numbers" classname="math" time="0.03"/>
+    <testcase name="multiplies numbers" classname="math" time="0.02"/>
+    <testcase name="divides by zero" classname="math" time="0.01">
+      <failure message="Expected error">Division by zero not handled</failure>
+    </testcase>
+    <testcase name="modulo" classname="math" time="0.0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

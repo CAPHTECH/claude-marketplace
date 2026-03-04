@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caph.tech/disposable/autopsy/v1",
+  "title": "Disposable Autopsy Report",
+  "description": "10-axis analysis report for disposable prototype evaluation",
+  "type": "object",
+  "required": ["schemaVersion", "rubricVersion", "cycleId", "timestamp", "axes", "summary"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "rubricVersion": {
+      "const": "1.0.0",
+      "description": "Scoring rubric version for cross-cycle comparability"
+    },
+    "cycleId": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metricsRef": {
+      "type": "string",
+      "description": "Relative path to metrics.json used as evidence"
+    },
+    "axes": {
+      "type": "object",
+      "required": [
+        "correctness", "architecture", "security", "performance",
+        "testability", "readability", "maintainability",
+        "error-handling", "dependency-hygiene", "documentation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "correctness":        { "$ref": "#/$defs/axis" },
+        "architecture":       { "$ref": "#/$defs/axis" },
+        "security":           { "$ref": "#/$defs/axis" },
+        "performance":        { "$ref": "#/$defs/axis" },
+        "testability":        { "$ref": "#/$defs/axis" },
+        "readability":        { "$ref": "#/$defs/axis" },
+        "maintainability":    { "$ref": "#/$defs/axis" },
+        "error-handling":     { "$ref": "#/$defs/axis" },
+        "dependency-hygiene": { "$ref": "#/$defs/axis" },
+        "documentation":      { "$ref": "#/$defs/axis" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["verdict", "strengths", "criticalIssues", "averageScore"],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["PASS", "CALIBRATE", "FAIL"]
+        },
+        "strengths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "criticalIssues": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "averageScore": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "axis": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["scored", "na", "insufficient-evidence"]
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Required when status=scored"
+        },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/recommendation" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "scored" } } },
+          "then": { "required": ["status", "score", "findings"] }
+        },
+        {
+          "if": { "properties": { "status": { "enum": ["na", "insufficient-evidence"] } } },
+          "then": { "not": { "required": ["score"] } }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "severity", "description"],
+      "properties": {
+        "id": { "type": "string", "description": "e.g. SEC-001" },
+        "severity": { "type": "string", "enum": ["critical", "major", "minor", "info"] },
+        "description": { "type": "string" },
+        "evidenceRef": { "type": "string", "description": "Metric key or file:line reference" }
+      },
+      "additionalProperties": false
+    },
+    "recommendation": {
+      "type": "object",
+      "required": ["id", "priority", "description"],
+      "properties": {
+        "id": { "type": "string" },
+        "priority": { "type": "string", "enum": ["must", "should", "could"] },
+        "description": { "type": "string" },
+        "evidenceRef": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "filePath": "/src/index.ts",
+    "messages": [
+      { "severity": 2, "message": "Unexpected any", "ruleId": "no-explicit-any", "line": 10 },
+      { "severity": 1, "message": "Unused variable", "ruleId": "no-unused-vars", "line": 15 },
+      { "severity": 1, "message": "Missing return type", "ruleId": "explicit-function-return-type", "line": 20 }
+    ]
+  },
+  {
+    "filePath": "/src/utils.ts",
+    "messages": [
+      { "severity": 2, "message": "Type assertion", "ruleId": "no-unsafe-assertion", "line": 5 }
+    ]
+  }
+]

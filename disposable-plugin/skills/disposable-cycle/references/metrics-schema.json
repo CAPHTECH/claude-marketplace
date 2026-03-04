@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caph.tech/disposable/metrics/v1",
+  "title": "Disposable Metrics",
+  "description": "Unified metrics aggregated from SARIF, JUnit, and LCOV sources",
+  "type": "object",
+  "required": ["schemaVersion", "cycleId", "language", "timestamp", "lint", "tests", "coverage", "dataCompleteness"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "cycleId": {
+      "type": "string",
+      "description": "Unique cycle identifier (e.g. cycle_1)"
+    },
+    "parentCycleId": {
+      "type": "string",
+      "description": "Previous cycle ID for delta comparison"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["typescript", "dart", "swift", "elixir", "rust"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO 8601"
+    },
+    "toolVersions": {
+      "type": "object",
+      "description": "Tool name → version string",
+      "additionalProperties": { "type": "string" }
+    },
+    "lint": {
+      "type": "object",
+      "required": ["error", "warning", "info", "total"],
+      "properties": {
+        "error":   { "type": "integer", "minimum": 0 },
+        "warning": { "type": "integer", "minimum": 0 },
+        "info":    { "type": "integer", "minimum": 0 },
+        "total":   { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "tests": {
+      "type": "object",
+      "required": ["passed", "failed", "skipped", "total", "durationMs"],
+      "properties": {
+        "passed":     { "type": "integer", "minimum": 0 },
+        "failed":     { "type": "integer", "minimum": 0 },
+        "skipped":    { "type": "integer", "minimum": 0 },
+        "total":      { "type": "integer", "minimum": 0 },
+        "durationMs": { "type": "number",  "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["line", "branch", "function"],
+      "properties": {
+        "line":     { "$ref": "#/$defs/coverageEntry" },
+        "branch":   { "$ref": "#/$defs/coverageEntry" },
+        "function": { "$ref": "#/$defs/coverageEntry" }
+      },
+      "additionalProperties": false
+    },
+    "dataCompleteness": {
+      "type": "object",
+      "description": "Which data sources were available",
+      "required": ["lint", "tests", "coverage"],
+      "properties": {
+        "lint":     { "type": "boolean" },
+        "tests":    { "type": "boolean" },
+        "coverage": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "coverageEntry": {
+      "type": "object",
+      "required": ["pct", "covered", "total"],
+      "properties": {
+        "pct":     { "type": "number", "minimum": 0, "maximum": 100 },
+        "covered": { "type": "integer", "minimum": 0 },
+        "total":   { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

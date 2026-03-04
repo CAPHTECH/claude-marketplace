@@ -1,0 +1,131 @@
+# Tool Profiles — Language-specific tool allowlist for disposable cycles
+# Each profile defines: lint, test, coverage commands and their output formats
+
+typescript:
+  detect:
+    files: ["tsconfig.json", "package.json"]
+    indicators: ["*.ts", "*.tsx"]
+  lint:
+    tool: eslint
+    command: "npx --no-install eslint . --format json -o .disposable/lint-report.json"
+    outputFormat: sarif-compatible-json
+    outputPath: ".disposable/lint-report.json"
+    severityMap:
+      2: error
+      1: warning
+      0: info
+  test:
+    tool: vitest
+    command: "npx --no-install vitest run --reporter=junit --outputFile=.disposable/test-report.xml"
+    altTool: jest
+    altCommand: "JEST_JUNIT_OUTPUT_DIR=.disposable JEST_JUNIT_OUTPUT_NAME=test-report.xml npx --no-install jest --ci --reporters=jest-junit"
+    outputFormat: junit-xml
+    outputPath: ".disposable/test-report.xml"
+  coverage:
+    tool: vitest
+    command: "npx --no-install vitest run --coverage --coverage.reporter=lcov --coverage.reportsDirectory=.disposable/coverage"
+    altTool: jest
+    altCommand: "npx --no-install jest --ci --coverage --coverageReporters=lcov --coverageDirectory=.disposable/coverage"
+    outputFormat: lcov
+    outputPath: ".disposable/coverage/lcov.info"
+
+dart:
+  detect:
+    files: ["pubspec.yaml"]
+    indicators: ["*.dart"]
+  lint:
+    tool: dart-analyze
+    command: "dart analyze --format=json > .disposable/lint-report.json"
+    outputFormat: dart-analyze-json
+    outputPath: ".disposable/lint-report.json"
+    severityMap:
+      ERROR: error
+      WARNING: warning
+      INFO: info
+  test:
+    tool: dart-test
+    command: "dart test --reporter=json | dart run junitreport:tojunit > .disposable/test-report.xml"
+    altCommand: "dart test --reporter=json | dart run junitreport:tojunit > .disposable/test-report.xml"
+    altNote: "If junitreport unavailable, use 'dart test --reporter=json > .disposable/test-report.json' and convert to JUnit XML before aggregate"
+    outputFormat: junit-xml
+    outputPath: ".disposable/test-report.xml"
+  coverage:
+    tool: coverage
+    command: "dart test --coverage=.disposable/coverage && format_coverage --lcov -i .disposable/coverage -o .disposable/coverage/lcov.info"
+    outputFormat: lcov
+    outputPath: ".disposable/coverage/lcov.info"
+
+swift:
+  detect:
+    files: ["Package.swift", "*.xcodeproj"]
+    indicators: ["*.swift"]
+  lint:
+    tool: swiftlint
+    command: "swiftlint lint --reporter json > .disposable/lint-report.json"
+    outputFormat: swiftlint-json
+    outputPath: ".disposable/lint-report.json"
+    severityMap:
+      error: error
+      warning: warning
+  test:
+    tool: swift-test
+    command: "swift test 2>&1 | xcbeautify --report junit --report-path .disposable/test-report.xml"
+    outputFormat: junit-xml
+    outputPath: ".disposable/test-report.xml"
+  coverage:
+    note: "v1.1 — not yet supported for Swift"
+    tool: null
+    outputFormat: null
+
+elixir:
+  detect:
+    files: ["mix.exs"]
+    indicators: ["*.ex", "*.exs"]
+  lint:
+    tool: credo
+    command: "mix credo --format json > .disposable/lint-report.json"
+    outputFormat: credo-json
+    outputPath: ".disposable/lint-report.json"
+    severityMap:
+      F: error
+      C: error
+      W: warning
+      R: info
+  test:
+    tool: mix-test
+    command: "mix test --formatter JUnitFormatter"
+    setupNote: "Requires junit_formatter dep and config in config/test.exs: config :junit_formatter, report_dir: \".disposable\", report_file: \"test-report.xml\""
+    outputFormat: junit-xml
+    outputPath: ".disposable/test-report.xml"
+  coverage:
+    tool: excoveralls
+    command: "MIX_ENV=test mix coveralls.lcov --output-dir .disposable/coverage"
+    outputFormat: lcov
+    outputPath: ".disposable/coverage/lcov.info"
+
+rust:
+  detect:
+    files: ["Cargo.toml"]
+    indicators: ["*.rs"]
+  lint:
+    tool: clippy
+    command: "cargo clippy --message-format=json > .disposable/lint-report.json"
+    outputFormat: cargo-json
+    outputPath: ".disposable/lint-report.json"
+    severityMap:
+      error: error
+      warning: warning
+      note: info
+      help: info
+  test:
+    tool: cargo-test
+    command: "cargo test 2>&1 | cargo2junit > .disposable/test-report.xml"
+    altCommand: "cargo test 2>&1 | cargo2junit > .disposable/test-report.xml"
+    altNote: "If cargo2junit unavailable, use 'cargo test -- -Z unstable-options --format json > .disposable/test-report.json' and convert to JUnit XML before aggregate"
+    outputFormat: junit-xml
+    outputPath: ".disposable/test-report.xml"
+  coverage:
+    tool: cargo-tarpaulin
+    command: "cargo tarpaulin --out Lcov --output-dir .disposable/coverage"
+    outputFormat: lcov
+    outputPath: ".disposable/coverage/lcov.info"

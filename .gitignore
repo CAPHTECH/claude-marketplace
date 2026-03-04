@@ -2,3 +2,5 @@
 .claude/
 *.log
 .idea/
+node_modules/
+.disposable/
