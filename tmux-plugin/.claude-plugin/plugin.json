@@ -1,0 +1,8 @@
+{
+  "name": "tmux-plugin",
+  "version": "1.0.0",
+  "description": "tmux integration skills for Claude Code - worktree management, session control",
+  "author": {
+    "name": "CAPH TECH Inc."
+  }
+}
