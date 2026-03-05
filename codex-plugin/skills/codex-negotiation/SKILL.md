@@ -1,12 +1,12 @@
 ---
 name: codex-negotiation
 context: fork
-description: Claude と Codex (gpt-5.3-codex) で構造化された議論を行い、設計判断や技術選定の合意を形成するスキル。「codexと議論」「codexとネゴシエーション」「codexと設計議論」「設計を議論して」「技術選定を議論」「両方の視点で比較」「codexと比較検討」と言った時にトリガーする。
+description: Claude と Codex (gpt-5.4) で構造化された議論を行い、設計判断や技術選定の合意を形成するスキル。「codexと議論」「codexとネゴシエーション」「codexと設計議論」「設計を議論して」「技術選定を議論」「両方の視点で比較」「codexと比較検討」と言った時にトリガーする。
 ---
 
 # Codex Negotiation
 
-Claude と Codex (gpt-5.3-codex) が構造化された議論プロトコルに従い、設計判断・技術選定・アーキテクチャ方針の合意を形成する。
+Claude と Codex (gpt-5.4) が構造化された議論プロトコルに従い、設計判断・技術選定・アーキテクチャ方針の合意を形成する。
 
 ## 議論プロトコル
 
@@ -46,7 +46,7 @@ mcp__codex__codex(
 - 提案の弱点・見落としを具体的に指摘
 - 可能なら対案を提示
 - 対案がある場合は同じ評価軸でスコアリング",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" }
 )
 ```
@@ -143,7 +143,7 @@ mcp__codex__codex(
 - 実装コスト / 保守性 / パフォーマンス / スケーラビリティ / リスク
 
 最も推奨する案とその理由も述べてください。",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" }
 )
 ```
@@ -164,7 +164,7 @@ mcp__codex__codex(
 
 ## 改善したい点
 - <具体的な懸念>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" }
 )
 ```
@@ -182,7 +182,7 @@ mcp__codex__codex(
 
 ## 制約（変更不可）
 - <変えられない部分>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>"
 )
@@ -200,7 +200,7 @@ mcp__codex__codex(
 
 | パラメータ | 値 | 説明 |
 |-----------|-----|------|
-| model | `gpt-5.3-codex` | 常に指定 |
+| model | `gpt-5.4` | 常に指定 |
 | config.model_reasoning_effort | `xhigh` | 常に指定 |
 | セッション継続 | `mcp__codex__codex-reply` + threadId | ラウンド間の文脈を維持 |
 

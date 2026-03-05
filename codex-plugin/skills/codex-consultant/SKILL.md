@@ -1,12 +1,12 @@
 ---
 name: codex-consultant
 context: fork
-description: Codex CLI (OpenAI gpt-5.3-codex) に直接相談するスキル。設計判断・実装方針・コードレビュー・デバッグ方針など、別モデルの視点が欲しい時に使用する。「codexに相談」「codexに聞いて」「別の視点が欲しい」「セカンドオピニオン」「codexでレビュー」「codexとペアプロ」「codexとTDD」「codexでペアプログラミング」「ペアプロモード」「adversarial review」と言った時にトリガーする。
+description: Codex CLI (OpenAI gpt-5.4) に直接相談するスキル。設計判断・実装方針・コードレビュー・デバッグ方針など、別モデルの視点が欲しい時に使用する。「codexに相談」「codexに聞いて」「別の視点が欲しい」「セカンドオピニオン」「codexでレビュー」「codexとペアプロ」「codexとTDD」「codexでペアプログラミング」「ペアプロモード」「adversarial review」と言った時にトリガーする。
 ---
 
 # Codex Consultant
 
-Codex MCP (gpt-5.3-codex, reasoning: xhigh) に直接相談し、セカンドオピニオンを得る。
+Codex MCP (gpt-5.4, reasoning: xhigh) に直接相談し、セカンドオピニオンを得る。
 
 ## モード選択ガイド
 
@@ -26,7 +26,7 @@ Codex MCP (gpt-5.3-codex, reasoning: xhigh) に直接相談し、セカンドオ
 ```
 mcp__codex__codex(
   prompt: "<質問・相談内容>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" }
 )
 ```
@@ -40,7 +40,7 @@ mcp__codex__codex(
   prompt: "以下のファイルを読んで<質問>に答えてください。
 対象ファイル: src/module.ts
 指摘は file:line 形式で記述してください。",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>"
 )
@@ -57,7 +57,7 @@ mcp__codex__codex(
 # 初回: 新規セッション開始
 mcp__codex__codex(
   prompt: "<初回の質問>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" }
 )
 # → レスポンスから threadId を取得
@@ -81,7 +81,7 @@ git diff main...HEAD  # 特定ブランチとの差分
 # 2. 差分を Codex に渡してレビュー
 mcp__codex__codex(
   prompt: "以下の差分をコードレビューしてください。設計上の問題点、バグの可能性、改善案を指摘してください。\n\n<diff出力>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>"
 )
@@ -89,7 +89,7 @@ mcp__codex__codex(
 # カスタム観点でのレビュー
 mcp__codex__codex(
   prompt: "セキュリティ脆弱性に注目して以下の差分をレビューしてください。\n\n<diff出力>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>"
 )
@@ -102,7 +102,7 @@ mcp__codex__codex(
 ```
 mcp__codex__codex(
   prompt: "以下の差分をコードレビューし、バグや明確な問題は対象ファイルを読んだ上でその場で修正してください。設計上の問題は指摘のみ行ってください。差分に含まれるファイル以外は編集しないでください。修正した箇所は file:line 形式で報告してください。\n\n<diff出力>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
   sandbox: "workspace-write",
@@ -117,7 +117,7 @@ mcp__codex__codex(
 ```
 mcp__codex__codex(
   prompt: "<変更指示>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
   sandbox: "workspace-write",
@@ -147,7 +147,7 @@ mcp__codex__codex(
 
 対象ファイル: src/feature.ts
 要件: <要件の要約>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>"
 )
@@ -176,7 +176,7 @@ mcp__codex__codex(
 制約:
 - <技術的制約>
 - <アーキテクチャの方針>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
   sandbox: "workspace-write",
@@ -207,7 +207,7 @@ mcp__codex__codex(
   prompt: "以下のテストファイルを読み、テストを通す最小限の実装を書いてください。テスト以外の変更は不要です。
 
 テストファイル: tests/feature.test.ts",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
   sandbox: "workspace-write",
@@ -228,7 +228,7 @@ mcp__codex__codex(
 要件: <要件>
 テストファイル: <テストファイルパス>
 テストフレームワーク: <jest/vitest/pytest等>",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
   sandbox: "workspace-write",
@@ -271,7 +271,7 @@ mcp__codex__codex(
 致命的な問題（セキュリティ脆弱性、データ破壊等）は対象ファイルを読んだ上で直接修正してください。設計レベルの問題は指摘のみ行ってください。対象ファイル以外は編集しないでください。
 具体的な攻撃ケース（入力例やシナリオ）を提示してください。
 修正・指摘は file:line 形式で記述してください。",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
   sandbox: "workspace-write",
@@ -320,7 +320,7 @@ Codexはエージェントとしてファイル読み取り能力を持つため
 
 | パラメータ | 値 | 説明 |
 |-----------|-----|------|
-| model | `gpt-5.3-codex` | 常に指定 |
+| model | `gpt-5.4` | 常に指定 |
 | config.model_reasoning_effort | `xhigh` | 常に指定 |
 | cwd | プロジェクトルート | ファイルアクセスが必要な場合に指定 |
 | sandbox | `workspace-write` | コード変更を伴う場合に使用 |

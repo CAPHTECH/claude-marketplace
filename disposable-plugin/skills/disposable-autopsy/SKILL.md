@@ -72,7 +72,7 @@ mcp__codex__codex(
   Focus on: {axis-specific criteria}.
   Report findings as JSON array with id, severity, description, evidenceRef fields.
   Files: {file list}",
-  model: "gpt-5.3-codex",
+  model: "gpt-5.4",
   config: { "model_reasoning_effort": "xhigh" },
   cwd: "{project_root}"
 )

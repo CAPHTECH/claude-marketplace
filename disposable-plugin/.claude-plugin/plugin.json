@@ -1,7 +1,7 @@
 {
   "name": "disposable-plugin",
   "description": "Hybrid Disposable Generation Method (H-DGM) plugin - disposable prototyping with spike, autopsy, and distill cycles",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "CAPH TECH Inc."
   },

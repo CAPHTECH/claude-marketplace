@@ -88,8 +88,8 @@
     {
       "name": "codex-plugin",
       "source": "./codex-plugin",
-      "description": "OpenAI Codex (gpt-5.3-codex) 連携プラグイン。Codex MCP サーバーを提供し、セカンドオピニオン・ペアプログラミング・構造化議論スキルを統合。",
-      "version": "1.2.0",
+      "description": "OpenAI Codex (gpt-5.4) 連携プラグイン。Codex MCP サーバーを提供し、セカンドオピニオン・ペアプログラミング・構造化議論スキルを統合。",
+      "version": "1.3.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -111,7 +111,7 @@
       "name": "disposable-plugin",
       "source": "./disposable-plugin",
       "description": "Hybrid Disposable Generation Method (H-DGM) plugin - disposable prototyping with spike, autopsy, and distill cycles",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "CAPH TECH Inc."
       },
