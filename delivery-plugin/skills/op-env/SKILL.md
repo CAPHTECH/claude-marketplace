@@ -496,13 +496,13 @@ echo "追加完了: ${KEY} → op://${VAULT}/${ITEM_NAME}/${KEY}"
       "Read(**/.env.*)",
       "Read(**/secrets/**)",
       "Read(**/*.pem)",
-      "Bash(env)",
-      "Bash(env *)",
-      "Bash(printenv)",
-      "Bash(printenv *)"
+      "Bash(env:*)",
+      "Bash(printenv:*)"
     ]
   }
 }
 ```
 
 注意: `Bash`のdenyルールは`*`ワイルドカード付きのコマンド文字列マッチであり、`cat .env`等の回避手段を完全には防げません。より厳密な制御にはPreToolUse hooksやsandbox併用を検討してください。
+
+プロジェクトに合わせたdenyルールの自動生成には `/secret-boundary baseline` を使用してください。
