@@ -1,6 +1,6 @@
 ---
 name: op-env
-description: .envファイルのシークレットを1Password CLIで管理する。migrate（.env→1Password移行）、run（op run実行）、sync（差分同期）をサポート。「.envを1Passwordに移行して」「op runで実行して」「シークレットを同期して」と言われた時に使用する。
+description: .envファイルのシークレットを1Password CLIで管理する（平文.envの保存・Git流出対策。AIからの秘匿は対象外）。migrate/run/sync/addをサポート。
 disable-model-invocation: true
 allowed-tools: Bash, Read
 argument-hint: "[migrate|run|sync|add] [options]"
@@ -8,7 +8,20 @@ argument-hint: "[migrate|run|sync|add] [options]"
 
 # op-env
 
-.envファイルのシークレットを1Password CLI (`op`) で安全に管理する。
+.envファイルのシークレットを1Password CLI (`op`) で管理する。
+
+> **このスキルの対象脅威と限界**
+>
+> op-envは**平文.envの保存・Git流出・チーム配布**のリスクを下げるツールです。
+> `op run --env-file`は実行プロセスの環境変数にシークレットを展開するため、
+> **AIエージェントや実行プロセスからシークレットを隠すものではありません。**
+>
+> AI開発環境でシークレットを扱う場合は、以下を併用してください:
+> - **キーのスコープ制限**: 開発専用・低権限・短命のキーのみ使用する
+> - **レート制限・決済上限**: API側で利用量上限・支出閾値を設定する
+> - **環境分離**: dev/staging/prodで鍵・vault・請求境界を分離する
+> - **本番キー禁止**: 本番用・高権限・決済系のキーはAI実行環境に絶対に入れない
+> - **漏洩前提の設計**: 漏洩時は即時ローテーション・失効できる運用を整備する
 
 ## 概要
 
@@ -98,6 +111,8 @@ while IFS= read -r line; do
   VALUE=$(echo "$VALUE" | sed 's/[[:space:]]#.*$//')
 
   [ -z "$KEY" ] && continue
+  # Note: 平文値がCLI引数に含まれ、プロセスリスト(/proc, ps)から見える可能性がある。
+  # 機密性の高い値はJSONテンプレートファイル経由での投入を検討すること。
   FIELDS+=("${KEY}[password]=${VALUE}")
 done < "$ENV_FILE"
 
@@ -149,7 +164,10 @@ echo "=== 移行完了 ==="
 echo "元ファイル: ${BACKUP_FILE}"
 echo "更新後: ${ENV_FILE}"
 echo ""
-echo "動作確認: op run --env-file=${ENV_FILE} -- env | head"
+echo "動作確認: op run --env-file=${ENV_FILE} -- <your-command>"
+echo ""
+echo "重要: バックアップファイル ${BACKUP_FILE} には平文シークレットが含まれます。"
+echo "動作確認後、速やかに削除してください: rm ${BACKUP_FILE}"
 
 # 7. .gitignoreに.env.bakを追加
 if [ -f .gitignore ]; then
@@ -204,7 +222,8 @@ if ! grep -q 'op://' "$ENV_FILE"; then
   exit 1
 fi
 
-# op runで実行（シークレットはデフォルトでマスクされる）
+# op runで実行（stdout/stderrのシークレット値はマスクされるが、
+# 環境変数としてはプロセス内から読み取り可能。アクセス制御ではない）
 op run --env-file="$ENV_FILE" -- "$@"
 ```
 
@@ -322,6 +341,7 @@ case "$MODE" in
 
     ```bash
     # push実行: .envの平文値を1Passwordに追加
+    # Note: 平文値がCLI引数に含まれ、プロセスリスト(/proc, ps)から見える可能性がある。
     for KEY in "${PUSH_KEYS[@]}"; do
       # .envから値を取得
       # awkで安全にキーを固定文字列マッチして値を取得
@@ -384,8 +404,15 @@ fi
 if [ -z "$KEY" ] || [ -z "$VALUE" ]; then
   echo "Error: キー名と値を指定してください"
   echo "Usage: op-env add API_KEY sk-xxx [.env]"
+  echo "Warning: 値はCLI引数としてプロセスリストに表示されます"
   exit 1
 fi
+
+# Warning: 平文値がCLI引数に含まれるため、プロセスリスト(/proc, ps)から
+# 他ユーザーに見える可能性がある。値を直書きした場合はシェル履歴にも残りうる。
+# 機密性の高いキーはJSONテンプレートファイル経由で投入すること:
+#   op item edit "<item>" --vault="<vault>" --template template.json
+# テンプレートファイルには平文が含まれるため、権限を制限(chmod 600)し、適用後は速やかに削除すること。
 
 # キー名のバリデーション（英数字とアンダースコアのみ）
 if ! echo "$KEY" | grep -qE '^[A-Za-z_][A-Za-z0-9_]*$'; then
@@ -425,4 +452,57 @@ echo "追加完了: ${KEY} → op://${VAULT}/${ITEM_NAME}/${KEY}"
 - 未認証: `eval $(op signin)` を案内
 - アイテム未存在: 自動作成 or 作成を案内
 - .envファイル不在: エラーメッセージを表示
-- 値の表示制御: シークレット値は出力に含めない
+- 値の表示制御: シークレット値はstdout/stderrに含めない（環境変数としてはプロセス内から読み取り可能）
+
+## セキュリティに関する重要な注意事項
+
+### このスキルがリスクを低減する脅威
+
+- 平文.envファイルのGitリポジトリへの誤コミットリスク
+- 平文シークレットのローカルファイルシステム上への長期残存
+- シークレットの分散管理によるローテーション困難・チーム配布の非効率
+
+### このスキルが解決しない脅威
+
+- **AIエージェントからのシークレット読み取り**: `op run`は環境変数に展開するため、同一プロセス内からは読み取り可能
+- **実行環境の侵害**: 環境変数は`/proc/<pid>/environ`やプロセスリストから読める場合がある
+- **漏洩時の被害最小化**: キーのスコープ制限・レート制限・決済上限はAPI提供者側で設定する必要がある
+
+### AI開発環境での推奨事項
+
+1. **開発専用キーのみ使用**: 本番用・高権限・決済系のキーはAI実行環境に入れない
+2. **最小権限の原則**: API キーは必要最小限のスコープ・権限で発行する
+3. **1Password側の最小権限化**: 個人の広権限セッションではなく、必要なvaultのみにアクセスできるService Accountで認証する
+4. **短命トークンの活用**: 可能な限りSTS/OIDC/OAuthで短命（1〜15分）のトークンを使う
+5. **利用量制限**: API側でレート制限・1日上限・決済上限を設定する
+6. **環境分離**: dev/staging/prodで鍵・vault・請求境界を完全に分離する
+7. **監査ログ**: API利用ログを有効化し、異常検知を設定する
+8. **漏洩対応**: 漏洩を検知した場合は即時ローテーション・失効を行う
+9. **バックアップの即時削除**: migrateで生成される.env.bakには平文が含まれるため、動作確認後に速やかに削除する
+10. **CLI引数への平文注意**: migrate/sync --push/addはop CLI引数に平文を渡す。プロセスリストから見える可能性がある
+
+### Claude Codeのsettings.jsonによる事故防止
+
+`~/.claude/settings.json`の`permissions.deny`で、AIエージェントによるシークレットファイルの読み取りや環境変数の表示を制限できます。これは強制的なセキュリティ境界ではなく**事故防止のガードレール**です（ユーザー自身が変更可能なため）。強制力が必要な場合はmanaged settingsを使用してください。
+
+設定例:
+```json
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Bash(env)",
+      "Bash(env *)",
+      "Bash(printenv)",
+      "Bash(printenv *)"
+    ]
+  }
+}
+```
+
+注意: `Bash`のdenyルールは`*`ワイルドカード付きのコマンド文字列マッチであり、`cat .env`等の回避手段を完全には防げません。より厳密な制御にはPreToolUse hooksやsandbox併用を検討してください。
