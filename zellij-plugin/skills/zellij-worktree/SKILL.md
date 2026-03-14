@@ -1,28 +1,28 @@
 ---
-name: tmux-worktree
-description: git worktreeを作成してtmux windowで開く。worktree削除とクリーンアップも行う。「worktreeを作って」「ブランチをworktreeで開いて」「worktreeを削除して」「worktreeを一覧して」と言われた時に使用する。
+name: zellij-worktree
+description: git worktreeを作成してzellij tabで開く。worktree削除とクリーンアップも行う。「worktreeを作って」「ブランチをworktreeで開いて」「worktreeを削除して」「worktreeを一覧して」と言われた時に使用する。
 disable-model-invocation: true
 allowed-tools: Bash, Read
 argument-hint: "[create|delete|list] [branch-name]"
 ---
 
-# tmux-worktree
+# zellij-worktree
 
-git worktreeをtmux windowとして管理する。
+git worktreeをzellij tabとして管理する。
 
 ## 概要
 
 ```
-create <branch> → git worktree add → tmux new-window
-delete <branch> → git worktree remove → tmux kill-window
-list            → git worktree list + tmux list-windows
+create <branch> → git worktree add → zellij action new-tab
+delete <branch> → zellij action close-tab → git worktree remove
+list            → git worktree list
 ```
 
 ## 前提チェック
 
 スキル実行前に以下を確認:
 1. gitリポジトリ内か
-2. `tmux` セッション内か（`$TMUX` 変数の存在）— 非tmux時はworktree操作のみ行いパスを出力
+2. `zellij` セッション内か（`$ZELLIJ` 変数の存在）— 非zellij時はworktree操作のみ行いパスを出力
 3. 現在の作業ディレクトリがworktreeの場合、メインリポジトリのパスを特定する
 
 ```bash
@@ -95,10 +95,9 @@ find_worktree_by_branch() {
 EXISTING_PATH=$(find_worktree_by_branch "$BRANCH")
 if [ -n "$EXISTING_PATH" ]; then
   echo "Worktree already exists: ${EXISTING_PATH}"
-  if [ -n "$TMUX" ]; then
-    # 既存windowを探して選択
-    WINDOW_NAME=$(basename "$EXISTING_PATH")
-    tmux select-window -t "${WINDOW_NAME}" 2>/dev/null || true
+  if [ -n "$ZELLIJ" ]; then
+    TAB_NAME=$(basename "$EXISTING_PATH")
+    zellij action go-to-tab-name "${TAB_NAME}" 2>/dev/null || true
   fi
   exit 0
 fi
@@ -122,9 +121,9 @@ else
   git worktree add -b "${BRANCH}" "${WORKTREE_PATH}"
 fi
 
-# 5. tmux windowを作成（tmux環境の場合のみ）
-if [ -n "$TMUX" ]; then
-  tmux new-window -n "${BRANCH_SLUG}" -c "${WORKTREE_PATH}"
+# 5. zellij tabを作成（zellij環境の場合のみ）
+if [ -n "$ZELLIJ" ]; then
+  zellij action new-tab --name "${BRANCH_SLUG}" --cwd "${WORKTREE_PATH}"
 else
   echo "Worktree created: ${WORKTREE_PATH}"
   echo "cd ${WORKTREE_PATH}"
@@ -152,7 +151,7 @@ if [ "$WORKTREE_RESOLVED" = "$MAIN_TOPLEVEL" ]; then
   echo "Error: Cannot delete main working tree"
   exit 1
 fi
-WINDOW_NAME=$(basename "$WORKTREE_PATH")
+TAB_NAME=$(basename "$WORKTREE_PATH")
 
 # 2. Guard: 削除前の安全チェック
 WARNINGS=""
@@ -169,17 +168,9 @@ if [ -n "$UNPUSHED" ]; then
   WARNINGS="${WARNINGS}\n⚠ 未pushのコミットがあります:\n${UNPUSHED}\n"
 fi
 
-# 実行中プロセスチェック（tmux pane内）
-if [ -n "$TMUX" ]; then
-  PANE_PIDS=$(tmux list-panes -t "${WINDOW_NAME}" -F '#{pane_pid}' 2>/dev/null)
-  for PID in $PANE_PIDS; do
-    # macOS互換: pgrep -Pで子プロセスを検出
-    CHILDREN=$(pgrep -P "$PID" 2>/dev/null | xargs -I{} ps -p {} -o pid=,comm= 2>/dev/null)
-    if [ -n "$CHILDREN" ]; then
-      WARNINGS="${WARNINGS}\n⚠ 実行中のプロセスがあります (PID ${PID}):\n${CHILDREN}\n"
-    fi
-  done
-fi
+# 注: zellijではpane内の実行中プロセスを外部から検出するAPIがないため、
+# tmux版のような実行中プロセスチェックは行えない。
+# zellij自体がタブ/pane閉じ時に確認プロンプトを表示する。
 
 # 警告がある場合はユーザーに確認を求める
 if [ -n "$WARNINGS" ]; then
@@ -190,9 +181,10 @@ if [ -n "$WARNINGS" ]; then
   exit 0
 fi
 
-# 3. tmux windowを閉じる（worktree削除前に実行 — cwdが消える前にwindowを閉じる）
-if [ -n "$TMUX" ]; then
-  tmux kill-window -t "${WINDOW_NAME}" 2>/dev/null || true
+# 3. zellij tabを閉じる（worktree削除前に実行 — cwdが消える前にタブを閉じる）
+if [ -n "$ZELLIJ" ]; then
+  zellij action go-to-tab-name "${TAB_NAME}" 2>/dev/null && \
+    zellij action close-tab 2>/dev/null || true
 fi
 
 # 4. worktreeを削除
@@ -205,22 +197,18 @@ rmdir "${WORKTREE_BASE}" 2>/dev/null || true
 
 ### list
 
-引数なし。現在のworktreeとtmux windowの対応を表示。
+引数なし。現在のworktreeを表示。
 
 ```bash
 echo "=== Git Worktrees ==="
 git worktree list
-
-if [ -n "$TMUX" ]; then
-  echo ""
-  echo "=== tmux Windows ==="
-  tmux list-windows -F '#{window_index}: #{window_name} → #{pane_current_path}'
-fi
 ```
+
+注: zellijにはtab一覧を取得するCLIコマンドが限定的なため、`git worktree list` のみ表示する。
 
 ## エラーハンドリング
 
 - worktree作成失敗時: `git worktree prune --expire now` を実行してリトライ
-- tmux非実行時: worktree操作のみ行い、パスを出力（`$TMUX` で判定）
-- 削除時のtmux window不在: 警告を出すがworktree削除は完了済み
+- zellij非実行時: worktree操作のみ行い、パスを出力（`$ZELLIJ` で判定）
+- 削除時のzellij tab不在: 警告を出すがworktree削除は続行
 - `--git-common-dir` 復元失敗時: `git worktree list --porcelain` の最初のエントリからメインrepoパスを取得

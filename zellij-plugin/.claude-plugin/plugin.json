@@ -1,0 +1,8 @@
+{
+  "name": "zellij-plugin",
+  "version": "1.0.0",
+  "description": "zellij integration skills for Claude Code - worktree management with zellij tabs",
+  "author": {
+    "name": "CAPH TECH Inc."
+  }
+}

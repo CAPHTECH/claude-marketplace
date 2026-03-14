@@ -128,6 +128,17 @@
       },
       "keywords": ["tmux", "worktree", "git", "workspace", "window"],
       "category": "development"
+    },
+    {
+      "name": "zellij-plugin",
+      "source": "./zellij-plugin",
+      "description": "zellij integration skills for Claude Code - worktree management with zellij tabs",
+      "version": "1.0.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["zellij", "worktree", "git", "workspace", "tab"],
+      "category": "development"
     }
   ]
 }
