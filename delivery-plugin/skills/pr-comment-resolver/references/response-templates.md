@@ -53,6 +53,21 @@ commit: {commit_sha}
 お手数ですが、再度ご確認いただけますでしょうか。
 ```
 
+### Outside diff range 指摘への一括対応報告
+
+レビューbodyに埋め込まれたoutside diff rangeコメントへの返信用。
+`gh pr review {pr_number} --comment` で投稿する。
+
+```markdown
+## Outside diff range 指摘への対応
+
+| ファイル | 指摘 | 対応 | commit |
+|---------|------|------|--------|
+| {filepath}:{line} | {指摘の要約} | {修正済み/見送り} | {commit_sha or -} |
+
+{見送りがある場合、理由を記載}
+```
+
 ## gh CLIでの返信コマンド
 
 ### 一般コメントへの返信

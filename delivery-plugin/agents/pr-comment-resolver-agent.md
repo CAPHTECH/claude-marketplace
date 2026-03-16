@@ -25,27 +25,33 @@ PRコメントを収集・分類し、優先順位に従って対応を実行す
 
 ```
 Phase 1: Collect（収集）
-  └→ gh api でPRの全コメントを取得
+  └→ gh api --paginate でPRの全コメントを取得
      - issues/{pr}/comments（一般コメント）
      - pulls/{pr}/comments（インラインコメント）
-     - pulls/{pr}/reviews（レビュー本体）
+     - pulls/{pr}/reviews（レビュー本体 + body解析）
+     - GraphQL reviewThreads（解決済みスレッド判定）
+  └→ CodeRabbitレビューbodyからoutside diff rangeコメントを抽出
+  └→ 解決済みスレッドのコメントを除外
 
 Phase 2: Classify（分類）
   └→ 各コメントをカテゴリ分類
-     - must: セキュリティ、ブロッカー、必須修正
+     - must: セキュリティ、ブロッカー、必須修正、🔴 Actionable
      - question: 質問、確認事項
      - should: 推奨修正
-     - could: 任意対応
+     - could: 任意対応、🟡 Nitpick
      - note: LGTM、参考情報
+     - resolved: 除外（解決済みスレッド）
 
 Phase 3: Execute（実行）
   └→ 優先順位順に対応
      - must → question → should → could
      - コード修正 or 回答作成
+     - outside diff range指摘も通常と同様に対応
 
 Phase 4: Reply（返信）
   └→ 対応完了コメントへ返信
-     - 修正: commit SHA付きで報告
+     - インライン: commit SHA付きでスレッド返信
+     - outside diff range: レビューコメントで一括報告
      - 回答: 説明を返信
 
 Phase 5: Report（報告）
@@ -85,26 +91,60 @@ gh pr view {pr_number} --json number,title,body,author,state,headRefName
 gh repo view --json owner,name
 ```
 
-### Step 2: コメント収集
+### Step 2: コメント収集（ページネーション必須）
 
 ```bash
-# 一般コメント
-gh api repos/{owner}/{repo}/issues/{pr_number}/comments
+# 一般コメント（全件取得）
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/issues/{pr_number}/comments
 
-# レビューコメント（インライン）
-gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
+# レビューコメント（インライン、全件取得）
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/pulls/{pr_number}/comments
 
-# レビュー本体
-gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
+# レビュー本体（body含む、全件取得）
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/pulls/{pr_number}/reviews
 ```
+
+### Step 2b: 解決済みスレッド判定
+
+```bash
+# GraphQL APIで解決状態を取得
+gh api graphql -f query='
+  query($owner: String!, $repo: String!, $pr: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pr) {
+        reviewThreads(first: 100) {
+          nodes {
+            isResolved
+            comments(first: 100) {
+              nodes { id databaseId body author { login } path line }
+            }
+          }
+        }
+      }
+    }
+  }
+' -f owner="{owner}" -f repo="{repo}" -F pr={pr_number}
+```
+
+解決済みスレッドのコメントIDを収集し、Step 2の結果から除外する。
+
+### Step 2c: CodeRabbitレビューbody解析
+
+CodeRabbit（`user.login == "coderabbitai[bot]"`）のレビューbodyから:
+1. `⚠️ Outside diff range comments` セクションを検出
+2. `**filepath:line**:` パターンで各指摘を抽出
+3. 抽出した指摘を通常コメントと同じ分類フローに流す
+4. Actionable（🔴）/ Nitpick（🟡）ラベルがある場合は分類に反映
 
 ### Step 3: 分類・優先順位付け
 
 各コメントについて:
-1. キーワードマッチングでカテゴリ判定
-2. レビュー状態（CHANGES_REQUESTED等）を考慮
-3. 優先度スコアを算出
-4. 対応リストを生成
+1. 解決済みスレッドのコメントを除外
+2. CodeRabbitラベル（🔴 Actionable / 🟡 Nitpick）を考慮
+3. キーワードマッチングでカテゴリ判定
+4. レビュー状態（CHANGES_REQUESTED等）を考慮
+5. `created_at` でソートし最新のコメントを優先
+6. 対応リストを生成
 
 ### Step 4: 対応実行
 
@@ -125,13 +165,21 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
 ### Step 5: 返信送信
 
 ```bash
-# インラインコメントへの返信
+# インラインコメントへの返信（スレッド内）
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments/{comment_id}/replies \
   -f body="返信内容"
 
 # 一般コメントへの返信
 gh pr comment {pr_number} --body "返信内容"
+
+# レビュー全体への返信（outside diff range対応報告等）
+gh pr review {pr_number} --comment --body "返信内容"
 ```
+
+#### Outside diff range コメントへの返信
+
+レビューbodyから抽出したコメントにはインラインで返信できない。
+レビュー全体へのコメントとして一括報告する。
 
 ## 出力形式
 

@@ -1,16 +1,7 @@
 ---
 name: pr-comment-resolver
 context: fork
-description: |
-  PRのすべてのコメント（レビューコメント、一般コメント、インラインコメント）を取得し、
-  種類別（指摘/質問/提案/承認）に分類、優先順位をつけて対応を実行するスキル。
-  対応完了後はコメントへの返信も行う。
-
-  トリガー条件:
-  - 「PRのコメントに対応して」「PR #N のレビューコメントを処理して」
-  - 「PRのフィードバックを解決して」「レビュー指摘を修正して」
-  - PRレビュー後に指摘事項への対応が必要な時
-  - 「/pr-comment-resolver」「/resolve-pr-comments」
+description: PRコメント（レビュー/インライン/CodeRabbit outside diff range含む）を収集・分類し、優先順位に従って対応・返信を実行する
 ---
 
 # PR Comment Resolver
@@ -29,19 +20,97 @@ PRコメントを収集・分類し、優先順位に従って対応を実行す
 
 ## Step 1: コメント収集
 
+### 1-1. 基本情報取得
+
 ```bash
 # PR情報取得
-gh pr view {pr_number} --json number,title,body,author,state
+gh pr view {pr_number} --json number,title,body,author,state,headRefName
 
+# リポジトリ情報
+gh repo view --json owner,name
+```
+
+### 1-2. 全コメント取得（ページネーション必須）
+
+GitHub APIはデフォルト30件しか返さない。`--paginate`で全件取得する。
+
+```bash
 # 一般コメント
-gh api repos/{owner}/{repo}/issues/{pr_number}/comments
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/issues/{pr_number}/comments
 
 # レビューコメント（インライン）
-gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/pulls/{pr_number}/comments
 
-# レビュー本体
-gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
+# レビュー本体（body含む）
+gh api --paginate -F per_page=100 repos/{owner}/{repo}/pulls/{pr_number}/reviews
 ```
+
+> `--paginate`は複数ページのJSON配列を連結出力する。`--jq`と併用して必要フィールドのみ抽出すると扱いやすい。
+
+### 1-3. 解決済みスレッドの除外
+
+REST APIではスレッドの解決状態を取得できない。GraphQL APIを使用する。
+
+```bash
+gh api graphql -f query='
+  query($owner: String!, $repo: String!, $pr: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pr) {
+        reviewThreads(first: 100) {
+          nodes {
+            isResolved
+            comments(first: 100) {
+              nodes { id databaseId body author { login } path line }
+            }
+          }
+        }
+      }
+    }
+  }
+' -f owner="{owner}" -f repo="{repo}" -F pr={pr_number}
+```
+
+解決済み（`isResolved: true`）のスレッドに属するコメントは収集対象から除外する。
+
+### 1-4. CodeRabbitレビューbodyの解析
+
+CodeRabbit（`user.login == "coderabbitai[bot]"`）のレビューbodyには構造化セクションが含まれる。
+レビューbodyから以下を抽出する。
+
+#### Outside diff range comments の抽出
+
+diff範囲外の指摘はインラインコメントではなく、レビューbody内に埋め込まれる:
+
+```html
+<details>
+<summary>⚠️ Outside diff range comments (N)</summary>
+
+**src/config.py:42-45**: Consider adding validation.
+
+**src/utils.py:100**: This function could use memoization.
+
+</details>
+```
+
+抽出パターン: `**{filepath}:{line_or_range}**:` の後に指摘テキストが続く。
+これらは通常のコメントと同じ分類フロー（Step 2）に流す。`source: "review_body_outside_diff"` として識別する。
+
+#### その他の構造化セクション（情報提供のみ）
+
+以下のセクションは対応不要だが、コンテキスト理解に利用する:
+
+| セクション | 用途 |
+|-----------|------|
+| Walkthrough | 変更概要。対応不要 |
+| Summary | PR全体の要約。対応不要 |
+| Sequence diagram | フロー可視化。対応不要 |
+
+#### Actionable / Nitpick コメントの識別
+
+CodeRabbitのインラインコメントには以下のラベルが付くことがある:
+
+- `🔴 Actionable` — 修正が必要な指摘。`must` or `should` に分類
+- `🟡 Nitpick` — スタイル・好みの指摘。`could` に分類
 
 ## Step 2: 分類
 
@@ -86,12 +155,29 @@ priority_order:
 返信テンプレートは [references/response-templates.md](references/response-templates.md) 参照。
 
 ```bash
-# レビューコメントへの返信
+# レビューコメントへの返信（スレッド内）
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments/{comment_id}/replies \
   -f body="修正しました。 ✅ commit: {sha}"
 
 # 一般コメントへの返信
 gh pr comment {pr_number} --body "回答内容"
+
+# レビュー全体への返信（outside diff range対応報告等）
+gh pr review {pr_number} --comment --body "回答内容"
+```
+
+### Outside diff range コメントへの返信
+
+レビューbodyから抽出したコメントにはインラインで返信できない。
+レビュー全体へのコメントとして、対応内容を一括報告する:
+
+```markdown
+## Outside diff range 指摘への対応
+
+| ファイル | 指摘 | 対応 | commit |
+|---------|------|------|--------|
+| src/config.py:42-45 | バリデーション追加 | 修正済み | abc1234 |
+| src/utils.py:100 | メモ化 | 見送り（理由: ...） | - |
 ```
 
 ## 出力形式
@@ -174,3 +260,5 @@ src/api/users.ts を修正中...
 2. **確認なしの大規模変更禁止**: 影響範囲が大きい場合はユーザーに確認
 3. **テスト実行**: 修正後は関連テストを実行
 4. **返信必須**: 対応した指摘には必ず返信
+5. **解決済みスレッドは無視**: `isResolved: true` のスレッドは対応対象外
+6. **最新レビュー優先**: 同一ファイル・行への複数指摘は最新のものを優先
