@@ -1,10 +1,10 @@
 # Mobile Plugin for Claude Code
 
-モバイル開発（iOS/Android）を支援するスキル・エージェントのコレクションです。mobile-mcp によるデバイス操作・UI自動化に加え、Swift/SwiftUI開発、Xcodeプロジェクト管理、テスト・品質保証を提供します。
+モバイル開発（iOS/Android/Flutter）を支援するスキル・エージェントのコレクションです。mobile-mcp によるデバイス操作・UI自動化に加え、Swift/SwiftUI開発、Flutter/Riverpod UI設計、Xcodeプロジェクト管理、テスト・品質保証を提供します。
 
 ## 概要
 
-このプラグインは、Swift/SwiftUI開発、Xcodeプロジェクト管理、テスト・品質保証の3つの領域でiOS開発を包括的にサポートします。
+このプラグインは、Swift/SwiftUI開発、Flutter/Riverpod UI設計、Xcodeプロジェクト管理、テスト・品質保証の領域でモバイル開発を包括的にサポートします。
 
 ## スキル一覧
 
@@ -16,6 +16,12 @@
 | `swiftui-component` | SwiftUIコンポーネント設計支援。状態管理、View構造化、アクセシビリティ対応 |
 | `swift-protocol` | プロトコル指向設計支援。Protocol拡張、関連型、依存性注入パターン |
 | `swift-concurrency` | Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止 |
+
+### Flutter / Riverpod開発支援
+
+| スキル | 説明 |
+|--------|------|
+| `flutter-widget-splitting` | Flutter Widget分割支援。巨大なbuild()の分割、共通化、Riverpodのwatch/read/listen/select境界整理 |
 
 ### Xcode/ビルド関連
 
@@ -67,6 +73,7 @@
 # スキルの実行
 /swift-code-review         # Swiftコードをレビュー
 /swiftui-component         # SwiftUIコンポーネントを設計
+/flutter-widget-splitting  # Flutter Widgetを責務とRiverpod境界で分割
 /ios-test-design           # テスト設計を支援
 /xcode-project             # Xcodeプロジェクト設定を支援
 /ios-design-direction      # デザイン哲学とHIG準拠を支援
@@ -93,6 +100,7 @@ mobile-plugin/
 │   ├── swiftui-component/
 │   ├── swift-protocol/
 │   ├── swift-concurrency/
+│   ├── flutter-widget-splitting/
 │   ├── xcode-project/         # Xcode/ビルド
 │   ├── ios-signing/
 │   ├── ios-archive/
@@ -143,6 +151,12 @@ mobile-plugin/
 - XCTestベースのテスト戦略
 - スナップショットテストによるUI検証
 - パフォーマンステストの統合
+
+### 4. Flutter UI Architecture
+
+- 大きな `build()` を責務と再ビルド境界で分割
+- Riverpod の `watch/read/listen/select` を役割ごとに分離
+- 共有状態と一時 UI 状態を分け、過剰な Provider 化を避ける
 
 ## ライセンス
 

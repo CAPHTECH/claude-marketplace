@@ -1,7 +1,7 @@
 {
   "name": "mobile-plugin",
-  "description": "モバイル開発支援プラグイン。mobile-mcp によるiOS/Android デバイス操作・UI自動化に加え、Swift/SwiftUI開発、Xcodeプロジェクト管理、テスト・品質保証を提供。",
-  "version": "1.0.0",
+  "description": "モバイル開発支援プラグイン。mobile-mcp によるiOS/Android デバイス操作・UI自動化に加え、Swift/SwiftUI開発、Flutter/Riverpod UI設計、Xcodeプロジェクト管理、テスト・品質保証を提供。",
+  "version": "1.1.0",
   "author": {
     "name": "CAPH TECH Inc."
   },
