@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Plan Builder"
+  short_description: "Build task-shaped plans from references"
+  default_prompt: "Use $task-plan-builder to choose the right planning references and produce a self-contained plan."

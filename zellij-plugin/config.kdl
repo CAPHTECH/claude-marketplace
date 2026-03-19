@@ -1,0 +1,43 @@
+// zellij-plugin 推奨設定
+// Ctrl-t prefix + locked デフォルト
+// Emacs/ターミナルのCtrl系キーバインドと衝突しない
+//
+// インストール: cp config.kdl ~/.config/zellij/config.kdl
+
+simplified_ui true
+default_mode "locked"
+
+keybinds {
+    // デフォルトのCtrl系バインドを全モードから解除
+    unbind "Ctrl g" "Ctrl q" "Ctrl p" "Ctrl n" "Ctrl s" "Ctrl o" "Ctrl t" "Ctrl h" "Ctrl b"
+
+    // Locked: Ctrl-t でNormalモードに入る（unlock）
+    locked {
+        bind "Ctrl t" { SwitchToMode "Normal"; }
+    }
+
+    // Normalモードから1キーで各モードへ遷移
+    normal {
+        bind "p" { SwitchToMode "Pane"; }
+        bind "t" { SwitchToMode "Tab"; }
+        bind "r" { SwitchToMode "Resize"; }
+        bind "s" { SwitchToMode "Scroll"; }
+        bind "o" { SwitchToMode "Session"; }
+        bind "m" { SwitchToMode "Move"; }
+    }
+
+    // Locked以外の全モード: Ctrl-t / Esc / Enter でLockedに戻る
+    shared_except "locked" {
+        bind "Ctrl t" { SwitchToMode "Locked"; }
+        bind "Enter" "Esc" { SwitchToMode "Locked"; }
+    }
+}
+
+// 操作例:
+//   Ctrl-t → p → n     新しいpane（右）
+//   Ctrl-t → t → n     新しいタブ
+//   Ctrl-t → t → h/l   タブ切り替え
+//   Ctrl-t → r → hjkl  paneリサイズ
+//   Ctrl-t → s          スクロールモード
+//   Ctrl-t → o          セッション管理
+//   Esc / Enter          → lockedに戻る

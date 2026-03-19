@@ -55,12 +55,12 @@
     {
       "name": "planning-plugin",
       "source": "./planning-plugin",
-      "description": "企画・計画プラグイン。アプリアイデアワークショップとプロダクト計画を支援。",
-      "version": "1.1.0",
+      "description": "企画・計画プラグイン。アプリアイデアワークショップ、プロダクト計画、タスク別プラン生成を支援。",
+      "version": "1.2.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
-      "keywords": ["planning", "ideation", "workshop", "product"],
+      "keywords": ["planning", "ideation", "workshop", "product", "task-planning"],
       "category": "development"
     },
     {
