@@ -200,14 +200,25 @@ if [ -n "$SETUP_CMDS" ]; then
 fi
 ```
 
-### 5. エージェント起動と指示送信
+### 5. 指示の構成
+
+ユーザーの指示に、作業開始前に実行すべきスキルのプレフィックスを付加する。
+
+```bash
+# 作業開始前スキルのプレフィックス
+SKILL_PREFIX="/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して以下のタスクに取り組むこと: "
+
+FULL_INSTRUCTION="${SKILL_PREFIX}${INSTRUCTION}"
+```
+
+### 6. エージェント起動と指示送信
 
 **初回指示はCLI引数として渡す。** `tmux send-keys` でテキスト入力後にEnterを送ると、改行として解釈され送信されない場合があるため、CLI引数渡しが最も確実。
 
 ```bash
 # 指示をtmpファイルに書き出し（長い指示・特殊文字のエスケープ問題を回避）
 PROMPT_FILE=$(mktemp)
-printf '%s' "$INSTRUCTION" > "$PROMPT_FILE"
+printf '%s' "$FULL_INSTRUCTION" > "$PROMPT_FILE"
 
 case "$AGENT_TYPE" in
   claude)
@@ -225,52 +236,119 @@ esac
 # verify_agent_running 後に rm -f "$PROMPT_FILE" を実行する
 ```
 
-### 6. 送信確認
+### 7. 送信確認と能動的監視
 
-エージェント起動後、実際に指示が受理されたか確認する。
+エージェント起動後、pane内容を定期的に取得し、状態を判定して適切に対応する。
+**選択ダイアログや権限確認の取りこぼしを防ぐため、毎回pane全体の内容を確認する。**
 
 ```bash
-verify_agent_running() {
+# pane内容を取得して状態を分類する
+classify_pane_state() {
   local PANE="$1"
-  local MAX_WAIT="${2:-30}"  # デフォルト30秒
-  local ELAPSED=0
+  # pane全体を広めに取得（選択UIは画面下部に出るとは限らない）
+  local CONTENT
+  CONTENT=$(tmux capture-pane -t "$PANE" -p -S -30)
 
-  while [ $ELAPSED -lt $MAX_WAIT ]; do
-    sleep 3
-    CONTENT=$(tmux capture-pane -t "$PANE" -p -S -20)
-
-    # スピナー文字、ツール実行表示、処理中表示
-    if echo "$CONTENT" | grep -qE '(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏)'; then
-      echo "確認: エージェントが指示を処理中（スピナー検出）"
-      return 0
-    fi
-
-    # claude codeの特徴的な出力（ツール使用表示、ボックス描画）
-    if echo "$CONTENT" | grep -qE '(╭─|╰─|│.*Tool|› )'; then
-      echo "確認: エージェントが動作中"
-      return 0
-    fi
-
-    # codexの特徴的な出力
-    if echo "$CONTENT" | grep -qE '(Thinking|Working|Running|Executing)'; then
-      echo "確認: エージェントが処理中"
-      return 0
-    fi
-
-    ELAPSED=$((ELAPSED + 3))
-  done
-
-  echo "Warning: ${MAX_WAIT}秒以内にエージェントの動作を確認できませんでした"
-  return 1
+  # 状態を出力して呼び出し元が判定
+  echo "$CONTENT"
 }
 
-verify_agent_running "$PANE" 30
+check_pane_state() {
+  local CONTENT="$1"
 
-# tmpファイルを削除（エージェントが読み取り済み）
-rm -f "$PROMPT_FILE"
+  # 1. 選択ダイアログ検出（最優先で確認）
+  #    - "❯" や ">" のある行 + 他の選択肢行 = 選択UI
+  #    - "Allow" / "Deny" / "Yes" / "No" / "Trust" = 権限ダイアログ
+  if echo "$CONTENT" | grep -qE '(❯|›.*\[|Allow|Deny|Trust|Yes.*No|Approve|Reject)'; then
+    echo "SELECTION_DIALOG"
+    return
+  fi
+
+  # 2. エージェントが処理中
+  if echo "$CONTENT" | grep -qE '(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏)'; then
+    echo "PROCESSING_SPINNER"
+    return
+  fi
+  if echo "$CONTENT" | grep -qE '(╭─|╰─|│.*Tool)'; then
+    echo "PROCESSING_TOOL"
+    return
+  fi
+  if echo "$CONTENT" | grep -qE '(Thinking|Working|Running|Executing)'; then
+    echo "PROCESSING_TEXT"
+    return
+  fi
+
+  # 3. 入力待ち（エージェントが起動済みでプロンプト表示中）
+  if echo "$CONTENT" | grep -qE '(>\s*$|❯\s*$|\$\s*$)'; then
+    echo "INPUT_READY"
+    return
+  fi
+
+  echo "UNKNOWN"
+}
 ```
 
-確認できない場合、pane内容を `tmux capture-pane` で取得してユーザーに状況を報告する。
+**指示送信後、エージェントが作業を完了するかユーザーが停止を指示するまで監視を継続する。**
+
+```bash
+monitor_agent() {
+  local PANE="$1"
+  local PROMPT_FILE="$2"
+  local PROMPT_CLEANED=false
+  local PREV_STATE=""
+
+  while true; do
+    sleep 5
+    CONTENT=$(classify_pane_state "$PANE")
+    STATE=$(check_pane_state "$CONTENT")
+
+    # tmpファイルは最初に動作確認できた時点で削除
+    if [ "$PROMPT_CLEANED" = false ] && [ "$STATE" != "UNKNOWN" ] && [ "$STATE" != "INPUT_READY" ]; then
+      rm -f "$PROMPT_FILE"
+      PROMPT_CLEANED=true
+    fi
+
+    # 状態が変わった時だけ報告（同じ状態の連続報告を抑制）
+    if [ "$STATE" = "$PREV_STATE" ] && [ "$STATE" != "SELECTION_DIALOG" ]; then
+      continue
+    fi
+    PREV_STATE="$STATE"
+
+    case "$STATE" in
+      SELECTION_DIALOG)
+        # 選択ダイアログ検出 — pane内容を表示して選択UIの操作セクションに従い対応
+        echo "=== 選択ダイアログ検出 ==="
+        echo "$CONTENT" | tail -15
+        echo "==========================="
+        # ここで選択UIの操作セクションの手順に従い対応する
+        # 対応後、監視を継続
+        ;;
+      PROCESSING_SPINNER|PROCESSING_TOOL|PROCESSING_TEXT)
+        echo "監視: エージェント動作中 (${STATE})"
+        ;;
+      INPUT_READY)
+        # エージェントが入力待ち = 作業完了または応答待ち
+        echo "=== エージェントが入力待ち ==="
+        echo "$CONTENT" | tail -10
+        echo "=============================="
+        echo "エージェントが応答待ちか作業完了の可能性。pane内容を確認。"
+        break
+        ;;
+      UNKNOWN)
+        # pane内容を確認して判断
+        echo "=== pane状態不明 — 内容確認 ==="
+        echo "$CONTENT" | tail -15
+        echo "================================"
+        ;;
+    esac
+  done
+}
+
+# tmpファイル名を渡して監視開始
+monitor_agent "$PANE" "$PROMPT_FILE"
+```
+
+**重要**: 監視は無期限ループ。各イテレーションで `classify_pane_state` → `check_pane_state` を実行し、選択ダイアログが出たら即座にpane内容を表示して対応する。状態変化時のみ報告し、同じ状態の繰り返しは抑制する。
 
 ## 追加メッセージの送信
 
