@@ -1,6 +1,6 @@
 ---
 name: tmux-worktree-agent
-description: worktreeとtmux windowを作成し、セットアップ後にclaude codeまたはcodexを起動して指示を送る。「worktreeでclaudeに作業させて」「worktreeでcodexに頼んで」「ブランチを切ってagentに任せて」「worktreeでagent起動して」と言われた時に使用する。
+description: worktreeとtmux windowを作成し、セットアップ後にclaude codeまたはcodexを起動して指示を送る。タスクに応じて複数windowで複数エージェントを並列起動できる。「worktreeでclaudeに作業させて」「worktreeでcodexに頼んで」「ブランチを切ってagentに任せて」「worktreeでagent起動して」と言われた時に使用する。
 disable-model-invocation: true
 allowed-tools: Bash, Read
 argument-hint: "<branch> [claude|codex] <instruction>"
@@ -9,12 +9,14 @@ argument-hint: "<branch> [claude|codex] <instruction>"
 # tmux-worktree-agent
 
 worktreeとtmux windowを作成し、エージェント（claude/codex）を起動して指示を送る。
+タスクに応じて複数のwindowで複数エージェントを並列起動できる。
 
 ## 概要
 
 ```
 <branch> [agent-type] <instruction>
-  → worktree作成 → tmux window → セットアップ検出・実行 → エージェント起動 → 指示送信 → 送信確認
+  → worktree作成 → タスク分析・エージェント構成決定
+  → window作成 × N → セットアップ → エージェント起動 × N → 全pane監視
 ```
 
 ## 前提チェック
@@ -28,11 +30,9 @@ if [ -z "$TMUX" ]; then
 fi
 ```
 
-エージェントCLIの存在確認:
+エージェントCLIの存在確認（使用するものだけ）:
 ```bash
-# claude codeの場合
 command -v claude >/dev/null 2>&1 || { echo "Error: claude CLIが見つかりません"; exit 1; }
-# codexの場合
 command -v codex >/dev/null 2>&1 || { echo "Error: codex CLIが見つかりません"; exit 1; }
 ```
 
@@ -113,15 +113,50 @@ else
 fi
 ```
 
-### 3. tmux window作成
+### 3. タスク分析とエージェント構成の決定
 
-```bash
-WINDOW_NAME="agent-$(basename "$WORKTREE_PATH")"
-tmux new-window -n "${WINDOW_NAME}" -c "${WORKTREE_PATH}"
-PANE="${WINDOW_NAME}.0"
+ユーザーの指示を解釈し、**単一エージェントで十分か、複数エージェントが有効か**を判断する。
+
+**複数エージェントが有効なケース:**
+- 実装とレビューを並行したい → claude(実装) + codex(レビュー)
+- フロントエンドとバックエンドの同時開発 → claude × 2
+- 実装 + テスト作成の並行 → claude(実装) + claude(テスト)
+- ユーザーが明示的に複数エージェントを要求
+
+**単一エージェントで十分なケース:**
+- シンプルなバグ修正、単一ファイルの変更、小さな機能追加
+
+判断結果として、エージェント構成リストを作成する:
+
+```
+AGENTS = [
+  { type: "claude", role: "impl",   instruction: "..." },
+  { type: "codex", role: "review",  instruction: "..." },
+]
 ```
 
-### 4. セットアップコマンドの検出と実行
+各エージェントの指示は、ユーザーの意図を解釈して伝わりやすいプロンプトに書き換える:
+- 曖昧な表現を具体化する
+- 省略された前提を補足する
+- スキルプレフィックスを付加する
+- 複数エージェント時は各自の役割と担当範囲を明確化する
+
+```
+各エージェントの INSTRUCTION 構成例:
+
+/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。
+
+[役割と担当範囲を明確にした指示文]
+```
+
+例（単一）: ユーザー「ログイン周りリファクタして」→
+「/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。ログイン機能のリファクタリング。認証フロー（src/auth/）の可読性と保守性を改善する。既存テストが通る状態を維持すること。」
+
+例（複数）: ユーザー「API追加してテストも書いて」→
+- Agent 1 (claude/impl): 「...APIエンドポイントの実装。ルーティング、バリデーション、ハンドラを追加する。」
+- Agent 2 (claude/test): 「...追加されたAPIエンドポイントのテストを作成。正常系・異常系・境界値を網羅する。Agent 1の実装を監視し、実装が進んだらテストを書き始める。」
+
+### 4. セットアップコマンドの検出
 
 worktreeディレクトリ内のファイルを確認し、必要なセットアップコマンドを特定する。
 
@@ -159,281 +194,138 @@ if [ -f "${WORKTREE_PATH}/pyproject.toml" ] || [ -f "${WORKTREE_PATH}/requiremen
   fi
 fi
 
-# Go
-if [ -f "${WORKTREE_PATH}/go.mod" ]; then
-  SETUP_CMDS="${SETUP_CMDS}go mod download && "
-fi
-
-# Rust
-if [ -f "${WORKTREE_PATH}/Cargo.toml" ]; then
-  SETUP_CMDS="${SETUP_CMDS}cargo fetch && "
-fi
-
-# Ruby
-if [ -f "${WORKTREE_PATH}/Gemfile" ]; then
-  SETUP_CMDS="${SETUP_CMDS}bundle install && "
-fi
+# Go / Rust / Ruby
+[ -f "${WORKTREE_PATH}/go.mod" ] && SETUP_CMDS="${SETUP_CMDS}go mod download && "
+[ -f "${WORKTREE_PATH}/Cargo.toml" ] && SETUP_CMDS="${SETUP_CMDS}cargo fetch && "
+[ -f "${WORKTREE_PATH}/Gemfile" ] && SETUP_CMDS="${SETUP_CMDS}bundle install && "
 ```
 
-セットアップコマンドがある場合、pane内で実行し完了を待つ:
+### 5. window作成・セットアップ・エージェント起動（エージェントごとに繰り返し）
+
+各エージェントに対して以下を実行する。**セットアップは最初のwindowでのみ実行し、完了を待ってから残りのwindowを起動する。**
 
 ```bash
-if [ -n "$SETUP_CMDS" ]; then
-  # 末尾の " && " を除去
-  SETUP_CMDS="${SETUP_CMDS% && }"
-  MARKER="__SETUP_DONE_$$__"
-  tmux send-keys -t "$PANE" "${SETUP_CMDS}; echo ${MARKER}" Enter
+PANES=()  # 監視対象pane一覧
+PROMPT_FILES=()  # tmpファイル一覧
 
-  # 完了待ち（最大5分）
-  ELAPSED=0
-  while [ $ELAPSED -lt 300 ]; do
-    sleep 3
-    if tmux capture-pane -t "$PANE" -p -S -50 | grep -qF "$MARKER"; then
-      break
-    fi
-    ELAPSED=$((ELAPSED + 3))
-  done
+for i in $(seq 0 $((AGENT_COUNT - 1))); do
+  AGENT_TYPE="${AGENTS[$i].type}"
+  AGENT_ROLE="${AGENTS[$i].role}"
+  AGENT_INSTRUCTION="${AGENTS[$i].instruction}"
 
-  if [ $ELAPSED -ge 300 ]; then
-    echo "Warning: セットアップが5分以内に完了しませんでした。paneを確認してください。"
+  # window作成
+  WINDOW_NAME="agent-${AGENT_ROLE}-$(basename "$WORKTREE_PATH")"
+  tmux new-window -n "${WINDOW_NAME}" -c "${WORKTREE_PATH}"
+  PANE="${WINDOW_NAME}.0"
+  PANES+=("$PANE")
+
+  # セットアップ（最初のwindowのみ）
+  if [ $i -eq 0 ] && [ -n "$SETUP_CMDS" ]; then
+    SETUP_CMDS_TRIMMED="${SETUP_CMDS% && }"
+    MARKER="__SETUP_DONE_$$__"
+    tmux send-keys -t "$PANE" "${SETUP_CMDS_TRIMMED}; echo ${MARKER}" Enter
+
+    ELAPSED=0
+    while [ $ELAPSED -lt 300 ]; do
+      sleep 3
+      if tmux capture-pane -t "$PANE" -p -S -50 | grep -qF "$MARKER"; then
+        break
+      fi
+      ELAPSED=$((ELAPSED + 3))
+    done
   fi
-fi
+
+  # エージェント起動（CLI引数で指示を渡す）
+  PROMPT_FILE=$(mktemp)
+  printf '%s' "$AGENT_INSTRUCTION" > "$PROMPT_FILE"
+  PROMPT_FILES+=("$PROMPT_FILE")
+  ESCAPED_FILE=$(printf '%q' "$PROMPT_FILE")
+
+  case "$AGENT_TYPE" in
+    claude)
+      tmux send-keys -t "$PANE" "claude \"\$(cat ${ESCAPED_FILE})\"" Enter ;;
+    codex)
+      tmux send-keys -t "$PANE" "codex \"\$(cat ${ESCAPED_FILE})\"" Enter ;;
+  esac
+done
 ```
 
-### 5. 指示の構成
+### 6. 全エージェントの監視
 
-ユーザーの指示をそのまま渡さず、意図を解釈して伝わりやすいプロンプトに書き換える。大々的な調査は不要。
-
-- 曖昧な表現を具体化する（「いい感じに」→ 何がゴールか明示）
-- 省略された前提を補足する（対象ファイル、ブランチの目的など）
-- スキルプレフィックスを付加する
-
-```
-FULL_INSTRUCTION の構成例:
-
-/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。
-
-[ユーザーの意図を明確にした指示文。ゴールと、必要なら対象・制約を簡潔に補足]
-```
-
-例: ユーザー「ログイン周りリファクタして」→
-「/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。ログイン機能のリファクタリング。認証フロー（src/auth/）の可読性と保守性を改善する。既存テストが通る状態を維持すること。」
-
-### 6. エージェント起動と指示送信
-
-**初回指示はCLI引数として渡す。** `tmux send-keys` でテキスト入力後にEnterを送ると、改行として解釈され送信されない場合があるため、CLI引数渡しが最も確実。
+全paneをラウンドロビンで監視する。選択ダイアログの検出・対応手順は references/monitoring.md を参照。
 
 ```bash
-# 指示をtmpファイルに書き出し（長い指示・特殊文字のエスケープ問題を回避）
-PROMPT_FILE=$(mktemp)
-printf '%s' "$FULL_INSTRUCTION" > "$PROMPT_FILE"
+PROMPT_CLEANED=false
+declare -A PREV_STATES
 
-case "$AGENT_TYPE" in
-  claude)
-    # cat経由で指示を渡し、シェルエスケープの問題を回避
-    ESCAPED_FILE=$(printf '%q' "$PROMPT_FILE")
-    tmux send-keys -t "$PANE" "claude \"\$(cat ${ESCAPED_FILE})\"" Enter
-    ;;
-  codex)
-    ESCAPED_FILE=$(printf '%q' "$PROMPT_FILE")
-    tmux send-keys -t "$PANE" "codex \"\$(cat ${ESCAPED_FILE})\"" Enter
-    ;;
-esac
+while true; do
+  sleep 5
+  ALL_INPUT_READY=true
 
-# tmpファイルはエージェント起動後に削除（起動完了待ち後）
-# verify_agent_running 後に rm -f "$PROMPT_FILE" を実行する
-```
-
-### 7. 送信確認と能動的監視
-
-エージェント起動後、pane内容を定期的に取得し、状態を判定して適切に対応する。
-**選択ダイアログや権限確認の取りこぼしを防ぐため、毎回pane全体の内容を確認する。**
-
-```bash
-# pane内容を取得して状態を分類する
-classify_pane_state() {
-  local PANE="$1"
-  # pane全体を広めに取得（選択UIは画面下部に出るとは限らない）
-  local CONTENT
-  CONTENT=$(tmux capture-pane -t "$PANE" -p -S -30)
-
-  # 状態を出力して呼び出し元が判定
-  echo "$CONTENT"
-}
-
-check_pane_state() {
-  local CONTENT="$1"
-
-  # 1. 選択ダイアログ検出（最優先で確認）
-  #    - "❯" や ">" のある行 + 他の選択肢行 = 選択UI
-  #    - "Allow" / "Deny" / "Yes" / "No" / "Trust" = 権限ダイアログ
-  if echo "$CONTENT" | grep -qE '(❯|›.*\[|Allow|Deny|Trust|Yes.*No|Approve|Reject)'; then
-    echo "SELECTION_DIALOG"
-    return
-  fi
-
-  # 2. エージェントが処理中
-  if echo "$CONTENT" | grep -qE '(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏)'; then
-    echo "PROCESSING_SPINNER"
-    return
-  fi
-  if echo "$CONTENT" | grep -qE '(╭─|╰─|│.*Tool)'; then
-    echo "PROCESSING_TOOL"
-    return
-  fi
-  if echo "$CONTENT" | grep -qE '(Thinking|Working|Running|Executing)'; then
-    echo "PROCESSING_TEXT"
-    return
-  fi
-
-  # 3. 入力待ち（エージェントが起動済みでプロンプト表示中）
-  if echo "$CONTENT" | grep -qE '(>\s*$|❯\s*$|\$\s*$)'; then
-    echo "INPUT_READY"
-    return
-  fi
-
-  echo "UNKNOWN"
-}
-```
-
-**指示送信後、エージェントが作業を完了するかユーザーが停止を指示するまで監視を継続する。**
-
-```bash
-monitor_agent() {
-  local PANE="$1"
-  local PROMPT_FILE="$2"
-  local PROMPT_CLEANED=false
-  local PREV_STATE=""
-
-  while true; do
-    sleep 5
-    CONTENT=$(classify_pane_state "$PANE")
-    STATE=$(check_pane_state "$CONTENT")
+  for PANE in "${PANES[@]}"; do
+    CONTENT=$(tmux capture-pane -t "$PANE" -p -S -30)
+    STATE=$(check_pane_state "$CONTENT")  # references/monitoring.md の関数
 
     # tmpファイルは最初に動作確認できた時点で削除
     if [ "$PROMPT_CLEANED" = false ] && [ "$STATE" != "UNKNOWN" ] && [ "$STATE" != "INPUT_READY" ]; then
-      rm -f "$PROMPT_FILE"
+      for F in "${PROMPT_FILES[@]}"; do rm -f "$F"; done
       PROMPT_CLEANED=true
     fi
 
-    # 状態が変わった時だけ報告（同じ状態の連続報告を抑制）
-    if [ "$STATE" = "$PREV_STATE" ] && [ "$STATE" != "SELECTION_DIALOG" ]; then
+    # 状態が変わった時だけ報告
+    PREV="${PREV_STATES[$PANE]:-}"
+    if [ "$STATE" = "$PREV" ] && [ "$STATE" != "SELECTION_DIALOG" ]; then
+      [ "$STATE" != "INPUT_READY" ] && ALL_INPUT_READY=false
       continue
     fi
-    PREV_STATE="$STATE"
+    PREV_STATES[$PANE]="$STATE"
 
     case "$STATE" in
       SELECTION_DIALOG)
-        # 選択ダイアログ検出 — pane内容を表示して選択UIの操作セクションに従い対応
-        echo "=== 選択ダイアログ検出 ==="
+        echo "=== [$PANE] 選択ダイアログ検出 ==="
         echo "$CONTENT" | tail -15
         echo "==========================="
-        # ここで選択UIの操作セクションの手順に従い対応する
-        # 対応後、監視を継続
+        # references/monitoring.md の選択UI操作手順に従い対応
+        ALL_INPUT_READY=false
         ;;
       PROCESSING_SPINNER|PROCESSING_TOOL|PROCESSING_TEXT)
-        echo "監視: エージェント動作中 (${STATE})"
+        echo "監視: [$PANE] 動作中 (${STATE})"
+        ALL_INPUT_READY=false
         ;;
       INPUT_READY)
-        # エージェントが入力待ち = 作業完了または応答待ち
-        echo "=== エージェントが入力待ち ==="
+        echo "=== [$PANE] 入力待ち ==="
         echo "$CONTENT" | tail -10
-        echo "=============================="
-        echo "エージェントが応答待ちか作業完了の可能性。pane内容を確認。"
-        break
         ;;
       UNKNOWN)
-        # pane内容を確認して判断
-        echo "=== pane状態不明 — 内容確認 ==="
+        echo "=== [$PANE] 状態不明 ==="
         echo "$CONTENT" | tail -15
-        echo "================================"
+        ALL_INPUT_READY=false
         ;;
     esac
   done
-}
 
-# tmpファイル名を渡して監視開始
-monitor_agent "$PANE" "$PROMPT_FILE"
-```
-
-**重要**: 監視は無期限ループ。各イテレーションで `classify_pane_state` → `check_pane_state` を実行し、選択ダイアログが出たら即座にpane内容を表示して対応する。状態変化時のみ報告し、同じ状態の繰り返しは抑制する。
-
-## 追加メッセージの送信
-
-初回以降にエージェントへ追加指示を送る場合:
-
-```bash
-send_message_to_agent() {
-  local PANE="$1"
-  local MESSAGE="$2"
-
-  # 1. テキストを送信（-l でリテラル送信、特殊文字を安全に処理）
-  tmux send-keys -t "$PANE" -l "$MESSAGE"
-
-  # 2. 間を空けてEnterで送信
-  sleep 0.5
-  tmux send-keys -t "$PANE" Enter
-
-  # 3. 送信確認: pane内容をチェック
-  sleep 3
-  CONTENT=$(tmux capture-pane -t "$PANE" -p -S -10)
-
-  # テキストがまだ入力欄に残っている場合 = 送信されていない
-  # エージェントが処理中でなければ再送信を試みる
-  if ! echo "$CONTENT" | grep -qE '(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|Thinking|thinking|Working)'; then
-    echo "送信未確認。Enterを再送信..."
-    tmux send-keys -t "$PANE" Enter
-    sleep 3
-
-    # 再確認
-    CONTENT=$(tmux capture-pane -t "$PANE" -p -S -10)
-    if echo "$CONTENT" | grep -qE '(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|Thinking|thinking|Working)'; then
-      echo "再送信で送信確認"
-    else
-      echo "Warning: 送信を確認できません。paneを手動確認してください。"
-      echo "--- pane内容 ---"
-      tmux capture-pane -t "$PANE" -p -S -15
-    fi
-  else
-    echo "送信確認: OK"
+  # 全エージェントが入力待ち = 全作業完了
+  if [ "$ALL_INPUT_READY" = true ]; then
+    echo "全エージェントが作業を完了しました。"
+    break
   fi
-}
+done
 ```
-
-## 選択UIの操作
-
-claude code / codex のTUIで選択肢が表示された場合、番号指定はできない。矢印キーで移動しEnterで確定する。
-
-```bash
-# 選択肢を下に移動
-tmux send-keys -t "$PANE" Down
-
-# 選択肢を上に移動
-tmux send-keys -t "$PANE" Up
-
-# 選択を確定
-tmux send-keys -t "$PANE" Enter
-```
-
-権限確認ダイアログ（Allow / Deny 等）が表示された場合:
-1. `tmux capture-pane -t "$PANE" -p -S -10` で現在のpane内容を確認
-2. 現在選択されている項目を特定（ハイライト表示やカーソル位置で判断）
-3. 目的の選択肢まで Down / Up で移動
-4. Enter で確定
-5. 確定後に `tmux capture-pane` で状態遷移を確認
-
-**注意**: 選択肢がいくつあるか、現在どれが選択されているかをpane内容から読み取って判断する。盲目的に Down + Enter を送らない。
 
 ## 完了情報の表示
 
 ```
 Branch: <branch>
 Worktree: <path>
-Window: <window-name>
-Agent: <claude|codex>
+Agents:
+  Window: <window-name> | Type: <claude|codex> | Role: <role> | Status: <状態>
+  Window: <window-name> | Type: <claude|codex> | Role: <role> | Status: <状態>
 Setup: <実行したコマンド or なし>
-Status: <処理中 or 確認失敗>
 ```
+
+## 監視・選択UI・追加メッセージ
+
+詳細な操作手順（pane状態分類、選択UI操作、追加メッセージ送信）→ references/monitoring.md
 
 ## クリーンアップ
 
