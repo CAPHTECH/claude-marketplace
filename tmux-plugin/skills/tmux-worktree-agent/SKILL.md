@@ -149,12 +149,16 @@ AGENTS = [
 [役割と担当範囲を明確にした指示文]
 ```
 
-例（単一）: ユーザー「ログイン周りリファクタして」→
-「/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。ログイン機能のリファクタリング。認証フロー（src/auth/）の可読性と保守性を改善する。既存テストが通る状態を維持すること。」
+**エージェント種別ごとの追加指示:**
+- **claude の場合**: 「TeamCreateでチームを作成し、複数のsubagentで並列に作業を進めること。」を指示に含める
+- **codex の場合**: 「Agentツールでsubagentを積極的に活用し、調査・実装・検証を並列化すること。」を指示に含める
+
+例（単一 claude）: ユーザー「ログイン周りリファクタして」→
+「/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。TeamCreateでチームを作成し、複数のsubagentで並列に作業を進めること。ログイン機能のリファクタリング。認証フロー（src/auth/）の可読性と保守性を改善する。既存テストが通る状態を維持すること。」
 
 例（複数）: ユーザー「API追加してテストも書いて」→
-- Agent 1 (claude/impl): 「...APIエンドポイントの実装。ルーティング、バリデーション、ハンドラを追加する。」
-- Agent 2 (claude/test): 「...追加されたAPIエンドポイントのテストを作成。正常系・異常系・境界値を網羅する。Agent 1の実装を監視し、実装が進んだらテストを書き始める。」
+- Agent 1 (claude/impl): 「...TeamCreateでチームを作成し並列に作業を進めること。APIエンドポイントの実装。」
+- Agent 2 (codex/test): 「...Agentツールでsubagentを活用すること。追加されたAPIエンドポイントのテストを作成。」
 
 ### 4. セットアップコマンドの検出
 
