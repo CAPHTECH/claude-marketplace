@@ -244,7 +244,7 @@ for i in $(seq 0 $((AGENT_COUNT - 1))); do
 
   case "$AGENT_TYPE" in
     claude)
-      tmux send-keys -t "$PANE" "claude \"\$(cat ${ESCAPED_FILE})\"" Enter ;;
+      tmux send-keys -t "$PANE" "claude --effort max --permission-mode plan --enable-auto-mode \"\$(cat ${ESCAPED_FILE})\"" Enter ;;
     codex)
       tmux send-keys -t "$PANE" "codex \"\$(cat ${ESCAPED_FILE})\"" Enter ;;
   esac
