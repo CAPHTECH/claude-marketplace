@@ -202,14 +202,22 @@ fi
 
 ### 5. 指示の構成
 
-ユーザーの指示に、作業開始前に実行すべきスキルのプレフィックスを付加する。
+ユーザーの指示をそのまま渡さず、意図を解釈して伝わりやすいプロンプトに書き換える。大々的な調査は不要。
 
-```bash
-# 作業開始前スキルのプレフィックス
-SKILL_PREFIX="/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して以下のタスクに取り組むこと: "
+- 曖昧な表現を具体化する（「いい感じに」→ 何がゴールか明示）
+- 省略された前提を補足する（対象ファイル、ブランチの目的など）
+- スキルプレフィックスを付加する
 
-FULL_INSTRUCTION="${SKILL_PREFIX}${INSTRUCTION}"
 ```
+FULL_INSTRUCTION の構成例:
+
+/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。
+
+[ユーザーの意図を明確にした指示文。ゴールと、必要なら対象・制約を簡潔に補足]
+```
+
+例: ユーザー「ログイン周りリファクタして」→
+「/task-plan-builder, /agent-coding-preflight, /uncertainty-resolution を活用して取り組むこと。ログイン機能のリファクタリング。認証フロー（src/auth/）の可読性と保守性を改善する。既存テストが通る状態を維持すること。」
 
 ### 6. エージェント起動と指示送信
 
