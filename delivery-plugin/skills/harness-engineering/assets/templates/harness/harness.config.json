@@ -1,0 +1,19 @@
+{
+  "profile": "__PROFILE__",
+  "targets": {
+    "software": {
+      "command": "node -e \"const input = JSON.parse(process.env.HARNESS_CASE_INPUT || '{}'); console.log(input.message || process.env.HARNESS_CASE_ID);\""
+    },
+    "agentEval": {
+      "command": "node -e \"const fs = require('node:fs'); const input = JSON.parse(process.env.HARNESS_CASE_INPUT || '{}'); const trace = { steps: [{ kind: 'prompt', value: input.prompt || 'replace-me' }] }; fs.writeFileSync(process.env.HARNESS_TRACE_FILE, JSON.stringify(trace, null, 2)); console.log(input.expectedLabel || 'score:ok');\""
+    }
+  },
+  "artifacts": {
+    "reportsDir": "reports",
+    "tracesDir": "traces"
+  },
+  "matrix": {
+    "os": ["ubuntu-latest"],
+    "node": ["20", "22"]
+  }
+}

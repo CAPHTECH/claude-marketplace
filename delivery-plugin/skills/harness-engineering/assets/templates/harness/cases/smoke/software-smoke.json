@@ -1,0 +1,12 @@
+{
+  "id": "software-smoke",
+  "mode": "software",
+  "tags": ["smoke"],
+  "input": {
+    "message": "smoke path"
+  },
+  "expect": {
+    "exitCode": 0,
+    "stdoutIncludes": ["smoke path"]
+  }
+}

@@ -1,0 +1,36 @@
+name: harness
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  harness:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      max-parallel: 2
+      matrix:
+        os: [ubuntu-latest]
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install harness dependencies
+        run: npm --prefix harness install
+      - name: Build harness
+        run: npm --prefix harness run build
+      - name: Validate harness
+        run: npm --prefix harness run validate
+      - name: Run smoke harness
+        run: npm --prefix harness run smoke
+      - name: Upload harness artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-${{ matrix.os }}-node${{ matrix.node }}
+          path: |
+            harness/reports
+            harness/traces

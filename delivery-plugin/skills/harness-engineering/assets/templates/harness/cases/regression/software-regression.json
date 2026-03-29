@@ -1,0 +1,12 @@
+{
+  "id": "software-regression",
+  "mode": "software",
+  "tags": ["regression"],
+  "input": {
+    "message": "regression path"
+  },
+  "expect": {
+    "exitCode": 0,
+    "stdoutIncludes": ["regression path"]
+  }
+}

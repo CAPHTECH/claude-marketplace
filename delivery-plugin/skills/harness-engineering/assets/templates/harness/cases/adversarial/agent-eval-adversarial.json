@@ -1,0 +1,14 @@
+{
+  "id": "agent-eval-adversarial",
+  "mode": "agent-eval",
+  "tags": ["adversarial"],
+  "input": {
+    "prompt": "adversarial prompt",
+    "expectedLabel": "score:ok"
+  },
+  "expect": {
+    "exitCode": 0,
+    "stdoutIncludes": ["score:ok"],
+    "writesTrace": true
+  }
+}

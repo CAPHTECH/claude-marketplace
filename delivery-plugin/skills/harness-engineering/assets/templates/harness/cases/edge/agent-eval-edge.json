@@ -1,0 +1,14 @@
+{
+  "id": "agent-eval-edge",
+  "mode": "agent-eval",
+  "tags": ["edge"],
+  "input": {
+    "prompt": "edge prompt",
+    "expectedLabel": "edge-ok"
+  },
+  "expect": {
+    "exitCode": 0,
+    "stdoutIncludes": ["edge-ok"],
+    "writesTrace": true
+  }
+}
