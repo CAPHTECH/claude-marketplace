@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Claude Code向けプラグイン/スキルのマーケットプレイスリポジトリ。9つのプラグインを配布。
+Claude Code向けプラグイン/スキルのマーケットプレイスリポジトリ。複数のプラグインを配布。
 
 ## Architecture
 

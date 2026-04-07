@@ -45,7 +45,7 @@ Sense → Spec → Change → Ground → Record
 ### Consistency（整合性検査）
 | スキル | 説明 |
 |--------|------|
-| `eld-counterexample-consistency` | 反例駆動で要件、形式仕様、テスト、コード、実行時観測の多層整合性を検査 |
+| `eld-counterexample-consistency` | 既存 ELD 利用者向けの互換入口。新規利用は requirements-plugin の `requirements-consistency` を推奨 |
 
 ### Predict-Light（予測ゲート）← 旧Predict
 | スキル | 説明 |

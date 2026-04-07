@@ -1,0 +1,34 @@
+id: REQ-domain-001
+title: TODO
+status: draft
+priority: p1
+context:
+  actor: TODO
+  state: TODO
+  external_conditions: []
+trigger: TODO
+precondition: []
+guarantee:
+  - TODO
+forbid:
+  - TODO
+timing: {}
+observable:
+  events: []
+  logs: []
+  metrics: []
+  returns: []
+  ui: []
+positive_examples:
+  - TODO
+negative_examples:
+  - TODO
+links:
+  laws: []
+  tests: []
+  code: []
+  telemetry: []
+  manual_checks: []
+unknowns: []
+assumptions: []
+questions_for_review: []

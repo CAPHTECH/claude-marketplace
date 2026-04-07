@@ -12,7 +12,7 @@
       "name": "eld-plugin",
       "source": "./eld-plugin",
       "description": "Evidence-Loop Development (ELD) プラグイン。Law/Termモデリング、影響予測、接地検証、知識管理を提供。",
-      "version": "3.1.0",
+      "version": "3.1.1",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -138,6 +138,17 @@
         "name": "CAPH TECH Inc."
       },
       "keywords": ["zellij", "worktree", "git", "workspace", "tab"],
+      "category": "development"
+    },
+    {
+      "name": "requirements-plugin",
+      "source": "./requirements-plugin",
+      "description": "要件定義管理プラグイン。要件 YAML の作成、カタログ管理、トレーサビリティ、多層整合性検査、手動テスト導出を支援。",
+      "version": "1.1.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["requirements", "yaml", "traceability", "consistency", "inspection", "manual-testing"],
       "category": "development"
     }
   ]

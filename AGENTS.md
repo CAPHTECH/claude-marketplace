@@ -11,13 +11,14 @@
 - `webapp-dev-plugin/`: Webアプリ開発支援。`skills/webapp-debugger/`と`webapp-debugger.skill`を同梱。
 - `codex-plugin/`: OpenAI Codex連携。セカンドオピニオン・ペアプログラミング・構造化議論。
 - `mobile-plugin/`: モバイル開発支援。mobile-mcp によるiOS/Androidデバイス操作・UI自動化、Swift/SwiftUI開発、Xcodeプロジェクト管理。
+- `requirements-plugin/`: 要件定義管理プラグイン。要件 YAML 作成、カタログ管理、トレーサビリティ、多層整合性検査、手動テスト導出。
 - `.claude-plugin/marketplace.json`: マーケットプレイス登録情報。新規プラグイン追加時に更新。
 
 各プラグインの構造: `skills/<skill>/SKILL.md`がソース、`*.skill`が配布アーカイブ。`agents/`にエージェント定義、`commands/`と`hooks/`は予約枠。
 
 ## Build, Test, and Development Commands
 現状、公式のビルド/テスト/実行コマンドは定義されていません。変更後は以下の軽量チェックを推奨します。
-- `rg -n "^name:|^description:" eld-plugin/skills delivery-plugin/skills knowledge-plugin/skills design-plugin/skills planning-plugin/skills meta-plugin/skills`（SKILL.mdのフロントマター確認）
+- `rg -n "^name:|^description:" eld-plugin/skills delivery-plugin/skills knowledge-plugin/skills design-plugin/skills planning-plugin/skills meta-plugin/skills requirements-plugin/skills`（SKILL.mdのフロントマター確認）
 - `rg -n "references/.*\.md" -g "SKILL.md"`（参照リンクの棚卸し）
 
 ## Coding Style & Naming Conventions

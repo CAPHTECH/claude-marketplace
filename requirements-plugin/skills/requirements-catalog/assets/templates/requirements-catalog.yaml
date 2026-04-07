@@ -1,0 +1,30 @@
+generated_at: TODO
+scope: TODO
+status_summary:
+  draft: 0
+  reviewed: 0
+  active: 0
+  deprecated: 0
+  superseded: 0
+priority_summary:
+  p0: 0
+  p1: 0
+  p2: 0
+  p3: 0
+requirements:
+  - id: REQ-domain-001
+    title: TODO
+    status: draft
+    priority: p1
+    depends_on: []
+    supersedes: []
+    linked_artifacts:
+      laws: []
+      tests: []
+      code: []
+      telemetry: []
+      manual_checks: []
+dependency_edges: []
+supersession_edges: []
+orphan_requirements: []
+notes: []
