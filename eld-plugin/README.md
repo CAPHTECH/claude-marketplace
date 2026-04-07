@@ -19,7 +19,7 @@ Sense → Spec → Change → Ground → Record
 - Epistemic Status強化（出典必須化）
 - Review Hybrid導入
 
-## スキル一覧（15 primary + 8 alias = 23）
+## スキル一覧（16 primary + 8 alias = 24）
 
 ### メイン
 | スキル | 説明 |
@@ -41,6 +41,11 @@ Sense → Spec → Change → Ground → Record
 | `eld-spec-discover` | Law/Term候補の発見（旧eld-model-law-discovery） |
 | `eld-spec-card` | Law/Term Cardの作成（旧law-card+term-card統合） |
 | `eld-spec-link` | Law↔Term連結表管理（旧eld-model-link-map） |
+
+### Consistency（整合性検査）
+| スキル | 説明 |
+|--------|------|
+| `eld-counterexample-consistency` | 反例駆動で要件、形式仕様、テスト、コード、実行時観測の多層整合性を検査 |
 
 ### Predict-Light（予測ゲート）← 旧Predict
 | スキル | 説明 |
