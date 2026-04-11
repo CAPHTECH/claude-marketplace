@@ -132,6 +132,20 @@ codex exec -c reasoning_effort=xhigh "..."
 - Keep the more detailed description when merging
 - Re-rank by severity after merge
 
+### 3.5 Mandatory Security Checklist
+
+For EVERY exported function, verify ALL of these:
+
+1. **Authentication**: Does this function verify the caller's identity?
+2. **Authorization**: Does this function check if the caller has permission for this action?
+3. **Input validation**: Are all parameters from external sources validated/sanitized?
+4. **Mass assignment**: Can the caller control fields they shouldn't (e.g., isAdmin, role)?
+5. **Error handling**: Are errors properly propagated? Are catch blocks swallowing failures?
+6. **SQL/injection**: Is user input interpolated into queries/commands without parameterization?
+7. **Sensitive data**: Are secrets, tokens, or credentials hardcoded or logged?
+
+Do NOT skip any function. Review each function individually against ALL 7 items.
+
 ---
 
 ## Phase 4: Verification Gate
