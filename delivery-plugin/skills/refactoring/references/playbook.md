@@ -2,9 +2,9 @@
 
 ## Duplicated Contract
 
-1. Find all structurally identical types.
+1. Find all structurally identical contracts.
 2. Pick the existing owner with the clearest domain meaning.
-3. Replace duplicates with imports or re-exports from that owner.
+3. Replace duplicates with imports, aliases, or re-exports from that owner.
 4. Delete copy-only mappers that only shuffle identical fields.
 
 ## Pass-Through Layer
@@ -22,8 +22,8 @@
 ## Split Async Path
 
 1. Identify duplicated retry, fetch, or error normalization loops.
-2. Move the shared mechanic to the low-level primitive.
-3. Preserve concrete result types at each boundary wrapper.
+2. Move the shared mechanic to the lowest layer that already owns it.
+3. Preserve concrete result and error behavior at each boundary wrapper.
 
 ## Half-Migration
 

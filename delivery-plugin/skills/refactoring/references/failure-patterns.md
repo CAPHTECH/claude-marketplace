@@ -5,34 +5,34 @@ Use this file when a first refactor attempt regresses or stalls.
 ## Contract Collision
 
 Symptoms:
-- Imported type name is redeclared locally
-- Consolidation copies multiple contracts into one file and causes compile failure
+- Imported or shared declarations are duplicated locally
+- Consolidation copies multiple equivalent contracts into one place and breaks verification
 
 Correction:
 - Keep one existing declaration
-- Update imports and re-exports instead of cloning the type
-- If the system already has a stable type owner, consolidate around that owner
+- Update imports, aliases, or re-exports instead of cloning the contract
+- If the system already has a stable owner, consolidate around that owner
 
 ## Upward Flattening
 
 Symptoms:
-- Runtime state, storage logic, or request primitives are copied into a service layer
+- Runtime state, storage logic, or request primitives are copied into a higher layer
 - File count drops, but ownership becomes less clear
 
 Correction:
 - Move simplification toward the lowest module that already owns the primitive
 - Keep higher layers thin or delete them entirely
 
-## Generic Async Widening
+## Shared Helper Widening
 
 Symptoms:
-- Shared helper returns `string | string[]` or another broad union
-- Callers need casts and compile breaks
+- A shared helper broadens result shapes or error semantics too much
+- Callers need casts, assertions, or unsafe conversions to recover concrete behavior
 
 Correction:
-- Keep section-specific wrappers concrete
-- Use overloads or separate low-level wrappers if needed
-- Prefer one shared retry primitive plus concrete boundary functions
+- Keep boundary wrappers concrete
+- Use overloads, separate low-level wrappers, or language-native specialization if needed
+- Prefer one shared primitive plus concrete boundary functions
 
 ## No-Op Refactor
 
