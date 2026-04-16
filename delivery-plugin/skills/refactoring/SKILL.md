@@ -1,7 +1,7 @@
 ---
 name: refactoring
 context: fork
-description: 言語横断で過剰抽象化や AI 生成コードの構造重複を安全にリファクタリングする。duplicated contract、pass-through layer、mirror mapper、split async path、half-migration を見つけ、最小の一貫した end-state に収束させる。TS/JS は専用 profile あり。「リファクタリングして」「AI生成コードを整理して」「重複型を統合して」「wrapperを潰して」で使用。
+description: 言語横断で過剰抽象化や AI 生成コードの構造重複を安全にリファクタリングする。duplicated contract、pass-through layer、mirror mapper、split async path、half-migration を見つけ、最小の一貫した end-state に収束させる。TS/JS と Dart/Flutter は専用 profile あり。「リファクタリングして」「AI生成コードを整理して」「重複型を統合して」「wrapperを潰して」で使用。
 ---
 
 # Refactoring
@@ -20,6 +20,7 @@ When refactoring code:
 ## Language Profiles
 
 - For TypeScript or JavaScript module, type, and async pitfalls, read [typescript-javascript.md](references/typescript-javascript.md).
+- For Dart or Flutter type, widget, state, and async pitfalls, read [dart-flutter.md](references/dart-flutter.md).
 - For other languages, keep the generic core above and follow the repository's native ownership boundaries, type system, and verification commands.
 
 ## Notes
