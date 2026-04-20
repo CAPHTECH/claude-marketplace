@@ -9,6 +9,32 @@ Read this file when the current refactor target is TypeScript or JavaScript.
 - Delete copy-only DTO or record mappers when the source and target shapes are identical.
 - When unifying mirrored contracts, keep the existing publicly exported name if one exists; otherwise use the shortest domain-neutral concept name (e.g. `User`, `Profile`) and drop layer suffixes like `Dto`, `Row`, `Record`, `Model`.
 
+### Example: mirror mapper removal
+
+Before (three files, two identical shapes plus an identity mapper):
+
+```ts
+// src/api/userDto.ts
+export interface UserDto { id: string; name: string; email: string }
+
+// src/domain/user.ts
+export interface User { id: string; name: string; email: string }
+
+// src/api/mapUser.ts
+import type { UserDto } from "./userDto";
+import type { User } from "../domain/user";
+export const mapUser = (d: UserDto): User => ({ id: d.id, name: d.name, email: d.email });
+```
+
+After (one canonical type, two files deleted, imports updated to `User`):
+
+```ts
+// src/domain/user.ts
+export interface User { id: string; name: string; email: string }
+```
+
+`UserDto` drops the `Dto` suffix because the shape is identical; `mapUser` disappears because mapping was identity.
+
 ## Ownership
 
 - Keep storage, transport, and runtime primitives in the low-level module that already owns them.

@@ -1,14 +1,6 @@
 # Dart / Flutter Profile
 
-Read this file when the current refactor target is Dart or Flutter.
-
-## Shared Direction
-
-- Start by identifying the structural smells that matter: duplicated contracts, pass-through layers, mirror mappers, split async paths, half-migrations.
-- Choose the smallest end-state that removes those smells without changing the required behavior or the public surface the repo actually exercises.
-- Prefer one coherent owner per behavior and one canonical data shape per concept, but stop once the remaining layers each own a real boundary.
-- Collapse pass-through repositories, helpers, wrapper widgets, and one-use factories instead of moving the same logic into new names.
-- Finish the migration in one pass. Do not keep legacy and replacement structures alive together.
+Read this file when the current refactor target is Dart or Flutter. For generic direction (smell list, end-state choice, one-owner principle, rule priority, migration-in-one-pass), see [../SKILL.md](../SKILL.md). This file adds Dart / Flutter specifics only.
 
 ## Dart Refactors
 

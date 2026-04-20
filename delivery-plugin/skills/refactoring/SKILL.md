@@ -11,13 +11,24 @@ Use this skill for refactors across languages, especially code with structural d
 When refactoring code:
 - First identify the structural smells that matter: duplicated contracts, pass-through layers, mirror mappers, split async paths, half-migrations.
 - Choose the smallest end-state that removes those smells without changing the required behavior.
-- Collapse pass-through wrappers, duplicated contracts, mirror mappers, one-use factories, and generic dispatchers called from only a couple of concrete sites.
+- Collapse pass-through layers, duplicated contracts, mirror mappers, one-use factories, and generic dispatchers called from only a couple of concrete sites.
 - For split async paths (parallel success/error/loading branches, duplicated await chains, or the same request issued from multiple owners), consolidate into one flow that returns a single result type.
 - Prefer one coherent owner per behavior and one canonical data shape per concept. One owner means one module per concept; when the public name differs from the internal name, do the alias re-export from the package entry, not from a dedicated facade file.
 - Export only what the public API requires. If a function becomes internal-only after consolidation, drop its export.
 - Delete dead abstractions before adding helpers.
 - Finish the migration in one pass. Do not keep legacy and replacement structures alive together.
 - Before stopping, run the native compile, test, or lint command that already exists in the repo and fix failures you introduced.
+
+## Rule priority
+
+When rules compete, apply in this order:
+
+1. Preserve the public API surface the repo actually exercises.
+2. Keep the native compile, test, or lint command green.
+3. Remove the structural smell.
+4. Reduce file count or line count.
+
+Example: consolidating two mirror mappers into one canonical type is correct at step 3, but if it breaks a publicly imported name, step 1 wins — keep an alias re-export from the package entry until callers migrate.
 
 ## Language Profiles
 
@@ -35,3 +46,13 @@ When refactoring code:
 
 Read [failure-patterns.md](references/failure-patterns.md) when a first refactor attempt regresses or stalls.
 Read [playbook.md](references/playbook.md) when you want the edit sequence for each smell family.
+
+## Not this skill
+
+This skill does not:
+
+- Change externally observable behavior (that is behavior-change work, not refactoring).
+- Redesign the public API surface (API change, separate task).
+- Add tests where none existed (test authoring, separate task).
+- Apply cosmetic renames without dedup (if there is no structural smell, do not touch names).
+- Review code for bugs, security, or performance (use `critical-code-review` instead).
