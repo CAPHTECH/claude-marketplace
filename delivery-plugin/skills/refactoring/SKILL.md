@@ -11,8 +11,10 @@ Use this skill for refactors across languages, especially code with structural d
 When refactoring code:
 - First identify the structural smells that matter: duplicated contracts, pass-through layers, mirror mappers, split async paths, half-migrations.
 - Choose the smallest end-state that removes those smells without changing the required behavior.
-- Collapse pass-through wrappers, duplicated contracts, and one-use factories.
-- Prefer one coherent owner per behavior and one canonical data shape per concept.
+- Collapse pass-through wrappers, duplicated contracts, mirror mappers, one-use factories, and generic dispatchers called from only a couple of concrete sites.
+- For split async paths (parallel success/error/loading branches, duplicated await chains, or the same request issued from multiple owners), consolidate into one flow that returns a single result type.
+- Prefer one coherent owner per behavior and one canonical data shape per concept. One owner means one module per concept; when the public name differs from the internal name, do the alias re-export from the package entry, not from a dedicated facade file.
+- Export only what the public API requires. If a function becomes internal-only after consolidation, drop its export.
 - Delete dead abstractions before adding helpers.
 - Finish the migration in one pass. Do not keep legacy and replacement structures alive together.
 - Before stopping, run the native compile, test, or lint command that already exists in the repo and fix failures you introduced.

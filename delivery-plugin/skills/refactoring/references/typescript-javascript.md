@@ -7,6 +7,7 @@ Read this file when the current refactor target is TypeScript or JavaScript.
 - If multiple interfaces or types are structurally identical, keep one existing declaration and update imports or re-exports around it.
 - Never import a type and redeclare the same name locally.
 - Delete copy-only DTO or record mappers when the source and target shapes are identical.
+- When unifying mirrored contracts, keep the existing publicly exported name if one exists; otherwise use the shortest domain-neutral concept name (e.g. `User`, `Profile`) and drop layer suffixes like `Dto`, `Row`, `Record`, `Model`.
 
 ## Ownership
 
