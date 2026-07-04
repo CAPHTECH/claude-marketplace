@@ -1,0 +1,9 @@
+{
+  "name": "pce-plugin",
+  "description": "PCE 3.0 plugin - Shape instructions to AI as Transition Contracts, prevent canonical changes without a Warrant, and judge good continuation. Ships role-separated agents and a canonical-change guard.",
+  "version": "1.0.0",
+  "author": {
+    "name": "CAPH TECH Inc."
+  },
+  "skills": "./skills/"
+}
