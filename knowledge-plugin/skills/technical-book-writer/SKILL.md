@@ -23,8 +23,8 @@ Create well-structured technical content with consistent depth and reader focus.
 
 **Process:**
 1. Use `assets/chapter_template.md` as the foundation for new chapters
-2. Follow the guidelines in `references/writing_guidelines.md` for technical depth and clarity
-3. Apply `references/markdown_conventions.md` for consistent formatting
+2. Follow the guidelines in references/writing_guidelines.md for technical depth and clarity
+3. Apply references/markdown_conventions.md for consistent formatting
 4. Ensure proper cross-references and internal links
 
 **Template structure:**
@@ -46,7 +46,7 @@ Create, validate, and maintain high-quality code examples that are tested and ac
 
 **Process:**
 1. Use templates from `assets/code_example_templates/` for language-specific examples
-2. Follow `references/code_examples_guide.md` for naming, comments, and structure
+2. Follow references/code_examples_guide.md for naming, comments, and structure
 3. Run `scripts/validate_code_examples.py` to extract and validate code
 4. Use `scripts/extract_code_blocks.py` to extract code by language for testing
 
@@ -71,7 +71,7 @@ Review content for technical accuracy, consistency, readability, and adherence t
 4. **Completeness** - Ensure prerequisites, learning objectives, and summaries are present
 5. **Cross-references** - Validate internal links and references
 
-Refer to `references/writing_guidelines.md` for detailed review criteria.
+Refer to references/writing_guidelines.md for detailed review criteria.
 
 ### 4. Book Structure Management
 
@@ -93,20 +93,6 @@ Maintain overall book organization, navigation, and cross-references.
 
 **Script:**
 - `check_book_structure.py` - Comprehensive structure validation
-
-### 5. Workflow Establishment
-
-Create and maintain a systematic writing workflow for consistency and efficiency.
-
-**Recommended workflow:**
-1. **Planning** - Define chapter objectives, outline sections, identify code examples
-2. **Drafting** - Use chapter template, write conceptual content, add placeholder code blocks
-3. **Code Development** - Implement and test code examples externally
-4. **Integration** - Insert validated code into chapter, add explanations
-5. **Review** - Self-review using technical review checklist
-6. **Validation** - Run validation scripts for code and structure
-7. **Revision** - Address issues and improve clarity
-8. **Publication** - Finalize and publish chapter
 
 ## Resources
 
@@ -142,12 +128,3 @@ Language-specific code example templates (Python, JavaScript, TypeScript, Go, et
 
 **toc_template.md**
 Table of contents template for maintaining book organization.
-
-## Best Practices
-
-1. **Write for the reader** - Focus on learning outcomes, not just feature descriptions
-2. **Test all code** - Every code example should be validated and tested
-3. **Maintain consistency** - Use templates and guidelines to ensure uniform quality
-4. **Review regularly** - Run validation scripts frequently to catch issues early
-5. **Iterate** - Write, validate, review, and revise in cycles
-6. **Document decisions** - Record architectural decisions and design choices in the book

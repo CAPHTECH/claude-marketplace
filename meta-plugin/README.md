@@ -2,18 +2,18 @@
 
 CLAUDE.md管理とスキル開発を支援するメタツールプラグインです。
 
-## スキル一覧（4スキル）
-
-### CLAUDE.md Management
-| スキル | 説明 |
-|--------|------|
-| `claude-md-customizer` | 対話形式でCLAUDE.mdをカスタマイズ |
+## スキル一覧（3スキル）
 
 ### Skill Development
 | スキル | 説明 |
 |--------|------|
 | `skill-creator` | Claude Code用Skillの設計・実装・検証ガイド |
-| `skill-extraction-finder` | プロジェクトからSkill化すべきドメイン知識を発見 |
+
+### CLAUDE.md & Settings Management
+| スキル | 説明 |
+|--------|------|
+| `permission-promoter` | settings.local.jsonのpermissions.allowから安全なコマンドをsettings.jsonへ昇格 |
+| `secret-boundary` | AI実行環境のシークレット境界設定（permissions.denyルールの生成） |
 
 ## インストール
 

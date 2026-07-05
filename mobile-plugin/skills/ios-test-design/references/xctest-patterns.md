@@ -1,39 +1,5 @@
 # XCTestパターン集
 
-## 基本パターン
-
-### AAA（Arrange-Act-Assert）パターン
-
-```swift
-func test_calculate_withPositiveNumbers_returnsSum() {
-    // Arrange（準備）
-    let calculator = Calculator()
-    let a = 5
-    let b = 3
-    
-    // Act（実行）
-    let result = calculator.add(a, b)
-    
-    // Assert（検証）
-    XCTAssertEqual(result, 8)
-}
-```
-
-### Given-When-Then パターン
-
-```swift
-func test_user_whenDeactivated_becomesInactive() {
-    // Given: アクティブなユーザー
-    var user = User(name: "Test", isActive: true)
-    
-    // When: 非アクティブ化
-    user.deactivate()
-    
-    // Then: 非アクティブ状態
-    XCTAssertFalse(user.isActive)
-}
-```
-
 ## 非同期テストパターン
 
 ### async/await テスト

@@ -1,16 +1,7 @@
 ---
 name: pr-ci-responder
 context: fork
-description: |
-  PRのCI失敗を自動診断・修正し、成功するまでリトライするスキル。
-  GitHub Actionsの実際のログを取得し、エラーを構造化分類して優先順位順に修正する。
-
-  トリガー条件:
-  - 「CIを修正して」「CI直して」
-  - 「PR #N のCIが落ちている」
-  - PRのCI失敗を自動修正したい時
-  - 「CIが通るまで直して」
-  - 「/pr-ci-responder」
+description: "PRのCI失敗を自動診断・修正し、成功するまでリトライするスキル。GitHub Actionsの実際のログを取得し、エラーを構造化分類して優先順位順に修正する。トリガー条件: 「CIを修正して」「CI直して」、「PR #N のCIが落ちている」、PRのCI失敗を自動修正したい時、「CIが通るまで直して」、「/pr-ci-responder」。"
 ---
 
 # PR CI Responder

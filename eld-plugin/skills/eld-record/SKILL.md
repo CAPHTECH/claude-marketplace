@@ -1,12 +1,7 @@
 ---
 name: eld-record
 context: fork
-description: |
-  Context Delta の収集・検証・構造化・知識移転を一貫実行する。
-  開発知識をtasks/lessons.mdやADRとして永続化する。
-
-  トリガー条件:
-  - 「記録して」「知識を整理して」「引き継ぎ資料を作って」
+description: Context Delta の収集・検証・構造化・知識移転を一貫実行する。開発知識をtasks/lessons.mdやADRとして永続化する。「記録して」「知識を整理して」「引き継ぎ資料を作って」等で使用。
 ---
 
 # ELD Record
@@ -178,10 +173,3 @@ Collect (Phase 1)
 
 - `scripts/scan_project.py` - プロジェクト構造スキャン（Phase 1-B）
 - `scripts/validate_claims.py` - ハッシュベース検証（Phase 2）
-
-## 品質原則
-
-1. **Epistemic Humility**: 推測を事実として扱わない。`unknown`と言う勇気を持つ
-2. **Evidence First**: 因果と証拠を中心にする
-3. **Source of Truth**: 真実は常に現在のコード。要約はインデックス
-4. **Minimal Change**: 最小単位で変更し、即時検証する

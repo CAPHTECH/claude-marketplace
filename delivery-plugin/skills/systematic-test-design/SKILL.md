@@ -1,21 +1,7 @@
 ---
 name: systematic-test-design
 context: fork
-description: |
-  ユニットテストとPBT（Property-Based Testing）を組み合わせた体系的テスト設計スキル。
-  「脳を使う場所」を原因推理から「プロパティとジェネレータの設計」へ移動させる。
-
-  4つの成果物（ユニットテスト、プロパティカタログ、ジェネレータ群、反例コーパス）を固定し、
-  意地悪レベル（L0-L8）を段階的に上げながら、反例を資産化して回帰テストに回収する。
-
-  トリガー条件:
-  - 「体系的にテスト設計して」「テストを設計して」
-  - 「PBTでテスト設計して」「プロパティベーステストを書いて」
-  - 「ユニットテストを設計して」「テストケースを作成して」
-  - 「テストをもっと意地悪にして」「境界値を網羅して」
-  - 「ジェネレータを設計して」「反例を資産化して」
-  - 「テストの穴を探して」「プロパティカタログを作成して」
-  - ELDのGroundフェーズでL1-L3テスト設計時
+description: "ユニットテストとPBT（Property-Based Testing）を組み合わせた体系的テスト設計スキル。「脳を使う場所」を原因推理から「プロパティとジェネレータの設計」へ移動させる。4つの成果物（ユニットテスト、プロパティカタログ、ジェネレータ群、反例コーパス）を固定し、意地悪レベル（L0-L8）を段階的に上げながら、反例を資産化して回帰テストに回収する。トリガー条件: 「体系的にテスト設計して」「テストを設計して」、「PBTでテスト設計して」「プロパティベーステストを書いて」、「ユニットテストを設計して」「テストケースを作成して」、「テストをもっと意地悪にして」「境界値を網羅して」、「ジェネレータを設計して」「反例を資産化して」、「テストの穴を探して」「プロパティカタログを作成して」、ELDのGroundフェーズでL1-L3テスト設計時。"
 ---
 
 # Systematic Test Design
@@ -34,19 +20,6 @@ description: |
 
 **重要**: PBTが見つけた反例をユニットテストへ回収しないと、運用が"浪費"になる。
 
-## ELDとの関係
-
-```
-ELD Loop: Sense → Model → Predict → Change → Ground → Record
-                                              ↑
-                      test-design-audit + systematic-test-design
-                                              ↑
-                      Law/Term → ユニットテスト + プロパティ → 反例回収
-```
-
-本スキルはELDのGroundフェーズで`/test-design-audit`と連携し、
-Law/Termを**ユニットテスト**と**プロパティ**に変換する。
-
 ## 4つの成果物
 
 | 成果物 | 役割 | ファイル |
@@ -59,47 +32,22 @@ Law/Termを**ユニットテスト**と**プロパティ**に変換する。
 ## ワークフロー
 
 ```
-Phase 1: Law/Termからテスト対象を特定
+Phase 1: ユニットテスト設計（典型例・境界例・回帰例）
     ↓
-Phase 2: ユニットテスト設計（典型例・境界例・回帰例）
+Phase 2: プロパティ分類（7カテゴリ）
     ↓
-Phase 3: プロパティ分類（7カテゴリ）
+Phase 3: ジェネレータ設計（意地悪レベル）
     ↓
-Phase 4: ジェネレータ設計（意地悪レベル）
+Phase 4: PBT実行＋反例収集
     ↓
-Phase 5: PBT実行＋反例収集
+Phase 5: 反例の回帰テスト化（ユニットテストへ回収）
     ↓
-Phase 6: 反例の回帰テスト化（ユニットテストへ回収）
-    ↓
-Phase 7: 意地悪レベル上昇（ループ）
+Phase 6: 意地悪レベル上昇（ループ）
 ```
 
 ---
 
-## Phase 1: Law/Termからテスト対象を特定
-
-ELDのLaw/Termをテスト対象として整理する。
-
-### Law種別とテスト対応
-
-| Law種別 | ユニットテスト | PBTプロパティ |
-|---------|---------------|---------------|
-| Invariant | 代表例で確認 | 不変条件プロパティ |
-| Pre | 違反時の拒否を確認 | 堅牢性プロパティ |
-| Post | 出力の正しさを確認 | 不変条件/参照モデル |
-| Policy | ルール適用例を確認 | 代数的性質/メタモルフィック |
-
-### Term要素とテスト対応
-
-| Term要素 | ユニットテスト | PBTプロパティ |
-|----------|---------------|---------------|
-| 境界 | min/max/空の具体例 | 境界ジェネレータ |
-| 観測写像 | encode/decode例 | ラウンドトリップ |
-| 状態遷移 | 遷移パス具体例 | 状態機械プロパティ |
-
----
-
-## Phase 2: ユニットテスト設計
+## Phase 1: ユニットテスト設計
 
 ユニットテストは3種類に分類して設計する。
 
@@ -153,7 +101,7 @@ def test_password_too_long():
 ```
 
 **選定基準**:
-- Termで定義された境界値
+- 仕様で定義された境界値
 - 0, 1, -1, max, min, max-1, min+1
 - 空、1要素、最大要素数
 
@@ -184,11 +132,11 @@ def test_session_expiry_boundary_regression():
 
 ---
 
-## Phase 3: プロパティ分類（7カテゴリ）
+## Phase 2: プロパティ分類（7カテゴリ）
 
 PBTのプロパティを「型」で分類し、穴を減らす。
 
-詳細は `references/property-catalog.md` を参照。
+詳細は references/property-catalog.md を参照。
 
 | # | 分類 | 定義 | 例 |
 |---|------|------|-----|
@@ -230,9 +178,9 @@ def test_invalid_input_no_crash(s):
 
 ---
 
-## Phase 4: ジェネレータ設計（意地悪レベル）
+## Phase 3: ジェネレータ設計（意地悪レベル）
 
-詳細は `references/generator-ladder.md` を参照。
+詳細は references/generator-ladder.md を参照。
 
 ### 意地悪さの4軸
 
@@ -274,7 +222,7 @@ near_invalid = st.one_of(
 
 ---
 
-## Phase 5: PBT実行＋反例収集
+## Phase 4: PBT実行＋反例収集
 
 ### 実行コマンド
 
@@ -292,11 +240,11 @@ pytest tests/pbt/ -k "level_3 or level_4 or level_5" --hypothesis-seed=random
 
 ---
 
-## Phase 6: 反例の回帰テスト化
+## Phase 5: 反例の回帰テスト化
 
 見つかった反例を即座に**ユニットテスト（回帰例）へ回収**する。
 
-詳細は `references/counterexample-workflow.md` を参照。
+詳細は references/counterexample-workflow.md を参照。
 
 ### 回収プロセス
 
@@ -323,7 +271,7 @@ LAW-session-expiry:
 
 ---
 
-## Phase 7: 運用ループ
+## Phase 6: 運用ループ
 
 ### 1モジュールの標準ループ
 
@@ -367,19 +315,6 @@ PR時:
 
 ---
 
-## ELD統合: Evidence Ladder対応
-
-| テスト種別 | Evidence Ladder | 対応 |
-|-----------|-----------------|------|
-| ユニットテスト（典型例） | L1 | 基本動作確認 |
-| ユニットテスト（境界例） | L1 | 境界条件確認 |
-| PBT L0-L2 | L1 | プロパティ検証 |
-| PBT L3-L5（状態機械） | L2 | 状態・操作列検証 |
-| PBT L6-L7（並行・フォールト） | L3 | 環境・並行検証 |
-| ユニットテスト（回帰例） | L1 | バグ再発防止 |
-
----
-
 ## テストディレクトリ構成
 
 ```
@@ -408,8 +343,8 @@ tests/
 
 | チェック | 対策 |
 |----------|------|
-| 典型例の不足 | Law/Termから漏れなく導出 |
-| 境界例の不足 | Termの境界を網羅 |
+| 典型例の不足 | 仕様・要求から漏れなく導出 |
+| 境界例の不足 | 仕様の境界を網羅 |
 | 空疎プロパティ | assume比率80%超で失敗扱い |
 | 再現不能フレーク | seed必須ログ、固定seed併用 |
 | 反例の放置 | 即座に回帰テスト化 |
@@ -418,10 +353,10 @@ tests/
 
 ## 完了条件
 
-- [ ] 全S0/S1 Lawにユニットテスト（典型例）が存在
-- [ ] 全Termの境界にユニットテスト（境界例）が存在
+- [ ] 全ての重要な仕様にユニットテスト（典型例）が存在
+- [ ] 全ての境界にユニットテスト（境界例）が存在
 - [ ] プロパティカタログが7分類で整理されている
-- [ ] 全S0/S1 Lawに対応するプロパティが存在
+- [ ] 全ての重要な仕様に対応するプロパティが存在
 - [ ] ジェネレータがL0-L2まで設計されている
 - [ ] assume比率が80%未満
 - [ ] 反例が回帰テストに回収されている
@@ -436,17 +371,7 @@ User: 認証機能のテストを体系的に設計して
 
 Claude: 体系的テスト設計を開始します。
 
-## Phase 1: Law/Termの特定
-
-対象Law:
-- LAW-session-valid (S0): セッショントークンは有効期限内で有効
-- LAW-auth-idempotent (S1): 同じ認証情報で同じ結果
-
-対象Term:
-- TERM-token: JWT形式、256bit、1時間有効
-- TERM-password: 8-256文字、英数字記号
-
-## Phase 2: ユニットテスト設計
+## Phase 1: ユニットテスト設計
 
 ### 典型例
 - test_login_success_with_valid_credentials
@@ -458,15 +383,15 @@ Claude: 体系的テスト設計を開始します。
 - test_password_max_length_256_chars
 - test_session_expiry_at_exactly_1_hour
 
-## Phase 3: プロパティ分類
+## Phase 2: プロパティ分類
 
-| プロパティ | 分類 | Law/Term |
-|-----------|------|----------|
-| セッション期限内で認証成功 | 不変条件 | LAW-session-valid |
-| encode→decodeで復元 | ラウンドトリップ | TERM-token |
-| 同一入力で同一結果 | 冪等性 | LAW-auth-idempotent |
+| プロパティ | 分類 | 対象 |
+|-----------|------|------|
+| セッション期限内で認証成功 | 不変条件 | セッション有効期限 |
+| encode→decodeで復元 | ラウンドトリップ | トークン形式 |
+| 同一入力で同一結果 | 冪等性 | 認証処理 |
 
-## Phase 4: ジェネレータ設計
+## Phase 3: ジェネレータ設計
 
 L0: valid_token, valid_credentials
 L1: 期限ちょうど切れ、空文字トークン、最大長パスワード
@@ -479,16 +404,7 @@ L2: 署名不正JWT、期限1ms超過
 
 ## リファレンス
 
-- `references/property-catalog.md` - プロパティ7分類の詳細
-- `references/generator-ladder.md` - 意地悪レベルL0-L8の詳細
-- `references/counterexample-workflow.md` - 反例回収ワークフロー
-- `references/ci-config.md` - CI運用設定例
-
-## 関連スキル
-
-| スキル | 用途 |
-|--------|------|
-| `/test-design-audit` | テスト設計の全体フレームワーク（要求→テスト条件） |
-| `/eld-ground-tdd-enforcer` | TDDサイクル強制 |
-| `/eld-ground-verify` | Law/Term接地検証 |
-| `/boundary-observation` | 境界条件の観測 |
+- references/property-catalog.md - プロパティ7分類の詳細
+- references/generator-ladder.md - 意地悪レベルL0-L8の詳細
+- references/counterexample-workflow.md - 反例回収ワークフロー
+- references/ci-config.md - CI運用設定例

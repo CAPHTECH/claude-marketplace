@@ -30,7 +30,7 @@ phase:
 ```yaml
 phase:
   id: "context"
-  skill: "/eld-sense-activation"
+  skill: "/eld-sense-planning"
   purpose: "関連知識の活性化、コード探索、再現環境構築"
 
   entry_criteria:
@@ -199,7 +199,7 @@ phase:
 ```yaml
 phase:
   id: "review"
-  skill: "/eld-ground-pr-review"
+  skill: "/eld-ground review"
   purpose: "PRレビュー、証拠パック検証、マージ判断"
 
   entry_criteria:

@@ -13,7 +13,7 @@ description: |
   - Issueから実装までを一貫して進めたい時
   - 複数のELDスキルを連携させたい時
 tools: Read, Write, Edit, Glob, Grep, Bash, MCPSearch
-skills: eld, eld-spec, eld-spec-discover, eld-spec-card, eld-spec-link, eld-predict-light, eld-ground, eld-record, eld-change-worktree, eld-ground-tdd-enforcer, issue-intake, issue-workflow-orchestrator, impact-analysis, codex-consultant, codex-negotiation, critical-code-review, pr-ci-responder
+skills: eld, eld-spec, eld-spec-discover, eld-spec-card, eld-spec-link, eld-predict-light, eld-ground, eld-record, eld-change-worktree, issue-intake, issue-workflow-orchestrator, impact-analysis, codex-consultant, codex-negotiation, critical-code-review, pr-ci-responder
 ---
 
 # ELD Workflow Orchestrator
@@ -119,26 +119,12 @@ Phase 9: Record
 | リファクタリング | Phase 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 |
 | 緊急対応 | Phase 4 → 5 → 6 → 7 → 8（後追いでSpec整備） |
 
-## Two-Model Responsibility
-
-- **Claude（実装者）**: 設計・実装の最終決定権を持つ
-- **Codex（レビュアー）**: 独立した批判的レビューと対案を提供
-- 意見の相違時: `論点 → 根拠 → 採用理由` をPRに記録
-
-### Codex連携スキル
+## Codex連携スキル（レーン別）
 
 | スキル | 用途 | レーン |
 |--------|------|--------|
 | `/codex-consultant` | ペアプログラミング・実装相談 | M/L |
 | `/codex-negotiation` | 設計議論・トレードオフ分析 | L |
-
-## Quality Principles
-
-1. **Simplicity First**: 変更を最小限にシンプルに
-2. **No Laziness**: 根本原因を突き止める。一時的修正は禁止
-3. **Minimal Impact**: 必要な箇所だけ変更
-4. **Test-First**: テストを先に書く
-5. **Elegance Check**: 非自明な変更は「もっとエレガントな方法は？」と問う
 
 ## Progress Tracking
 

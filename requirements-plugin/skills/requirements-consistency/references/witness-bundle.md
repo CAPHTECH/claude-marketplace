@@ -5,7 +5,7 @@
 ## 必須項目
 
 ```yaml
-req_id: REQ-<domain>-<number>
+id: REQ-<domain>-<number>
 requirement_text: <元の要件文>
 artifact_links:
   formal_spec:

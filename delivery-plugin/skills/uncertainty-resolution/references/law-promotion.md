@@ -93,7 +93,7 @@ law_card_draft:
 - Runtime: トランザクション境界アサーション
 - Telemetry: law.inventory.atomic_update.*
 
--> `/lde-law-card` で正式化しますか？
+-> `/eld-spec-card law` で正式化しますか？
 
 ### U-003 (昇格保留)
 

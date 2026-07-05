@@ -11,20 +11,9 @@
 5. 同一IDの重複がない
 6. `superseded` 要件に置換先がある
 
-## Consistency Rules
+## Diff / Consistency Rules
 
-次のような組み合わせは矛盾疑いとして扱う。
-
-- 同じ `context` と `trigger` で、互いに排他的な `guarantee`
-- 同じ対象に対し、片方は必須、片方は禁止
-- 成立時刻の上限と外部依存条件が明らかに両立しない
-
-## Diff Rules
-
-- コード変更あり、関連要件変更なし
-- 要件変更あり、関連テスト変更なし
-- Telemetry 変更あり、要件ID付与なし
-- `deprecated` になったのに下流の現行リンクが残る
+組み合わせ矛盾の判定と差分不整合の判定基準は `/requirements-consistency` の references/ai-diff-rules.md を単一の情報源とする。
 
 ## Severity
 

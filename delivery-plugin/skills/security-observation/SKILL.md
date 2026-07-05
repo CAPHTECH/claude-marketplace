@@ -116,7 +116,7 @@ def test_input_is_sanitized(payload):
 
 ## 脅威カタログ
 
-詳細は `references/threat-catalog.md` を参照。
+詳細は references/threat-catalog.md を参照。
 
 ## Outputs
 

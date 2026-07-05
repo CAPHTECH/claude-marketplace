@@ -52,19 +52,7 @@ XCTestおよびXCUITestを活用したiOSアプリケーションのテスト設
 
 ### Phase 2: テスト戦略の策定
 
-#### 2.1 テストピラミッドの設計
-
-```
-        ╱╲
-       ╱  ╲     E2E Test（XCUITest）: 主要シナリオのみ
-      ╱────╲
-     ╱      ╲   Integration Test: コンポーネント間連携
-    ╱────────╲
-   ╱          ╲ Unit Test: ビジネスロジック中心
-  ╱────────────╲
-```
-
-#### 2.2 テストレベル別の方針
+#### テストレベル別の方針
 
 | レベル | 対象 | テストダブル | 実行頻度 |
 |-------|------|------------|---------|
@@ -74,7 +62,7 @@ XCTestおよびXCUITestを活用したiOSアプリケーションのテスト設
 
 ### Phase 3: XCTestによるUnitテスト設計
 
-詳細は `references/xctest-patterns.md` を参照。
+詳細は references/xctest-patterns.md を参照。
 
 #### 3.1 テストケースの構造
 
@@ -125,18 +113,9 @@ test_calculate_withNegativeInput_returnsZero
 
 ### Phase 4: テストダブルの設計
 
-詳細は `references/test-doubles.md` を参照。
+詳細は references/test-doubles.md を参照。
 
-#### 4.1 テストダブルの種類と使い分け
-
-| 種類 | 用途 | 実装例 |
-|-----|------|-------|
-| Stub | 事前定義した値を返す | `stub.returnValue = expectedData` |
-| Mock | 呼び出しを検証する | `XCTAssertTrue(mock.didCallMethod)` |
-| Fake | 軽量な実装 | `InMemoryUserRepository` |
-| Spy | 呼び出し履歴を記録 | `spy.calledArguments` |
-
-#### 4.2 プロトコルベースのテストダブル
+#### プロトコルベースのテストダブル
 
 ```swift
 // 抽象化されたプロトコル
@@ -163,7 +142,7 @@ final class MockUserRepository: UserRepositoryProtocol {
 
 ### Phase 5: XCUITestによるUIテスト設計
 
-詳細は `references/xcuitest-patterns.md` を参照。
+詳細は references/xcuitest-patterns.md を参照。
 
 #### 5.1 Page Objectパターン
 
@@ -203,7 +182,7 @@ final class LoginPage {
 
 ### Phase 6: テストデータ管理
 
-詳細は `references/test-data.md` を参照。
+詳細は references/test-data.md を参照。
 
 #### 6.1 Factoryパターン
 
@@ -237,21 +216,13 @@ Tests/
 
 ### Phase 7: テストカバレッジ分析
 
-#### 7.1 カバレッジ目標
-
-| レベル | 目標 | 説明 |
-|-------|-----|------|
-| 行カバレッジ | 80%以上 | 実行された行の割合 |
-| 分岐カバレッジ | 70%以上 | if/switch分岐の網羅 |
-| 重要パス | 100% | ビジネスクリティカルなパス |
-
-#### 7.2 Xcodeでのカバレッジ確認
+#### Xcodeでのカバレッジ確認
 
 1. スキーム設定 → Test → Options → Code Coverage有効化
 2. `Cmd + U` でテスト実行
 3. Report Navigator → Coverage でレポート確認
 
-#### 7.3 カバレッジ改善の優先順位
+#### カバレッジ改善の優先順位
 
 1. **ビジネスロジック**: Domain層、UseCase層
 2. **状態管理**: ViewModel、Reducer
@@ -323,7 +294,7 @@ final class FeatureTests: XCTestCase {
 
 ## 参照
 
-- `references/xctest-patterns.md`: XCTestパターン集
-- `references/xcuitest-patterns.md`: XCUITestパターン集
-- `references/test-doubles.md`: テストダブル設計ガイド
-- `references/test-data.md`: テストデータ管理ガイド
+- references/xctest-patterns.md: XCTestパターン集
+- references/xcuitest-patterns.md: XCUITestパターン集
+- references/test-doubles.md: テストダブル設計ガイド
+- references/test-data.md: テストデータ管理ガイド

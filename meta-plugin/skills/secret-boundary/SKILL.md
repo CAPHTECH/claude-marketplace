@@ -229,7 +229,6 @@ secrets:
 
 - `/op-env`: 平文.envの保管衛生改善。secret-boundaryのremediate推奨からリンク
 - `/security-observation`: コード内のセキュリティ脆弱性検出。対象が異なり補完関係
-- `/claude-md-optimizer`: .claude/settings.json の最適化。secret-boundaryが生成した設定との整合性確認
 
 ## 参考資料
 

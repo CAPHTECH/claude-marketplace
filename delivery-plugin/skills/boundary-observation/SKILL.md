@@ -71,7 +71,7 @@ description: "境界条件・エッジケースの観測。null/空/0/最大値/
 
 ## 境界値カタログ
 
-詳細は `references/boundary-catalog.md` を参照。
+詳細は references/boundary-catalog.md を参照。
 
 ## Outputs
 

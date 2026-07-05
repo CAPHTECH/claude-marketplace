@@ -12,10 +12,7 @@
 
 | スキル | 説明 |
 |--------|------|
-| `swift-code-review` | Swiftコードの品質レビュー。Swift 6 Strict Concurrency、プロトコル指向、値型/参照型の使い分けをチェック |
-| `swiftui-component` | SwiftUIコンポーネント設計支援。状態管理、View構造化、アクセシビリティ対応 |
-| `swift-protocol` | プロトコル指向設計支援。Protocol拡張、関連型、依存性注入パターン |
-| `swift-concurrency` | Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止 |
+| `swift-concurrency` | Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止、Swift 6移行 |
 
 ### Flutter / Riverpod開発支援
 
@@ -43,7 +40,6 @@
 
 | スキル | 説明 |
 |--------|------|
-| `ios-design-direction` | デザイン哲学・クリエイティブディレクション。Apple HIG、SwiftUI実装、アクセシビリティ、マルチプラットフォーム対応 |
 | `ios-ia-navigation` | 情報設計（IA）と画面遷移設計。タブ/push/modal選定、iPad適応、ディープリンク、状態保持ポリシー |
 
 ### デバッグ・自動化
@@ -60,28 +56,15 @@
 |----------|------|
 | `mobile-mcp` | モバイルデバイス操作（iOS/Android対応、UI操作、スクショ、アプリ管理） |
 
-## エージェント一覧
-
-| エージェント | 説明 | 使用タイミング |
-|-------------|------|----------------|
-| `ios-architecture-advisor` | iOSアーキテクチャ設計支援 | 新規プロジェクト設計、アーキテクチャリファクタリング時 |
-| `swift-code-analyzer` | Swiftコード品質分析 | コードレビュー、リファクタリング前の分析時 |
-
 ## 使い方
 
 ```bash
 # スキルの実行
-/swift-code-review         # Swiftコードをレビュー
-/swiftui-component         # SwiftUIコンポーネントを設計
+/swift-concurrency         # Swift Concurrencyの実装・移行を支援
 /flutter-widget-splitting  # Flutter Widgetを責務とRiverpod境界で分割
 /ios-test-design           # テスト設計を支援
 /xcode-project             # Xcodeプロジェクト設定を支援
-/ios-design-direction      # デザイン哲学とHIG準拠を支援
 /ios-ia-navigation         # 情報設計と画面遷移を設計
-
-# エージェントの利用
-「iOSのアーキテクチャを相談したい」  # ios-architecture-advisor
-「Swiftコードを分析して」            # swift-code-analyzer
 ```
 
 ## 対応バージョン
@@ -96,10 +79,7 @@
 ```
 mobile-plugin/
 ├── skills/                    # スキルソース
-│   ├── swift-code-review/     # Swift開発
-│   ├── swiftui-component/
-│   ├── swift-protocol/
-│   ├── swift-concurrency/
+│   ├── swift-concurrency/     # Swift開発
 │   ├── flutter-widget-splitting/
 │   ├── xcode-project/         # Xcode/ビルド
 │   ├── ios-signing/
@@ -107,12 +87,8 @@ mobile-plugin/
 │   ├── ios-test-design/       # テスト
 │   ├── ios-snapshot-test/
 │   ├── ios-performance/
-│   ├── ios-design-direction/  # デザイン・UI/UX
 │   ├── ios-ia-navigation/     # 情報設計・画面遷移
 │   └── ios-simulator-debug/   # デバッグ・自動化
-├── agents/                    # エージェント定義
-│   ├── ios-architecture-advisor.md
-│   └── swift-code-analyzer.md
 ├── hooks/                     # フック定義
 ├── commands/                  # コマンド定義
 └── .claude-plugin/

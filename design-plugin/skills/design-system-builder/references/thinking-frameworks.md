@@ -38,19 +38,7 @@
 
 ## Double Diamond
 
-英国Design Council（2003年）提唱。発散→収束を2回繰り返す。
-
-```
-      Diamond 1              Diamond 2
-(正しい問題を見つける)    (正しい解決策を作る)
-
-    ╱  ╲                    ╱  ╲
-   ╱    ╲                  ╱    ╲
-  ╱      ╲                ╱      ╲
- ╱        ╲              ╱        ╲
-Discover  Define       Develop   Deliver
-(発散)    (収束)       (発散)    (収束)
-```
+発散→収束を2回繰り返すモデル（Diamond 1で正しい問題を見つけ、Diamond 2で正しい解決策を作る）。
 
 ### DS構築での適用
 
@@ -71,22 +59,9 @@ Discover  Define       Develop   Deliver
 
 ## Atomic Design
 
-Brad Frost（2013年）提唱。UIを化学のメタファーで5階層に構成する。
-
 ### DS構築における位置づけ
 
-Atomic Designは**厳密な分類体系ではなく思考モデル**として使う（Brad Frost自身が明言）。チームに合わせてラベルやルールを調整してよい。
-
-### 5階層 + Sub-atomic
-
-| 階層 | 定義 | DS構築での役割 |
-|------|------|--------------|
-| Sub-atomic（Design Tokens） | Atomsより下位の値。単独では機能しない | Foundation定義 |
-| Atoms | 最小UI要素 | コンポーネントカタログの最小単位 |
-| Molecules | Atomsの組み合わせ | 基本的なUIパターン |
-| Organisms | 独立したUIセクション | 再利用可能なUIブロック |
-| Templates | ページレイアウト | レイアウトシステム |
-| Pages | 実コンテンツ | 検証・テスト |
+Atomic Designは**厳密な分類体系ではなく思考モデル**として使う（Brad Frost自身が明言）。チームに合わせてラベルやルールを調整してよい。DS構築ではAtomsより下位のSub-atomic層をDesign TokensのFoundation定義に対応させる。
 
 ### 階層判定の基準
 
@@ -100,17 +75,6 @@ Atomic Designは**厳密な分類体系ではなく思考モデル**として使
     └── YES → ページ構造を定義しているか？
         ├── YES → Template
         └── NO → Organism
-```
-
-### ディレクトリ構造への反映
-
-```
-components/
-  atoms/       → Button, Input, Icon, Badge, Label
-  molecules/   → SearchBar, FormField, NavItem
-  organisms/   → Header, Sidebar, DataTable
-  templates/   → DashboardLayout, AuthLayout
-  pages/       → DashboardPage, SettingsPage
 ```
 
 ---

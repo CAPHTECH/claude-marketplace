@@ -1,15 +1,7 @@
 ---
 name: eld-sense-requirements-brainstorming
 context: fork
-description: |
-  要件の曖昧さを能動的に発見する対話的ブレインストーミングスキル。
-  Issue Contract作成前に、Law/Term観点、境界条件、失敗モードから多角的質問を生成。
-
-  トリガー条件:
-  - 「要件を明確にして」「要件をブレストして」「要件の曖昧さをチェックして」
-  - 新機能開発の最初期（Issue Contract作成前）
-  - 「何が不明確か教えて」「前提条件を確認して」
-  - ELD Phase 1: Issue の前段階として自動実行
+description: 要件の曖昧さを能動的に発見する対話的ブレインストーミングスキル。Issue Contract作成前に、Law/Term観点、境界条件、失敗モードから多角的質問を生成する。「要件を明確にして」「要件をブレストして」「要件の曖昧さをチェックして」「何が不明確か教えて」等、新機能開発の最初期（Issue Contract作成前）に使用。ELD Phase 1: Issueの前段階として自動実行される。
 ---
 
 # ELD Sense: Requirements Brainstorming
@@ -61,7 +53,7 @@ description: |
 ...
 ```
 
-詳細な質問テンプレートは `references/question-templates.md` を参照。
+詳細な質問テンプレートは references/question-templates.md を参照。
 
 ### Phase 3: 回答収集と深掘り
 
@@ -109,34 +101,13 @@ Issue Contract:
 
 ### Phase 5: Law/Term候補の引き継ぎ
 
-抽出したLaw/Term候補を `/eld-model` に引き継ぎ:
+抽出したLaw/Term候補を `/eld-spec` に引き継ぎ:
 - Law候補: 守るべき条件（Invariant/Precondition/Postcondition/Policy）
 - Term候補: ドメイン語彙（Entity/Value Object/Context/Boundary）
 
 ## 対話パターン
 
-### パターン1: 質問→回答→深掘り
-
-```
-Claude: 認証機能について3つ質問させてください。
-
-## 1. セキュリティ要件
-### トークンの有効期限はどうしますか？
-- なぜこれを聞くか: LAW-token-expiry の定義に必要
-- 例:
-  - 短時間（15分）+ リフレッシュトークン
-  - 中期間（1時間）
-  - 長期間（24時間）
-
-User: 1時間で
-
-Claude: 了解です。では追加で：
-- 1時間経過後のユーザー体験はどうしますか？
-  - 自動ログアウト？
-  - リフレッシュトークンで自動更新？
-```
-
-### パターン2: 曖昧さの指摘
+曖昧さは指摘して具体化を促す。例:
 
 ```
 User: ユーザーが適切に認証されるようにして
@@ -149,21 +120,7 @@ Claude: 「適切に」の定義を明確にしたいです。
 3. セッション管理: ログイン状態の保持期間は？
 ```
 
-### パターン3: 境界条件の確認
-
-```
-Claude: 境界条件を確認させてください。
-
-## 入力の範囲
-- ユーザー名: 最小/最大文字数は？使用可能文字は？
-- パスワード: 複雑さ要件は？
-
-## 例外ケース
-- 既に同じメールアドレスが存在する場合は？
-- ネットワークタイムアウト時は？
-```
-
-詳細な対話パターンは `references/dialogue-patterns.md` を参照。
+他の対話パターン（質問→回答→深掘り、境界条件の確認等）は references/dialogue-patterns.md を参照。
 
 ## Law/Term発見ガイドライン
 
@@ -199,25 +156,7 @@ Severity判定:
   - "有効期限内" → TERM-token-validity-period (Boundary)
 ```
 
-詳細は `references/law-term-discovery.md` を参照。
-
----
-
-## 品質優先原則（Superpowers統合）
-
-### 核心原則
-
-1. **Epistemic Humility**: 推測を事実として扱わない。`unknown`と言う勇気を持つ
-2. **Evidence First**: 結論ではなく因果と証拠を中心にする
-3. **Minimal Change**: 最小単位で変更し、即時検証する
-4. **Grounded Laws**: Lawは検証可能・観測可能でなければならない
-5. **Source of Truth**: 真実は常に現在のコード。要約はインデックス
-
-### 「速さより質」の実践
-
-- 要件の曖昧さによる手戻りを根本から排除
-- テストなし実装を許さない
-- 観測不能な変更を防ぐ
+詳細は references/law-term-discovery.md を参照。
 
 ---
 
@@ -235,66 +174,11 @@ Severity判定:
 
 完了後、以下のスキルに引き継ぎ:
 
-1. `/eld-model`: Law/Term候補の詳細化・Card作成
+1. `/eld-spec`: Law/Term候補の詳細化・Card作成
 2. `/eld-sense-planning`: タスク分解（Issue Contract をもとに）
 
 ## リファレンス
 
-- `references/question-templates.md` - 質問カテゴリ別テンプレート集
-- `references/dialogue-patterns.md` - 対話フローパターン詳細
-- `references/law-term-discovery.md` - Law/Term発見の詳細ガイド
-
-## 使用例
-
-```
-User: ユーザー認証機能を追加したい
-
-Claude: 要件を明確にするため、3つの観点で質問させてください。
-
-## 1. Law/Term観点（守るべき条件と語彙）
-### 認証方式は何を想定していますか？
-- なぜこれを聞くか: TERM-authentication-method の定義と、LAW-auth-security の基準が決まります
-- 例:
-  - パスワードのみ
-  - OAuth2.0（Google/GitHub等）
-  - 多要素認証（MFA）
-
-### トークンの有効期限はどうしますか？
-- なぜこれを聞くか: LAW-token-expiry の定義に必要
-- 例: 15分/1時間/24時間
-
-## 2. 失敗モード（何が壊れうるか）
-### 認証失敗時の挙動は？
-- なぜこれを聞くか: LAW-failed-login-limit の定義
-- 例:
-  - 3回失敗でアカウントロック
-  - 失敗回数の記録のみ
-  - 失敗時に追加の検証（CAPTCHA等）
-
-### セッション期限切れ時のUXは？
-- なぜこれを聞くか: 境界条件とエラーハンドリングの設計
-- 例:
-  - 自動ログアウト
-  - リフレッシュトークンで自動延長
-  - 警告表示後に再ログイン要求
-
-## 3. 既存システムとの関係
-### 既存の認証機構はありますか？
-- なぜこれを聞くか: 移行戦略と不変条件の確認
-- 例:
-  - なし（新規実装）
-  - Basic認証あり（置き換え）
-  - 外部プロバイダあり（統合）
-
-どこから回答しますか？
-```
-
----
-
-## 停止条件
-
-以下が発生したら即座に停止し、追加計測またはスコープ縮小：
-
-- 予測と現実の継続的乖離（想定外テスト失敗3回以上）
-- 観測不能な変更の増加（物差しで検証できない変更）
-- ロールバック線の崩壊（戻せない変更の発生）
+- references/question-templates.md - 質問カテゴリ別テンプレート集
+- references/dialogue-patterns.md - 対話フローパターン詳細
+- references/law-term-discovery.md - Law/Term発見の詳細ガイド

@@ -2,7 +2,7 @@
 
 アーキテクチャレビュー、ドキュメント生成、情報収集を提供するプラグインです。
 
-## スキル一覧（10スキル）
+## スキル一覧（7スキル）
 
 ### Architecture Review
 | スキル | 説明 |
@@ -10,7 +10,6 @@
 | `system-understanding` | システムマップ収集・不変条件抽出・コンポーネントカード作成 |
 | `architecture-reviewer` | 3種類の分析（ノード/エッジ/縦串）＋矛盾検出＋優先順位付け |
 | `review-report-generator` | 意思決定用レポート生成 |
-| `synthesis-analyzer` | 統合分析 |
 
 ### Documentation & Specification
 | スキル | 説明 |
@@ -23,8 +22,6 @@
 | スキル | 説明 |
 |--------|------|
 | `info-gathering` | 技術・一般情報の体系的収集（統合版） |
-| `general-info-gathering` | 一般分野の情報収集に特化 |
-| `tech-info-gathering` | 技術分野の情報収集に特化 |
 
 ## エージェント（2エージェント）
 

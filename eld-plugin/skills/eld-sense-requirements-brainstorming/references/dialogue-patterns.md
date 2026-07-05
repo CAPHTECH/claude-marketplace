@@ -459,7 +459,7 @@ Claude:
 - 未確定事項: 1個（優先度Low）
 
 次のステップ:
-1. `/eld-model` でLaw/Termを詳細化
+1. `/eld-spec` でLaw/Termを詳細化
 2. `/eld-sense-planning` でタスク分解
 
 進めてよろしいですか？

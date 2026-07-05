@@ -1,10 +1,7 @@
 ---
 name: swift-concurrency
 context: fork
-description: |
-  Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止。
-  使用タイミング: (1) 並行処理コードの実装時、(2) Swift 6 Strict Concurrency対応時、
-  (3) データ競合の診断・修正時、(4) MainActorとバックグラウンド処理の設計時
+description: Swift Concurrency支援。async/await、Actor、Sendable、データ競合防止。使用タイミング: (1) 並行処理コードの実装時、(2) Swift 6 Strict Concurrency対応時、(3) データ競合の診断・修正時、(4) MainActorとバックグラウンド処理の設計時
 ---
 
 # Swift Concurrency 支援スキル
@@ -13,11 +10,11 @@ Swift Concurrencyの正しい使用法とデータ競合防止をガイドする
 
 ## 対象
 
-- async/await パターン
 - Actor と隔離
 - Sendable 準拠
-- Task と構造化並行性
+- Task キャンセルと構造化並行性
 - @MainActor とUI更新
+- Swift 6 Strict Concurrencyへの移行
 
 ## Swift 6 Strict Concurrency
 
@@ -40,7 +37,7 @@ actor DataManager {
 }
 
 // ⚠️ クラスは明示的な対応が必要
-// 方法1: @unchecked Sendable（内部で同期を保証）
+// 方法1: @unchecked Sendable（内部で同期を保証している場合のみ使用）
 final class ThreadSafeCache: @unchecked Sendable {
     private let lock = NSLock()
     private var storage: [String: Any] = [:]
@@ -106,77 +103,32 @@ class ViewModel {
 }
 ```
 
-## async/await パターン
+## Swift 6移行ビルド設定
 
-### 基本パターン
-
-```swift
-// 非同期関数
-func fetchUser(id: String) async throws -> User {
-    let url = URL(string: "https://api.example.com/users/\(id)")!
-    let (data, response) = try await URLSession.shared.data(from: url)
-    
-    guard let httpResponse = response as? HTTPURLResponse,
-          httpResponse.statusCode == 200 else {
-        throw APIError.invalidResponse
-    }
-    
-    return try JSONDecoder().decode(User.self, from: data)
-}
-
-// 呼び出し
-func loadUserProfile() async {
-    do {
-        let user = try await fetchUser(id: "123")
-        await MainActor.run {
-            self.user = user
-        }
-    } catch {
-        await MainActor.run {
-            self.error = error
-        }
-    }
-}
-```
-
-### 並列実行
+### Package.swift
 
 ```swift
-// async let で並列実行
-func loadDashboard() async throws -> Dashboard {
-    async let user = fetchUser()
-    async let posts = fetchPosts()
-    async let notifications = fetchNotifications()
-    
-    // すべて並列で実行され、結果を待つ
-    return try await Dashboard(
-        user: user,
-        posts: posts,
-        notifications: notifications
-    )
-}
-
-// TaskGroupで動的な並列処理
-func fetchAllUsers(ids: [String]) async throws -> [User] {
-    try await withThrowingTaskGroup(of: User.self) { group in
-        for id in ids {
-            group.addTask {
-                try await self.fetchUser(id: id)
-            }
-        }
-        
-        var users: [User] = []
-        for try await user in group {
-            users.append(user)
-        }
-        return users
-    }
-}
+swiftSettings: [
+    .enableExperimentalFeature("StrictConcurrency")
+    // または
+    .swiftLanguageMode(.v6)
+]
 ```
+
+### Xcodeプロジェクト
+
+- Build Settings > Swift Compiler - Upcoming Features
+- `SWIFT_STRICT_CONCURRENCY = complete`（コンパイラフラグとしては `-strict-concurrency=complete`）
+
+### 段階的移行
+
+- Phase 1: `.enableUpcomingFeature("StrictConcurrency")` で警告のみ有効化
+- Phase 2-3: 新規コードから準拠、依存の少ないモジュールから順次移行
+- Phase 4: `swiftLanguageMode: .v6` でアプリ全体をSwift 6モードへ
 
 ## Task管理
 
-### 構造化並行性
+### 構造化並行性とキャンセル
 
 ```swift
 class SearchViewModel: ObservableObject {
@@ -225,65 +177,9 @@ class SearchViewModel: ObservableObject {
 }
 ```
 
-### 優先度とdetached Task
-
-```swift
-// 優先度指定
-Task(priority: .userInitiated) {
-    await loadCriticalData()
-}
-
-Task(priority: .background) {
-    await performBackgroundSync()
-}
-
-// detached Task（親のコンテキストを継承しない）
-Task.detached(priority: .utility) {
-    await self.cleanupCache()
-}
-```
-
 ## よくあるエラーと解決策
 
-### 1. Sendable違反
-
-```swift
-// ❌ エラー: Capture of 'self' with non-sendable type
-class DataLoader {
-    var data: [String] = []
-    
-    func load() {
-        Task {
-            self.data = await fetchData()  // エラー
-        }
-    }
-}
-
-// ✅ 解決策1: Actorにする
-actor DataLoader {
-    var data: [String] = []
-    
-    func load() {
-        Task {
-            self.data = await fetchData()  // OK
-        }
-    }
-}
-
-// ✅ 解決策2: @MainActorを使う
-@MainActor
-class DataLoader {
-    var data: [String] = []
-    
-    func load() {
-        Task {
-            self.data = await fetchData()  // OK
-        }
-    }
-}
-```
-
-### 2. Actor再入問題
+### Actor再入問題
 
 ```swift
 actor BankAccount {
@@ -319,28 +215,6 @@ func transfer(from: BankAccount, to: BankAccount, amount: Int) async {
 }
 ```
 
-### 3. MainActor隔離
-
-```swift
-// ❌ バックグラウンドからUI更新
-func loadData() async {
-    let data = try? await fetchData()
-    self.items = data  // MainActorでない場合エラー
-}
-
-// ✅ 明示的にMainActorで実行
-func loadData() async {
-    let data = try? await fetchData()
-    await MainActor.run {
-        self.items = data
-    }
-}
-
-// ✅ またはプロパティをMainActorに
-@MainActor
-var items: [Item] = []
-```
-
 ## チェックリスト
 
 ### 設計時
@@ -349,9 +223,8 @@ var items: [Item] = []
 - [ ] MainActorの範囲は適切か
 
 ### 実装時
-- [ ] async letで並列化できる箇所はあるか
 - [ ] Taskのキャンセル処理を実装したか
-- [ ] await前後での状態変化を考慮したか
+- [ ] await前後での状態変化を考慮したか（Actor再入）
 
 ### レビュー時
 - [ ] @unchecked Sendableの使用は正当化されているか

@@ -1,15 +1,7 @@
 ---
 name: ai-led-onboarding
 context: fork
-description: |
-  生成AIが人間に対して行う作業開始時オンボーディング。AIが"説明係"ではなく"進行役"として、探索→仮説→検証→要約→未確定の明示を回し、人間が最小スキーマ（因果・境界・不変条件・壊れ方・観測）を短時間で再構築できる状態に導く。
-
-  トリガー条件:
-  - 新しいタスクやコード変更に着手する前（「この機能を修正して」「このバグを直して」）
-  - 未知のコードベースを理解する必要がある時
-  - 「オンボーディングして」「作業開始の準備をして」「コードを理解したい」
-  - 複雑なタスクを始める前の文脈理解が必要な時
-  - 「作戦ブリーフを作成して」「安全に始められるようにして」
+description: "生成AIが人間に対して行う作業開始時オンボーディング。AIが\"説明係\"ではなく\"進行役\"として、探索→仮説→検証→要約→未確定の明示を回し、人間が最小スキーマ（因果・境界・不変条件・壊れ方・観測）を短時間で再構築できる状態に導く。トリガー条件: 新しいタスクやコード変更に着手する前（「この機能を修正して」「このバグを直して」）、未知のコードベースを理解する必要がある時、「オンボーディングして」「作業開始の準備をして」「コードを理解したい」、複雑なタスクを始める前の文脈理解が必要な時、「作戦ブリーフを作成して」「安全に始められるようにして」、AIエージェント自身の着手前チェック（preflight、要件・境界・検証・観測のボトルネック解消、ready/partial/blocked判定）が必要な時。"
 ---
 
 # AI-Led Onboarding
@@ -142,6 +134,31 @@ boundary_map:
 5. **ドキュメント＝真実を前提にしない**: DocDDでもドリフトは起こりうる。検証計画が必須
 
 詳細は [references/guardrails.md](references/guardrails.md) を参照。
+
+## ボトルネック別フォローアップ
+
+未知リストの主なボトルネックに応じて、深掘りは既存スキルへ接続する。推奨は多くても3つまでに絞る。
+
+| 主ボトルネック | 接続先 |
+|---|---|
+| 要件の曖昧さ | spec-observation, uncertainty-resolution |
+| コンテキスト・入口の不明 | impact-analysis, ai-readability-analysis |
+| 境界・依存・影響範囲の不確実性 | impact-analysis, dependency-observation, security-observation, concurrency-observation |
+| 検証不足 | observation-minimum-set, boundary-observation |
+| 観測不足 | operability-observation, observation-minimum-set |
+
+## エージェント向け準備ブリーフ
+
+対象が人間ではなくAIエージェント自身の着手判断であるとき、Step 10のブリーフに以下を追加し、`ready` / `partial` / `blocked` を判定する。
+
+- `boundary_map.avoid_touching`: 触らない境界の明示
+- `validation_first_step.stop_if`: 最初の検証で何が起きたら中断するか（反証条件の最短形）
+- `observation_first_step`: 最初に見るログ/メトリクスと、それを見る理由
+
+判定基準:
+- `ready`: 境界・不変条件・検証の初手が確定し、致命的な未確定がない
+- `partial`: 着手はできるが、1〜2項目に残件がある
+- `blocked`: source of truth・境界・検証のいずれかが未確定で、誤実装や手戻りの確率が高い
 
 ## スキル詳細
 

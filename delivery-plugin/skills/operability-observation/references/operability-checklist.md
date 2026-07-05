@@ -107,3 +107,25 @@
 | 最低限 | 設定検証、ヘルス、構造化ログ |
 | 推奨 | 上記 + メトリクス、エラー分類 |
 | 成熟 | 上記 + 分散トレース、SLI/SLO |
+
+## Kubernetesヘルスチェック設定例
+
+```yaml
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: app
+    livenessProbe:
+      httpGet:
+        path: /health/live
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /health/ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+```

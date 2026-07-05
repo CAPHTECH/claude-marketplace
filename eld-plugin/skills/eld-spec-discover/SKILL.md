@@ -1,12 +1,7 @@
 ---
 name: eld-spec-discover
-description: |
-  コードベースや要件からVocabulary（語彙）とLaw（守るべき条件）を自動発見するスキル。
-  名辞抽象（Term/Type）と関係抽象（Law/制約）の両方を抽出し、
-  /eld-spec-card term および /eld-spec-card law への入力を生成する。
-  使用タイミング: (1) 新規プロジェクトでVocabulary/Lawを洗い出す時、
-  (2) 既存コードからLaw/Termを抽出する時、(3) 「Lawを発見して」「語彙を抽出して」、
-  (4) ELD Specをレトロフィットする時、(5) 初期Catalogを作る時
+context: fork
+description: コードベースや要件からVocabulary（語彙）とLaw（守るべき条件）を自動発見するスキル。名辞抽象（Term/Type）と関係抽象（Law/制約）の両方を抽出し、/eld-spec-card term および /eld-spec-card law への入力を生成する。使用タイミング: 新規プロジェクトでVocabulary/Lawを洗い出す時、既存コードからLaw/Termを抽出する時、「Lawを発見して」「語彙を抽出して」、ELD Specをレトロフィットする時、初期Catalogを作る時。
 ---
 
 # ELD Spec Discovery
@@ -121,26 +116,6 @@ law_candidate:
 
 ## 発見例
 
-### Zodからの抽出
-
-```typescript
-// 発見元
-const OrderSchema = z.object({
-  quantity: z.number().min(1).max(100),
-  price: z.number().positive(),
-});
-
-// 抽出されるTerm候補
-// TERM-order-quantity: 注文数量（1〜100の整数）
-// TERM-order-price: 注文価格（正の数）
-
-// 抽出されるLaw候補
-// LAW-pre-order-quantity: 1 ≤ quantity ≤ 100
-//   Terms: [TERM-order-quantity]
-// LAW-pre-order-price: price > 0
-//   Terms: [TERM-order-price]
-```
-
 ### アサーションからの抽出
 
 ```typescript
@@ -239,45 +214,3 @@ class Inventory {
 | 重複検出 | 既存TermやLawと重複していないか |
 | 類似統合 | 類似した定義の統合を提案 |
 | 矛盾検出 | 既存定義と矛盾していないか |
-
-## 使用例
-
-```
-User: このプロジェクトからVocabularyとLawを発見して
-
-Claude:
-## ELD Spec Discovery実行中...
-
-### Step 1: ソース収集
-- src/配下を走査中...
-- 型定義: 35件検出
-- バリデーション: 23件検出
-- アサーション: 8件検出
-
-### Step 2: Vocabulary候補生成
-- Term候補: 12件生成
-
-### Step 3: Law候補生成
-- Law候補: 15件生成
-
-### Step 4: 相互拘束チェック
-- 孤立リスク: 5件検出
-
----
-
-## Discovery Report
-
-### High Confidence Vocabulary (8件)
-1. TERM-order-quantity → `/eld-spec-card term`
-2. TERM-inventory-available → `/eld-spec-card term`
-...
-
-### High Confidence Laws (9件)
-1. LAW-pre-order-quantity → `/eld-spec-card law`
-   Terms: [TERM-order-quantity]
-2. LAW-inv-available-balance → `/eld-spec-card law`
-   Terms: [TERM-inventory-available, TERM-inventory-total, TERM-inventory-reserved]
-...
-
-Vocabulary CatalogとLaw Catalogを初期化しますか？
-```

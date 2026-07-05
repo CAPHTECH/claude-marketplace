@@ -1,6 +1,6 @@
 # CI/CD統合ガイド
 
-eld-ground-verifyをCI/CDパイプラインに統合し、PR作成前の自動検証を実現する。
+`/eld-ground verify` をCI/CDパイプラインに統合し、PR作成前の自動検証を実現する。
 
 ## GitHub Actions統合
 

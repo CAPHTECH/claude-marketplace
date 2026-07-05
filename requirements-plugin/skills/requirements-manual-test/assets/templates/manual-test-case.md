@@ -3,7 +3,7 @@
 ## Case
 
 - case_id: MTC-REQ-domain-001-01
-- req_id: REQ-domain-001
+- id: REQ-domain-001
 - purpose: TODO
 - preconditions:
   - TODO

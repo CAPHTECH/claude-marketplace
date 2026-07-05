@@ -21,13 +21,15 @@ REQ_i ↔ F_i ↔ T_i ↔ K_i ↔ C_i ↔ M_i
 
 各辺は、単なる参照ではなく「どの証拠で結んだか」を持つ。
 
-## 最小マトリクス
+## 一覧表現
 
-```markdown
-| req_id | formal_spec | tests | contracts | code_symbols | runtime_rules | gaps |
-|--------|-------------|-------|-----------|--------------|---------------|------|
-| REQ-order-102 | order_reservation.tla | test_order_reservation.py | reservation_count <= 1 | reserveInventory | trace rule 102 | MISSING_MUTATION |
-```
+行列としての一覧表現は `/requirements-traceability` の traceability-matrix.md を正準とする。
+この検出器グラフでは、正準マトリクスにない次の列を追加で持たせる。
+
+- `formal_spec`: 対応する形式仕様ファイルまたはID
+- `contracts`: 対応するコード内契約（precondition/postcondition/invariant）
+- `runtime_rules`: 対応する trace rule または alert rule
+- `gaps`: 欠落種別（例: `MISSING_MUTATION`）
 
 ## 変更影響の見方
 

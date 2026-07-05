@@ -21,31 +21,7 @@ description: "運用観測性の確保。ログ、メトリクス、ヘルスチ
 
 ### Step 1: 起動時設定検証（Fail Fast）
 
-設定が検証されず起動後に壊れるのを防ぐ：
-
-```python
-from pydantic import BaseSettings, validator
-
-class AppConfig(BaseSettings):
-    database_url: str
-    api_key: str
-    max_connections: int = 10
-
-    @validator('database_url')
-    def validate_database_url(cls, v):
-        if not v.startswith(('postgresql://', 'mysql://')):
-            raise ValueError('Invalid database URL format')
-        return v
-
-    @validator('max_connections')
-    def validate_max_connections(cls, v):
-        if v < 1 or v > 100:
-            raise ValueError('max_connections must be between 1 and 100')
-        return v
-
-# 起動時に検証（失敗したら即終了）
-config = AppConfig()
-```
+設定が検証されず起動後に壊れるのを防ぐ。必須設定の欠落、型・範囲・形式の不正を起動時に検知し、検証に失敗したら即座に終了する。
 
 ### Step 2: ヘルスチェックの実装
 
@@ -77,32 +53,7 @@ async def readiness():
 
 ### Step 3: 構造化ログの実装
 
-相関できる形でログを出力：
-
-```python
-import structlog
-
-logger = structlog.get_logger()
-
-# 相関ID、操作名、結果、エラー分類を含める
-logger.info(
-    "request_processed",
-    correlation_id="abc-123",
-    operation="create_order",
-    user_id="user-456",
-    result="success",
-    duration_ms=150,
-)
-
-# エラーログには分類を含める
-logger.error(
-    "request_failed",
-    correlation_id="abc-123",
-    operation="create_order",
-    error_type="validation_error",  # validation_error / policy_violation / invariant_broken
-    error_message="Invalid product ID",
-)
-```
+相関ID、操作名、結果、エラー分類を含めた構造化ログ（JSON形式）を出力する。エラーログにはエラー分類（validation_error / policy_violation / invariant_broken 等）を含める。
 
 ### Step 4: 基本メトリクスの設定
 
@@ -115,28 +66,6 @@ logger.error(
 | error_total | Counter | エラー数（error_type別） |
 | active_connections | Gauge | アクティブ接続数 |
 | queue_depth | Gauge | キュー深度（飽和の兆候） |
-
-```python
-from prometheus_client import Counter, Histogram, Gauge
-
-REQUEST_LATENCY = Histogram(
-    'request_latency_seconds',
-    'Request latency',
-    ['endpoint', 'method']
-)
-
-REQUEST_COUNT = Counter(
-    'request_total',
-    'Request count',
-    ['endpoint', 'method', 'status']
-)
-
-ERROR_COUNT = Counter(
-    'error_total',
-    'Error count',
-    ['error_type', 'endpoint']
-)
-```
 
 ### Step 5: エラー分類の設計
 
@@ -159,7 +88,7 @@ ERROR_COUNT = Counter(
 
 ## 運用チェックリスト
 
-詳細は `references/operability-checklist.md` を参照。
+詳細は references/operability-checklist.md を参照。
 
 ## Outputs
 
@@ -173,47 +102,4 @@ ERROR_COUNT = Counter(
 
 ### Kubernetes ヘルスチェック設定
 
-```yaml
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: app
-    livenessProbe:
-      httpGet:
-        path: /health/live
-        port: 8080
-      initialDelaySeconds: 5
-      periodSeconds: 10
-    readinessProbe:
-      httpGet:
-        path: /health/ready
-        port: 8080
-      initialDelaySeconds: 10
-      periodSeconds: 5
-```
-
-### 構造化ログ出力例
-
-```json
-{
-  "timestamp": "2024-01-15T10:30:00Z",
-  "level": "info",
-  "event": "order_created",
-  "correlation_id": "req-abc-123",
-  "user_id": "user-456",
-  "order_id": "order-789",
-  "total_amount": 15000,
-  "duration_ms": 45
-}
-
-{
-  "timestamp": "2024-01-15T10:30:05Z",
-  "level": "error",
-  "event": "payment_failed",
-  "correlation_id": "req-abc-123",
-  "error_type": "external_error",
-  "error_message": "Payment gateway timeout",
-  "retry_count": 2
-}
-```
+Liveness/Readinessプローブの設定例は references/operability-checklist.md を参照。

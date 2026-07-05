@@ -85,7 +85,7 @@ Merge Codex findings with Claude findings:
 
 ### Step 5: Determine Verdict
 
-Apply quality gates from references/quality-gates.md:
+Apply quality gates from {plugin_root}/skills/disposable-cycle/references/quality-gates.md:
 
 1. Calculate `averageScore` from all `scored` axes
 2. Check each gate condition against metrics and scores
@@ -93,7 +93,7 @@ Apply quality gates from references/quality-gates.md:
 
 ### Step 6: Generate Report
 
-Construct autopsy report following references/autopsy-schema.json:
+Construct autopsy report following {plugin_root}/skills/disposable-cycle/references/autopsy-schema.json:
 
 ```json
 {
@@ -145,6 +145,6 @@ Present summary:
 
 ## Error Handling
 
-- If metrics file is missing: check data completeness. If tests are unavailable, set verdict to FAIL per quality-gates.md. For lint/coverage only, mark affected axes as `insufficient-evidence` and continue
+- If metrics file is missing: check data completeness. If tests are unavailable, set verdict to FAIL per {plugin_root}/skills/disposable-cycle/references/quality-gates.md. For lint/coverage only, mark affected axes as `insufficient-evidence` and continue
 - If Codex MCP is unavailable: proceed with Claude-only analysis, note in report
 - If schema validation fails: fix report structure, re-validate (max 2 retries)

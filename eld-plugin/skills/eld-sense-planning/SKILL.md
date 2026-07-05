@@ -164,6 +164,31 @@ from_child:
 
 Context継承パターンの詳細（Broadcast/Pipeline/Scatter-Gather/Hierarchical）は [context-inheritance.md](references/context-inheritance.md) を参照（Task tool統合で設計に迷った時に読む）。
 
+### アクティブコンテキストの構造
+
+タスクに渡す最終的なコンテキストは以下の形式に正規化する:
+
+```yaml
+active_context:
+  goal: <このタスクの目的、期待成果物、完了条件>
+  constraints: [<セキュリティ/性能/互換性/禁止事項/期限>]
+  references: [<参照ドキュメント/既存コード/過去決定/外部仕様>]
+  context: [<実行環境/依存ライブラリ/前提条件>]
+  expected_output:
+    format: <成果物の形式>
+    quality: <品質基準>
+    validation: <検証方法>
+```
+
+### Context Budget
+
+| 項目 | 推奨上限 |
+|------|---------|
+| Goal | 3行 |
+| Constraints | 5項目 |
+| References | 3ファイル |
+| Context | 必要最小限 |
+
 ---
 
 ## Phase 3: 並列化
@@ -284,17 +309,3 @@ Claude:
 
 分解完了。Wave 1から開始しますか？
 ```
-
----
-
-## 品質原則
-
-1. **Epistemic Humility**: 推測を事実として扱わない
-2. **Evidence First**: 結論ではなく因果と証拠を中心にする
-3. **Minimal Change**: 最小単位で変更し即時検証する
-
-### 完了の定義
-
-- Evidence Ladder目標レベル達成
-- Law/Termが接地している
-- ロールバック可能な状態

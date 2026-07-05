@@ -1,10 +1,7 @@
 ---
 name: ios-snapshot-test
 context: fork
-description: |
-  スナップショットテスト支援。swift-snapshot-testing、UI変更検出。
-  使用タイミング: (1) UIコンポーネントのリグレッションテスト、(2) デザインシステムの検証、
-  (3) 複数デバイス・ダークモード対応の確認、(4) UIリファクタリング時の安全性確保
+description: スナップショットテスト支援。swift-snapshot-testing、UI変更検出。使用タイミング: (1) UIコンポーネントのリグレッションテスト、(2) デザインシステムの検証、(3) 複数デバイス・ダークモード対応の確認、(4) UIリファクタリング時の安全性確保
 ---
 
 # iOS スナップショットテスト支援スキル
@@ -39,8 +36,7 @@ import SnapshotTesting
 
 final class ProfileViewSnapshotTests: XCTestCase {
     
-    // 記録モードを有効にして初回スナップショット生成
-    // isRecording = true
+    // 初回・意図的な変更時の記録は withSnapshotTesting(record: .all) { ... } でラップして実行
     
     func testProfileView() {
         let view = ProfileView(user: .mock)
@@ -137,89 +133,6 @@ func testCustomStrategy() {
         of: view,
         as: .swiftUIImage(size: CGSize(width: 320, height: 480))
     )
-}
-```
-
-## 複数デバイス対応
-
-### デバイス設定
-
-```swift
-struct SnapshotDevice {
-    let name: String
-    let size: CGSize
-    let traits: UITraitCollection
-    
-    static let iPhone15Pro = SnapshotDevice(
-        name: "iPhone15Pro",
-        size: CGSize(width: 393, height: 852),
-        traits: .init(userInterfaceIdiom: .phone)
-    )
-    
-    static let iPhone15ProMax = SnapshotDevice(
-        name: "iPhone15ProMax",
-        size: CGSize(width: 430, height: 932),
-        traits: .init(userInterfaceIdiom: .phone)
-    )
-    
-    static let iPhoneSE = SnapshotDevice(
-        name: "iPhoneSE",
-        size: CGSize(width: 375, height: 667),
-        traits: .init(userInterfaceIdiom: .phone)
-    )
-    
-    static let iPadPro12_9 = SnapshotDevice(
-        name: "iPadPro12_9",
-        size: CGSize(width: 1024, height: 1366),
-        traits: .init(userInterfaceIdiom: .pad)
-    )
-    
-    static let all: [SnapshotDevice] = [
-        .iPhone15Pro, .iPhone15ProMax, .iPhoneSE, .iPadPro12_9
-    ]
-}
-```
-
-### マトリックステスト
-
-```swift
-final class MultiDeviceSnapshotTests: XCTestCase {
-    
-    func testHomeScreen_allDevices() {
-        let view = HomeScreen(viewModel: .mock)
-        
-        for device in SnapshotDevice.all {
-            let controller = UIHostingController(rootView: view)
-            controller.view.frame = CGRect(origin: .zero, size: device.size)
-            
-            assertSnapshot(
-                of: controller,
-                as: .image(traits: device.traits),
-                named: device.name
-            )
-        }
-    }
-    
-    func testHomeScreen_lightAndDark() {
-        let view = HomeScreen(viewModel: .mock)
-        let device = SnapshotDevice.iPhone15Pro
-        
-        for style in [UIUserInterfaceStyle.light, .dark] {
-            let traits = UITraitCollection(traitsFrom: [
-                device.traits,
-                UITraitCollection(userInterfaceStyle: style)
-            ])
-            
-            let controller = UIHostingController(rootView: view)
-            controller.view.frame = CGRect(origin: .zero, size: device.size)
-            
-            assertSnapshot(
-                of: controller,
-                as: .image(traits: traits),
-                named: style == .light ? "light" : "dark"
-            )
-        }
-    }
 }
 ```
 
@@ -371,70 +284,6 @@ func testFeed_maskTimestamps() {
 }
 ```
 
-## 設計システム検証
-
-### コンポーネントカタログ
-
-```swift
-final class DesignSystemSnapshotTests: XCTestCase {
-    
-    func testColorPalette() {
-        let view = VStack(spacing: 8) {
-            ForEach(ColorToken.allCases, id: \.self) { token in
-                HStack {
-                    Rectangle()
-                        .fill(token.color)
-                        .frame(width: 60, height: 40)
-                    Text(token.rawValue)
-                        .font(.caption)
-                    Spacer()
-                }
-            }
-        }
-        .padding()
-        
-        assertSnapshot(of: view, as: .swiftUIImage(size: CGSize(width: 300, height: 600)))
-    }
-    
-    func testTypography() {
-        let view = VStack(alignment: .leading, spacing: 12) {
-            Text("Title Large").font(.largeTitle)
-            Text("Title").font(.title)
-            Text("Title 2").font(.title2)
-            Text("Title 3").font(.title3)
-            Text("Headline").font(.headline)
-            Text("Body").font(.body)
-            Text("Callout").font(.callout)
-            Text("Subheadline").font(.subheadline)
-            Text("Footnote").font(.footnote)
-            Text("Caption").font(.caption)
-            Text("Caption 2").font(.caption2)
-        }
-        .padding()
-        
-        assertSnapshot(of: view, as: .swiftUIImage())
-    }
-    
-    func testIconLibrary() {
-        let icons = ["house", "gear", "person", "bell", "heart", "star"]
-        
-        let view = LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 16) {
-            ForEach(icons, id: \.self) { icon in
-                VStack {
-                    Image(systemName: icon)
-                        .font(.title)
-                    Text(icon)
-                        .font(.caption2)
-                }
-            }
-        }
-        .padding()
-        
-        assertSnapshot(of: view, as: .swiftUIImage(size: CGSize(width: 300, height: 200)))
-    }
-}
-```
-
 ## ベストプラクティス
 
 ### 命名規則
@@ -501,6 +350,6 @@ final class ProfileViewSnapshotTests: XCTestCase {
 - [ ] アクセシビリティ設定でテスト
 
 ### メンテナンス時
-- [ ] 意図的なUI変更時は `isRecording = true` で再生成
+- [ ] 意図的なUI変更時は `withSnapshotTesting(record: .all) { ... }` でラップして再生成
 - [ ] 差分が出た場合は変更が意図的かレビュー
 - [ ] CIでの失敗時はアーティファクトを確認

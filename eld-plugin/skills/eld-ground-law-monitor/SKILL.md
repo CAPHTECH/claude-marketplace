@@ -1,11 +1,7 @@
 ---
 name: eld-ground-law-monitor
 context: fork
-description: |
-  実行時Law違反監視スキル。
-  本番環境でのLaw違反を検知し、分析結果を記録して継続的改善を促す。
-  使用タイミング: (1) 本番ログからLaw違反を分析する時、(2) 「Law違反を確認して」、
-  (3) 運用中のLaw健全性をチェックする時、(4) 違反パターンから新Lawを発見する時
+description: 実行時Law違反監視スキル。本番環境でのLaw違反を検知し、分析結果を記録して継続的改善を促す。使用タイミング: 本番ログからLaw違反を分析する時、「Law違反を確認して」、運用中のLaw健全性をチェックする時、違反パターンから新Lawを発見する時。
 ---
 
 # Law Monitor
@@ -150,65 +146,11 @@ recommendations:
 ```
 User: 今週のLaw違反を確認して
 
-Claude:
-## Law Health Check実行中...
+Claude: Telemetry/Logを集計し（対象期間: 2024-12-15〜21）、Law Health Reportを生成します。
 
-### Telemetry/Log収集
-- law.*.violated_total を集計中...
-- 対象期間: 2024-12-15 ~ 2024-12-21
-
-## Law Health Report
-
-### Status: 🟡 Attention Required
-
-| Law ID | Severity | Violations | Trend |
-|--------|----------|------------|-------|
-| LAW-inv-balance | S1 | 47 | 📈 +35% |
-| LAW-pre-order | S1 | 12 | 📉 -20% |
-
-### 詳細分析: LAW-inv-balance
-
-**パターン**: バースト型（10:00-12:00に集中）
-**根本原因候補**: 並行処理での競合条件（confidence: high）
-
-**推奨アクション**:
-1. 在庫更新処理にSTMを導入
-2. Lawに並行制御要件を追加
+LAW-inv-balance (S1): 47件, 📈+35%, バースト型（10:00-12:00集中）
+根本原因候補: 並行処理での競合条件（confidence: high）
+推奨アクション: 在庫更新処理にSTM導入、Lawに並行制御要件を追加
 
 → 分析結果をtasks/lessons.mdに記録しました
-→ 新Law候補を生成しますか？
 ```
-
----
-
-## 品質優先原則（Superpowers統合）
-
-### 核心原則
-
-1. **Epistemic Humility**: 推測を事実として扱わない。`unknown`と言う勇気を持つ
-2. **Evidence First**: 結論ではなく因果と証拠を中心にする
-3. **Minimal Change**: 最小単位で変更し、即時検証する
-4. **Grounded Laws**: Lawは検証可能・観測可能でなければならない
-5. **Source of Truth**: 真実は常に現在のコード。要約はインデックス
-
-### 「速さより質」の実践
-
-- 要件の曖昧さによる手戻りを根本から排除
-- テストなし実装を許さない
-- 観測不能な変更を防ぐ
-
-### 完了の定義
-
-- [ ] Evidence Ladder目標レベル達成
-- [ ] Issue Contractの物差し満足
-- [ ] Law/Termが接地している（Grounding Map確認）
-- [ ] Link Mapに孤立がない
-- [ ] ロールバック可能な状態
-
-### 停止条件
-
-以下が発生したら即座に停止し、追加計測またはスコープ縮小：
-
-- 予測と現実の継続的乖離（想定外テスト失敗3回以上）
-- 観測不能な変更の増加（物差しで検証できない変更）
-- ロールバック線の崩壊（戻せない変更の発生）

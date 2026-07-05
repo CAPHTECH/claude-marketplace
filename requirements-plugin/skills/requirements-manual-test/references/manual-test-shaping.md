@@ -13,7 +13,7 @@
 ## 1ケースの最小要素
 
 - `case_id`
-- `req_id`
+- `id`
 - `purpose`
 - `preconditions`
 - `steps`

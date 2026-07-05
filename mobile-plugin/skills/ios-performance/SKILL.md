@@ -49,7 +49,7 @@ Instruments等のツールを活用した計測から、具体的な改善施策
 
 #### 1.2 Instruments の選択
 
-詳細は `references/instruments-guide.md` を参照。
+詳細は references/instruments-guide.md を参照。
 
 | 問題 | 推奨 Instrument |
 |------|----------------|
@@ -63,37 +63,9 @@ Instruments等のツールを活用した計測から、具体的な改善施策
 
 ### Phase 2: メモリ最適化
 
-詳細は `references/memory-optimization.md` を参照。
+詳細は references/memory-optimization.md を参照。
 
-#### 2.1 メモリリーク検出
-
-```swift
-// 循環参照の典型例と修正
-
-// Bad: 循環参照
-class ViewController: UIViewController {
-    var completion: (() -> Void)?
-    
-    func setup() {
-        completion = {
-            self.doSomething()  // strong reference cycle
-        }
-    }
-}
-
-// Good: weak self で循環参照を回避
-class ViewController: UIViewController {
-    var completion: (() -> Void)?
-    
-    func setup() {
-        completion = { [weak self] in
-            self?.doSomething()
-        }
-    }
-}
-```
-
-#### 2.2 メモリフットプリント削減
+#### メモリフットプリント削減
 
 ```swift
 // 画像メモリ最適化
@@ -133,9 +105,9 @@ func downsampledImage(at url: URL, to pointSize: CGSize, scale: CGFloat) -> UIIm
 
 ### Phase 3: CPU最適化
 
-詳細は `references/cpu-optimization.md` を参照。
+詳細は references/cpu-optimization.md を参照。
 
-#### 3.1 Time Profiler による分析
+#### Time Profiler による分析
 
 ```swift
 // 重い処理の特定と最適化
@@ -157,41 +129,9 @@ func processData() {
 }
 ```
 
-#### 3.2 計算の最適化
-
-```swift
-// アルゴリズムの改善
-// Bad: O(n^2) の検索
-func findDuplicates(in array: [Int]) -> [Int] {
-    var duplicates: [Int] = []
-    for i in 0..<array.count {
-        for j in (i+1)..<array.count {
-            if array[i] == array[j] && !duplicates.contains(array[i]) {
-                duplicates.append(array[i])
-            }
-        }
-    }
-    return duplicates
-}
-
-// Good: O(n) の検索
-func findDuplicates(in array: [Int]) -> [Int] {
-    var seen = Set<Int>()
-    var duplicates = Set<Int>()
-    for element in array {
-        if seen.contains(element) {
-            duplicates.insert(element)
-        } else {
-            seen.insert(element)
-        }
-    }
-    return Array(duplicates)
-}
-```
-
 ### Phase 4: GPU/レンダリング最適化
 
-詳細は `references/rendering-optimization.md` を参照。
+詳細は references/rendering-optimization.md を参照。
 
 #### 4.1 フレームドロップの検出
 
@@ -256,7 +196,7 @@ view
 
 ### Phase 5: 起動時間最適化
 
-詳細は `references/launch-optimization.md` を参照。
+詳細は references/launch-optimization.md を参照。
 
 #### 5.1 起動フェーズの理解
 
@@ -366,7 +306,7 @@ class DateFormatterProvider {
 
 ### Phase 6: バッテリー最適化
 
-詳細は `references/battery-optimization.md` を参照。
+詳細は references/battery-optimization.md を参照。
 
 #### 6.1 バッテリー消費の主要因
 
@@ -446,7 +386,7 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
         for payload in payloads {
             // 起動時間
             if let launchMetrics = payload.applicationLaunchMetrics {
-                analyzelaunchMetrics(launchMetrics)
+                analyzeLaunchMetrics(launchMetrics)
             }
             
             // メモリ
@@ -476,7 +416,7 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
         }
     }
     
-    private func analyzelaunchMetrics(_ metrics: MXAppLaunchMetric) {
+    private func analyzeLaunchMetrics(_ metrics: MXAppLaunchMetric) {
         let resumeTime = metrics.histogrammedApplicationResumeTime
         let launchTime = metrics.histogrammedTimeToFirstDraw
         
@@ -484,64 +424,6 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
         // ...
     }
 }
-```
-
-## 出力形式
-
-### パフォーマンスレポート
-
-```markdown
-# パフォーマンス分析レポート
-
-## 概要
-- 分析日: YYYY-MM-DD
-- 対象バージョン: x.x.x
-- テストデバイス: iPhone 15 Pro (iOS 17.2)
-
-## 計測結果
-
-### 起動時間
-| 種別 | 計測値 | 目標 | 判定 |
-|-----|--------|-----|------|
-| Cold Launch | 350ms | <400ms | OK |
-| Warm Launch | 180ms | <200ms | OK |
-
-### メモリ使用量
-| 状態 | 使用量 | 目標 | 判定 |
-|-----|--------|-----|------|
-| 起動直後 | 45MB | <50MB | OK |
-| リスト表示 | 80MB | <100MB | OK |
-| ピーク | 150MB | <200MB | OK |
-
-### CPU使用率
-| 状態 | 使用率 | 目標 | 判定 |
-|-----|--------|-----|------|
-| アイドル | 0.5% | <1% | OK |
-| スクロール中 | 25% | <30% | OK |
-
-## 検出された問題
-
-### 問題1: メモリリーク
-- 場所: ProfileViewController
-- 原因: クロージャでのstrong reference cycle
-- 影響: 画面遷移ごとに2MB増加
-- 推奨修正: [weak self] の追加
-
-### 問題2: フレームドロップ
-- 場所: ProductListView
-- 原因: セル再利用時の画像デコード
-- 影響: スクロール時に55fps以下
-- 推奨修正: 画像のプリフェッチと適切なサイズへのダウンサンプリング
-
-## 改善提案
-
-1. **優先度: 高**
-   - メモリリークの修正
-   - 推定効果: メモリ使用量 20% 削減
-
-2. **優先度: 中**
-   - 画像処理の最適化
-   - 推定効果: スクロール性能 30% 向上
 ```
 
 ## ガードレール
@@ -555,9 +437,8 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
 
 ### 禁止事項
 
-1. **早すぎる最適化**: 計測なしでの最適化は行わない
-2. **可読性の犠牲**: 極端な最適化で保守性を損なわない
-3. **機能の削減**: パフォーマンスのためにUXを損なわない
+1. **可読性の犠牲**: 極端な最適化で保守性を損なわない
+2. **機能の削減**: パフォーマンスのためにUXを損なわない
 
 ### 警告事項
 
@@ -568,9 +449,9 @@ class MetricsManager: NSObject, MXMetricManagerSubscriber {
 
 ## 参照
 
-- `references/instruments-guide.md`: Instruments活用ガイド
-- `references/memory-optimization.md`: メモリ最適化詳細
-- `references/cpu-optimization.md`: CPU最適化詳細
-- `references/rendering-optimization.md`: レンダリング最適化詳細
-- `references/launch-optimization.md`: 起動時間最適化詳細
-- `references/battery-optimization.md`: バッテリー最適化詳細
+- references/instruments-guide.md: Instruments活用ガイド
+- references/memory-optimization.md: メモリ最適化詳細
+- references/cpu-optimization.md: CPU最適化詳細
+- references/rendering-optimization.md: レンダリング最適化詳細
+- references/launch-optimization.md: 起動時間最適化詳細
+- references/battery-optimization.md: バッテリー最適化詳細

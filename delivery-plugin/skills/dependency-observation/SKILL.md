@@ -102,7 +102,7 @@ def test_database_smoke():
 
 ## CI設定例
 
-詳細は `references/ci-templates.md` を参照。
+詳細は references/ci-templates.md を参照。
 
 ## Outputs
 

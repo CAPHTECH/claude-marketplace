@@ -15,6 +15,9 @@ Generate a disposable prototype from requirements, collect metrics, and prepare 
 - Git repository with clean working tree
 - `.disposable/` directory will be created if absent
 
+**初回セットアップ**: `{plugin_root}/scripts/dist/*.mjs` はビルド済みではない。存在しない場合は先にビルドする:
+`cd {plugin_root}/scripts && npm install && npm run build`
+
 ## Procedure
 
 ### Step 1: Initialize Cycle

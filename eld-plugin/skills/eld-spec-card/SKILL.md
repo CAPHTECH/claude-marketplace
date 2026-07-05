@@ -1,13 +1,8 @@
 ---
 name: eld-spec-card
+context: fork
 argument-hint: "law | term | both (default: both)"
-description: |
-  ELD SpecのLaw Card・Term Card作成統合スキル。
-  ビジネス上の「守るべき条件」（Law）およびドメインの語彙（Vocabulary/Term）を
-  標準フォーマットで文書化する。
-  使用タイミング: (1) 新しいLaw/Termを追加する時、(2) 既存Law/Termを更新する時、
-  (3) Law Catalog/Vocabulary Catalogに新規エントリを追加する時、
-  (4) Grounding Mapを更新する時、(5) Discovery後にCard化する時
+description: ELD SpecのLaw Card・Term Card作成統合スキル。ビジネス上の「守るべき条件」（Law）およびドメインの語彙（Vocabulary/Term）を標準フォーマットで文書化する。使用タイミング: 新しいLaw/Termを追加する時、既存Law/Termを更新する時、Law Catalog/Vocabulary Catalogに新規エントリを追加する時、Grounding Mapを更新する時、Discovery後にCard化する時。
 ---
 
 # ELD Spec Card: Law Card + Term Card
@@ -70,6 +65,11 @@ description: |
   - Log/Event: <event name / fields>
 ```
 
+### 境界セマンティクスの法則化
+
+境界ケースの扱い（区間の開閉、同値・同時刻の順序、ゼロ・空の扱い、丸め方向）は実装判断に残さず、Lawとして決定・明文化する。
+例: 「区間は半開 [start, end) — Aの終了時刻 == Bの開始時刻は重複ではない」
+
 ### Severity（重要度）
 
 | レベル | 説明 |
@@ -124,36 +124,6 @@ description: |
   - Log/Event: `inventory.balance.violation` with `{expected, actual, diff}`
 ```
 
-### Law Card実例：注文数量の事前条件
-
-```md
-## LAW-pre-order-quantity
-- Type: Pre
-- Scope: `order.create` API
-- Statement: 注文数量は利用可能在庫を超えてはならない
-- Formal-ish: `orderQty ≤ available`
-
-- Terms:
-  - TERM-order-quantity（注文数量）
-  - TERM-inventory-available（利用可能在庫）
-
-- Exceptions:
-  - バックオーダー許可商品は例外（Policy LAW-policy-backorder 参照）
-
-- Violation Handling:
-  - Severity: S2
-  - When Violated: reject（400 Bad Request）
-  - Owner: order-team
-
-- Verification:
-  - Test: `test_order_quantity_exceeds_available`
-  - Runtime Check: Zod schema validation
-
-- Observability:
-  - Telemetry: `law.order.quantity_limit.violated_total`
-  - Log/Event: `order.validation.failed` with `{orderQty, available}`
-```
-
 ### Law Catalog更新
 
 Law Card作成後、Law Catalogに追加:
@@ -162,7 +132,6 @@ Law Card作成後、Law Catalogに追加:
 | ID | Type | Scope | Severity | Owner | Status |
 |----|------|-------|----------|-------|--------|
 | LAW-inv-available-balance | Invariant | inventory.* | S1 | inventory-team | Active |
-| LAW-pre-order-quantity | Pre | order.create | S2 | order-team | Active |
 ```
 
 ### Law Grounding Map更新
@@ -171,7 +140,6 @@ Law Card作成後、Law Catalogに追加:
 | Law ID | Type | Test | Runtime Check | Telemetry | Notes |
 |--------|------|------|---------------|-----------|-------|
 | LAW-inv-available-balance | Invariant | prop_inventory_balance | assert_balance | law.inventory.* | - |
-| LAW-pre-order-quantity | Pre | test_order_quantity | Zod validation | law.order.* | - |
 ```
 
 ### Law相互拘束ルール
@@ -268,36 +236,6 @@ Law Card作成後、Law Catalogに追加:
   - LAW-pre-order-quantity（注文数量上限）
 ```
 
-### Term Card実例：注文数量
-
-```md
-## TERM-order-quantity
-
-### 基本情報
-- Meaning: 1回の注文で指定される商品数量
-- Context: 注文処理
-- Synonyms: 購入数量、オーダー数
-- Non-goals: カート内の合計数量
-
-### 型・形状
-- Type/Shape: `OrderQuantity = Brand<number, 'OrderQuantity'>`
-- Constraints: `1 ≤ qty ≤ 100`
-- Example Values: 1, 5, 10
-
-### 境界と接地
-- IO Boundaries:
-  - Input: 注文API、購入画面
-  - Output: 確認画面、注文履歴
-- Validation: `z.number().int().min(1).max(100)`
-- Normalization: 整数化（Math.floor）
-- Observable Fields: `order.quantity`, `order.total_items`
-
-### 関連Law
-- Related Laws:
-  - LAW-pre-order-quantity（注文数量上限）
-  - LAW-policy-bulk-order（大量注文ポリシー）
-```
-
 ### Vocabulary Catalog更新
 
 Term Card作成後、Vocabulary Catalogに追加:
@@ -306,7 +244,6 @@ Term Card作成後、Vocabulary Catalogに追加:
 | ID | Meaning | Context | Type | Owner | Status |
 |----|---------|---------|------|-------|--------|
 | TERM-inventory-available | 利用可能在庫 | 在庫管理 | S1 | inventory-team | Active |
-| TERM-order-quantity | 注文数量 | 注文処理 | S2 | order-team | Active |
 ```
 
 ### Term相互拘束ルール

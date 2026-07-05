@@ -1,14 +1,7 @@
 ---
 name: github-project
 context: fork
-description: |
-  GitHub Projectの管理スキル。ghコマンドを使用してプロジェクトの確認、アイテム追加・状態変更、フィールド更新を行う。
-
-  トリガー条件:
-  - 「Projectを確認して」「プロジェクトのアイテム一覧」「Project #N を見せて」
-  - 「IssueをProjectに追加」「PRをProjectに紐付け」
-  - 「ステータスをDoneに変更」「フィールドを更新」
-  - 「カンバンを操作」「タスクの進捗を更新」
+description: "GitHub Projectの管理スキル。ghコマンドを使用してプロジェクトの確認、アイテム追加・状態変更、フィールド更新を行う。トリガー条件: 「Projectを確認して」「プロジェクトのアイテム一覧」「Project #N を見せて」、「IssueをProjectに追加」「PRをProjectに紐付け」、「ステータスをDoneに変更」「フィールドを更新」、「カンバンを操作」「タスクの進捗を更新」。"
 ---
 
 # GitHub Project Manager

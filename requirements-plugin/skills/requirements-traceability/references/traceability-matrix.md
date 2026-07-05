@@ -5,8 +5,8 @@
 
 ## 最小列
 
-| req_id | title | law_ids | test_ids | code_symbols | telemetry | manual_checks | status |
-|--------|-------|---------|----------|--------------|-----------|---------------|--------|
+| id | title | law_ids | test_ids | code_symbols | telemetry | manual_checks | status |
+|----|-------|---------|----------|--------------|-----------|---------------|--------|
 
 ## 記入ルール
 

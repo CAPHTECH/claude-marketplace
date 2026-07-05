@@ -2,22 +2,14 @@
 
 自然言語の要件を、そのまま比較しない。まず、比較可能で観測可能な原子へ正規化する。
 
-## 必須欄
+正準スキーマは /requirements-author の requirements-yaml-schema.md を参照する。
+`id`、`context`、`trigger`、`precondition`、`guarantee`、`forbid`、`positive_examples`、`negative_examples` は正準スキーマのとおり埋める。
+
+## 検出器向けの追加欄
+
+多層整合性の検出器は、正準スキーマの `timing` と `observable` だけでは比較に使えない。次の欄を追加で埋める。
 
 ```yaml
-req_id: REQ-<domain>-<number>
-context:
-  actor: <誰か>
-  state: <どの状態か>
-  external_conditions:
-    - <外部条件>
-trigger: <何が起点か>
-precondition:
-  - <事前条件>
-guarantee:
-  - <保証すること>
-forbid:
-  - <起きてはいけないこと>
 timing:
   start_event: <いつから測るか>
   deadline: <いつまでに成立するか>
@@ -27,28 +19,17 @@ observable:
     - <イベント名>
   telemetry:
     - <属性またはメトリクス>
-positive_examples:
-  - <満たす具体例>
-negative_examples:
-  - <満たさない具体例>
 ```
 
-## 必須にする理由
+## 追加欄が必要な理由
 
-- `observable` がない要件は、テストにも監視にも落ちない。
-- `negative_examples` がない要件は、禁止条件の境界が固定されない。
 - `timing.start_event` がない時間要件は、形式化が分岐しやすい。
-
-## 完成条件
-
-- 要件文を読まなくても、欄だけで検査対象が分かる。
-- `forbid` がテスト失敗か監視違反として観測できる。
-- 少なくとも1つの `positive_examples` と 1つの `negative_examples` がある。
+- `observable.return_value` がない要件は、契約違反検出器が比較対象を作れない。
 
 ## 例
 
 ```yaml
-req_id: REQ-order-102
+id: REQ-order-102
 context:
   actor: authenticated_user
   state: payment_authorized

@@ -26,8 +26,7 @@ Codex MCP (gpt-5.4, reasoning: xhigh) に直接相談し、セカンドオピニ
 ```
 mcp__codex__codex(
   prompt: "<質問・相談内容>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" }
+  # 固定パラメータ（下表「固定パラメータ」参照）: model, config.model_reasoning_effort
 )
 ```
 
@@ -40,9 +39,8 @@ mcp__codex__codex(
   prompt: "以下のファイルを読んで<質問>に答えてください。
 対象ファイル: src/module.ts
 指摘は file:line 形式で記述してください。",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<絶対パス形式のプロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>",
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort
 )
 ```
 
@@ -57,8 +55,7 @@ mcp__codex__codex(
 # 初回: 新規セッション開始
 mcp__codex__codex(
   prompt: "<初回の質問>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" }
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort
 )
 # → レスポンスから threadId を取得
 
@@ -81,17 +78,15 @@ git diff main...HEAD  # 特定ブランチとの差分
 # 2. 差分を Codex に渡してレビュー
 mcp__codex__codex(
   prompt: "以下の差分をコードレビューしてください。設計上の問題点、バグの可能性、改善案を指摘してください。\n\n<diff出力>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>"
+  cwd: "<プロジェクトルート>",
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort
 )
 
 # カスタム観点でのレビュー
 mcp__codex__codex(
   prompt: "セキュリティ脆弱性に注目して以下の差分をレビューしてください。\n\n<diff出力>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<プロジェクトルート>"
+  cwd: "<プロジェクトルート>",
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort
 )
 ```
 
@@ -102,11 +97,8 @@ mcp__codex__codex(
 ```
 mcp__codex__codex(
   prompt: "以下の差分をコードレビューし、バグや明確な問題は対象ファイルを読んだ上でその場で修正してください。設計上の問題は指摘のみ行ってください。差分に含まれるファイル以外は編集しないでください。修正した箇所は file:line 形式で報告してください。\n\n<diff出力>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
 
@@ -117,11 +109,8 @@ mcp__codex__codex(
 ```
 mcp__codex__codex(
   prompt: "<変更指示>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
 
@@ -133,10 +122,8 @@ mcp__codex__codex(
 
 #### パターン1: Claude=Driver / Codex=Navigator（デフォルト）
 
-Claudeが実装し、Codexがレビュー・改善提案する。
+Claudeが実装し、ユーザーの要件に基づきコードを書いた後、Codexにレビュー依頼する:
 
-1. **Claudeが実装**: ユーザーの要件に基づきコードを書く
-2. **Codexにレビュー依頼**:
 ```
 mcp__codex__codex(
   prompt: "Navigatorとしてレビューしてください。以下のファイルを読み、
@@ -147,13 +134,13 @@ mcp__codex__codex(
 
 対象ファイル: src/feature.ts
 要件: <要件の要約>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
-  cwd: "<絶対パス形式のプロジェクトルート>"
+  cwd: "<絶対パス形式のプロジェクトルート>",
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort
 )
 ```
-3. **Claudeがフィードバックを反映**: 指摘を取り込んで修正
-4. **必要に応じて再レビュー**:
+
+指摘を取り込んで修正した後、必要に応じて再レビューする:
+
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
@@ -166,7 +153,8 @@ mcp__codex__codex-reply(
 
 Codexが実装し、Claudeがレビュー・方向付けする。
 
-1. **Codexに実装依頼**:
+Codexに実装依頼:
+
 ```
 mcp__codex__codex(
   prompt: "以下の要件を実装してください:
@@ -176,15 +164,13 @@ mcp__codex__codex(
 制約:
 - <技術的制約>
 - <アーキテクチャの方針>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
-2. **Claudeがレビュー**: 生成されたコードを読み、品質・設計を評価
-3. **修正指示をCodexに送信**:
+
+生成されたコードの品質・設計をClaudeがレビューし、修正指示をCodexに送信する:
+
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
@@ -200,27 +186,27 @@ mcp__codex__codex-reply(
 
 #### パターン1: Claude=テスト / Codex=実装（デフォルト）
 
-1. **RED - Claudeがテストを書く**: 要件に基づき失敗するテストを作成
-2. **GREEN - Codexに実装を依頼**:
+1. **RED**: 要件に基づき失敗するテストを作成
+2. **GREEN**: Codexに実装を依頼
+
 ```
 mcp__codex__codex(
   prompt: "以下のテストファイルを読み、テストを通す最小限の実装を書いてください。テスト以外の変更は不要です。
 
 テストファイル: tests/feature.test.ts",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
-3. **Claudeがテスト実行**: テストが通ることを確認
-4. **REFACTOR - Claudeがリファクタリング**: 重複除去・設計改善
-5. **次のRED**: Claudeが次のテストを追加し、ステップ2に戻る
+
+3. テスト実行で通過を確認
+4. **REFACTOR**: 重複除去・設計改善
+5. 次のテストを追加し、ステップ2（GREEN）に戻る
 
 #### パターン2: Codex=テスト / Claude=実装
 
-1. **RED - Codexにテスト作成を依頼**:
+1. **RED**: Codexにテスト作成を依頼
+
 ```
 mcp__codex__codex(
   prompt: "以下の要件に対するテストを書いてください。実装は書かないでください。
@@ -228,17 +214,16 @@ mcp__codex__codex(
 要件: <要件>
 テストファイル: <テストファイルパス>
 テストフレームワーク: <jest/vitest/pytest等>",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<プロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
-2. **GREEN - Claudeが実装**: テストを通す最小限のコードを書く
-3. **テスト実行で確認**
-4. **REFACTOR - Claudeがリファクタリング**
-5. **次のRED**:
+
+2. **GREEN**: テストを通す最小限のコードを書く
+3. テスト実行で確認
+4. **REFACTOR**: リファクタリング
+5. 次のREDをCodexに依頼
+
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
@@ -253,8 +238,9 @@ mcp__codex__codex-reply(
 
 #### フロー
 
-1. **Claudeが実装**: 通常通りコードを書く
-2. **Codexに破壊テスト+修正を依頼**:
+1. 通常通り実装する
+2. Codexに破壊テスト+修正を依頼
+
 ```
 mcp__codex__codex(
   prompt: "以下のファイルを読み、攻撃的レビューを行ってください:
@@ -271,15 +257,14 @@ mcp__codex__codex(
 致命的な問題（セキュリティ脆弱性、データ破壊等）は対象ファイルを読んだ上で直接修正してください。設計レベルの問題は指摘のみ行ってください。対象ファイル以外は編集しないでください。
 具体的な攻撃ケース（入力例やシナリオ）を提示してください。
 修正・指摘は file:line 形式で記述してください。",
-  model: "gpt-5.4",
-  config: { "model_reasoning_effort": "xhigh" },
   cwd: "<絶対パス形式のプロジェクトルート>",
-  sandbox: "workspace-write",
-  approval-policy: "on-failure"
+  # 固定パラメータ（下表参照）: model, config.model_reasoning_effort, sandbox, approval-policy
 )
 ```
-3. **Claudeが残りの修正とCodexの修正をレビュー**: 設計レベルの指摘を修正し、Codexによる修正の品質を確認
-4. **再攻撃**:
+
+3. 設計レベルの指摘を修正し、Codexによる修正の品質をレビューする
+4. 再攻撃
+
 ```
 mcp__codex__codex-reply(
   threadId: "<前回のthreadId>",
@@ -289,7 +274,8 @@ mcp__codex__codex-reply(
 修正概要: <修正内容の要約>"
 )
 ```
-5. **収束まで繰り返し**: 新しい脆弱性が見つからなくなるまでループ
+
+5. 新しい脆弱性が見つからなくなるまで3-4を繰り返す
 
 ## ファイル参照の原則
 

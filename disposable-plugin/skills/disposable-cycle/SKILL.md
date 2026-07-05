@@ -21,6 +21,11 @@ Each phase runs independently. User triggers each step:
 
 Mode is determined by `$ARGUMENTS` prefix (`mode:auto` or `mode:manual`) or `.disposable/config.json`.
 
+## Prerequisites
+
+**初回セットアップ**: 各フェーズが呼び出す `{plugin_root}/scripts/dist/*.mjs` はビルド済みではない。存在しない場合は先にビルドする:
+`cd {plugin_root}/scripts && npm install && npm run build`
+
 ## Procedure
 
 ### Step 1: Initialize Session
@@ -100,8 +105,8 @@ If criteria met:
   1. Compile final distill spec with all cycle learnings
   2. Switch to base branch: `git checkout main` (or the branch active before the cycle)
   3. Clean up spike branches: `git branch --list 'disposable/cycle_*' | sed 's/^[* ]*//' | xargs -r git branch -D`
-  3. Archive `.disposable/` state
-  4. Output production-ready specification
+  4. Archive `.disposable/` state
+  5. Output production-ready specification
 
 ### Step 6: Cleanup
 

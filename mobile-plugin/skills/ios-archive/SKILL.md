@@ -1,10 +1,7 @@
 ---
 name: ios-archive
 context: fork
-description: |
-  アーカイブ・配布支援。App Store Connect、TestFlight、Ad Hoc/Enterprise配布。
-  使用タイミング: (1) App Storeへの提出準備時、(2) TestFlight配布時、
-  (3) Ad Hoc/Enterprise配布時、(4) CI/CDでの自動配布設定時
+description: アーカイブ・配布支援。App Store Connect、TestFlight、Ad Hoc/Enterprise配布。使用タイミング: (1) App Storeへの提出準備時、(2) TestFlight配布時、(3) Ad Hoc/Enterprise配布時、(4) CI/CDでの自動配布設定時
 ---
 
 # iOS アーカイブ・配布支援スキル
@@ -90,9 +87,6 @@ xcodebuild archive \
     
     <key>uploadSymbols</key>
     <true/>
-    
-    <key>uploadBitcode</key>
-    <false/>
     
     <!-- 署名設定 -->
     <key>signingStyle</key>
@@ -288,32 +282,7 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.2.app
       
-      - name: Install certificates
-        env:
-          CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        run: |
-          # キーチェーン作成
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          
-          # 証明書インポート
-          echo "$CERTIFICATE_BASE64" | base64 --decode > certificate.p12
-          security import certificate.p12 -k build.keychain \
-            -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          
-          security set-key-partition-list -S apple-tool:,apple: \
-            -s -k "$KEYCHAIN_PASSWORD" build.keychain
-      
-      - name: Install provisioning profile
-        env:
-          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode \
-            > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+      # 証明書・Provisioning Profileのセットアップは /ios-signing を参照
       
       - name: Build and archive
         run: |
@@ -414,8 +383,6 @@ xcrun altool --list-apps \
 ### App Store提出前
 - [ ] バージョン番号とビルド番号を更新
 - [ ] Release設定でビルド
-- [ ] App Store用のスクリーンショット準備
-- [ ] プライバシーポリシーURL設定
 - [ ] 暗号化申告（ITSAppUsesNonExemptEncryption）
 - [ ] App Review用のテストアカウント準備
 

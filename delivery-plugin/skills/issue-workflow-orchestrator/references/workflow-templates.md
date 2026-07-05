@@ -23,7 +23,7 @@ template:
       simplified: true  # 簡略化モード
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
       simplified: true
 
@@ -54,7 +54,7 @@ template:
       required: true
 
     - id: "context"
-      skill: "/eld-sense-activation"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "uncertainty"
@@ -74,7 +74,7 @@ template:
       required: true
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
 
   governance:
@@ -98,7 +98,7 @@ template:
       required: true
 
     - id: "context"
-      skill: "/eld-sense-activation"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "onboarding"
@@ -123,7 +123,7 @@ template:
       required: true
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
 
   governance:
@@ -151,7 +151,7 @@ template:
       timeout_minutes: 5  # 短縮
 
     - id: "context"
-      skill: "/eld-sense-activation"
+      skill: "/eld-sense-planning"
       required: true
       timeout_minutes: 10
 
@@ -161,7 +161,7 @@ template:
       mode: "hotfix"  # 最小変更モード
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
       mode: "expedited"  # 迅速モード
 
@@ -199,7 +199,7 @@ template:
       required: true
 
     - id: "context"
-      skill: "/eld-sense-activation"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "security_assessment"
@@ -231,7 +231,7 @@ template:
       required: true  # 再検証
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
 
   governance:
@@ -257,7 +257,7 @@ template:
       required: true
 
     - id: "context"
-      skill: "/eld-sense-activation"
+      skill: "/eld-sense-planning"
       required: true
 
     - id: "onboarding"
@@ -265,7 +265,7 @@ template:
       required: true
 
     - id: "design"
-      skill: "/eld-model"
+      skill: "/eld-spec"
       required: true  # 設計フェーズ
 
     - id: "uncertainty"
@@ -285,7 +285,7 @@ template:
       required: true
 
     - id: "review"
-      skill: "/eld-ground-pr-review"
+      skill: "/eld-ground review"
       required: true
 
   governance:
