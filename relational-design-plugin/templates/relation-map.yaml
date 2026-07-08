@@ -1,0 +1,11 @@
+relation_map:
+  - id: RD-R-001
+    relation_type: user_to_action
+    claim: ""
+    design_implication: ""
+    risk_if_ignored: ""
+    depends_on:
+      - RD-O-001
+      - RD-A-001
+    confidence: medium
+    status: active

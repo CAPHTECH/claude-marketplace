@@ -1,7 +1,7 @@
 ---
 name: design-system-builder
 context: fork
-description: "デザインシステムの構築・運用を体系的に行うスキル。ドキュメント（要件定義・ブランドガイドライン）からDesign Tokens・コンポーネント体系・ガバナンスまでを一貫して設計する。思考フレームワーク（Double Diamond・Atomic Design・Design Tokens 3層）の適用、暗黙的デザイン判断の形式知化（DDR/QOC/RFC）、UIインベントリ収集（手動+MCP自動化）を統合する。Use when: 「デザインシステムを構築して」「デザインシステムを設計して」「デザイントークンを定義して」「デザイン原則を策定して」「UIインベントリを作って」「デザインガバナンスを設計して」「デザイン判断を記録して」と言われた時。"
+description: "デザインシステムの構築・運用を体系的に行うスキル。ドキュメント（要件定義・ブランドガイドライン）からDesign Tokens・コンポーネント体系・ガバナンスまでを一貫して設計する。思考フレームワーク（Double Diamond・Atomic Design・Design Tokens 3層）の適用、暗黙的デザイン判断の形式知化（DDR/QOC/RFC）、UIインベントリ収集（手動+MCP自動化）を統合する。ゼロから体系的に構築する用途向け。既存の単発UIから再利用可能な構造を抽出するにはrelational-design-pluginのdesign-system-backflowスキルを使用すること。Use when: 「デザインシステムを構築して」「デザインシステムを設計して」「デザイントークンを定義して」「デザイン原則を策定して」「UIインベントリを作って」「デザインガバナンスを設計して」「デザイン判断を記録して」と言われた時。"
 ---
 
 # Design System Builder

@@ -1,0 +1,23 @@
+design_system_backflow:
+  id: RD-BF-001
+  source_artifacts: []
+  depends_on: []
+  tokens:
+    semantic_color: []
+    spacing: []
+    typography: []
+    motion: []
+  components:
+    new_components: []
+    variants: []
+    composition_rules: []
+  patterns:
+    information_patterns: []
+    trust_patterns: []
+    reversibility_patterns: []
+  copy_rules: []
+  interaction_rules: []
+  accessibility_rules: []
+  anti_patterns: []
+  migration_plan: []
+  status: proposed

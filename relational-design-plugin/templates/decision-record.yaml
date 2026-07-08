@@ -1,0 +1,13 @@
+design_decision:
+  id: RD-DD-001
+  claim: ""
+  decision_area: layout | copy | visual_hierarchy | interaction | component | token | information_architecture
+  depends_on:
+    - RD-H-001
+  reversibility: reversible | costly | irreversible
+  artifact_target: ""
+  rationale: ""
+  if_retracted:
+    expected_change: ""
+    affected_artifacts: []
+  status: active

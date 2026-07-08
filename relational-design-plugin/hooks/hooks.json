@@ -1,0 +1,62 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/trace-hook.py\" session-start",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/trace-hook.py\" pre-tool-use",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/trace-hook.py\" post-tool-use",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "relational-design-plugin:context-reader|relational-design-plugin:relation-mapper|relational-design-plugin:hypothesis-generator|relational-design-plugin:variant-designer|relational-design-plugin:variant-designer-isolated|relational-design-plugin:design-critic|relational-design-plugin:implementation-verifier|relational-design-plugin:trace-archivist|relational-design-plugin:retraction-analyst",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/trace-hook.py\" subagent-stop",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/trace-hook.py\" stop",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

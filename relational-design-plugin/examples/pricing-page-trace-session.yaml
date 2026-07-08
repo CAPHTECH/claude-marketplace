@@ -1,0 +1,91 @@
+trace_session:
+  id: RD-S-EXAMPLE-001
+  title: "Pricing page redesign example"
+  created_at: "2026-07-07T00:00:00Z"
+  updated_at: "2026-07-07T00:00:00Z"
+  mode: standard
+  status: example
+  task_summary: "Redesign a pricing page where trust and conversion tension matter."
+
+observations:
+  - id: RD-O-001
+    kind: observation
+    source: user_brief
+    claim: "The user wants to redesign a pricing page."
+    confidence: high
+    status: active
+
+assumptions:
+  - id: RD-A-001
+    kind: assumption
+    claim: "Visitors are evaluating whether the price is justified before starting a trial."
+    reason_for_assumption: "Pricing pages usually involve value justification, but the user did not specify the exact segment."
+    confidence: medium
+    isolated: true
+    status: active
+
+constraints:
+  - id: RD-C-001
+    kind: constraint
+    type: accessibility
+    claim: "Pricing comparison must remain keyboard navigable and readable at small screen widths."
+    confidence: high
+    status: active
+
+relations:
+  - id: RD-R-001
+    kind: relation
+    relation_type: information_to_confidence
+    claim: "More proof can increase price confidence but may reduce first-scan clarity."
+    design_implication: "Use progressive disclosure and put essential comparison first."
+    risk_if_ignored: "The page may either feel shallow or become too dense."
+    depends_on: [RD-O-001, RD-A-001]
+    confidence: medium
+    status: active
+
+hypotheses:
+  - id: RD-H-001
+    kind: hypothesis
+    name: proof-first
+    claim: "Comparison-stage visitors need dense evidence before committing."
+    expected_effect: "Improves confidence for evaluators."
+    risk: "May feel heavy for early exploratory visitors."
+    depends_on: [RD-R-001]
+    confidence: medium
+    if_false_retract: [RD-DD-001]
+    status: active
+
+decisions:
+  - id: RD-DD-001
+    kind: decision
+    claim: "Place concise proof and plan comparison before the primary CTA."
+    decision_area: information_architecture
+    depends_on: [RD-H-001, RD-R-001]
+    reversibility: costly
+    artifact_target: pricing-page
+    status: active
+
+artifacts:
+  - id: RD-AR-001
+    kind: artifact
+    artifact_type: screen
+    path: src/app/pricing/page.tsx
+    based_on: [RD-DD-001]
+    status: active
+
+critiques:
+  - id: RD-CR-001
+    kind: critique
+    target: RD-AR-001
+    severity: medium
+    claim: "If proof density increases, primary CTA may become visually secondary."
+    violated_relation: RD-R-001
+    affected_decision: RD-DD-001
+    recommendation: "Add a repeated CTA after proof blocks."
+    status: active
+
+revisions: []
+retractions: []
+backflow: []
+open_questions:
+  - "Which user segment is primary: buyer, evaluator, or end user?"

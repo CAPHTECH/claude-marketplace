@@ -45,7 +45,7 @@
       "name": "design-plugin",
       "source": "./design-plugin",
       "description": "UI/UXデザインプラグイン。Web・モバイルアプリのデザインを体系的手法で支援。",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "author": {
         "name": "CAPH TECH Inc."
       },
@@ -161,6 +161,17 @@
       },
       "keywords": ["pce", "transition-contract", "warrant", "good-continuation", "governance", "continuation"],
       "category": "development"
+    },
+    {
+      "name": "relational-design-plugin",
+      "source": "./relational-design-plugin",
+      "description": "デザイン判断をtraceable/isolable/retractableにするプラグイン。観察・関係・仮説・判断・批評の責務分離と、trace記録による撤回可能なデザインリーズニングを提供。",
+      "version": "0.1.0",
+      "author": {
+        "name": "CAPH TECH Inc."
+      },
+      "keywords": ["design", "trace", "relational-design", "subagents", "retraction", "design-system"],
+      "category": "design"
     }
   ]
 }

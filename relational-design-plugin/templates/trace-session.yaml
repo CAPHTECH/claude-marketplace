@@ -1,0 +1,92 @@
+trace_session:
+  id: RD-S-0001
+  title: ""
+  created_at: ""
+  updated_at: ""
+  mode: light | standard | deep
+  status: active | questioned | completed | superseded
+  task_summary: ""
+
+observations:
+  - id: RD-O-001
+    kind: observation
+    source: user_brief | file | screenshot | design_system | code | research
+    claim: ""
+    confidence: high
+    status: active
+
+assumptions:
+  - id: RD-A-001
+    kind: assumption
+    claim: ""
+    reason_for_assumption: ""
+    confidence: low
+    isolated: true
+    status: active
+
+constraints:
+  - id: RD-C-001
+    kind: constraint
+    type: implementation | brand | accessibility | device | time | content | business
+    claim: ""
+    confidence: high
+    status: active
+
+relations:
+  - id: RD-R-001
+    kind: relation
+    relation_type: user_to_action | business_to_user | information_to_confidence | visual_hierarchy_to_behavior | interaction_to_reversibility | implementation_constraint_to_design_choice
+    claim: ""
+    design_implication: ""
+    risk_if_ignored: ""
+    depends_on: []
+    confidence: medium
+    status: active
+
+hypotheses:
+  - id: RD-H-001
+    kind: hypothesis
+    name: ""
+    claim: ""
+    expected_effect: ""
+    risk: ""
+    visual_implications: {}
+    interaction_implications: {}
+    depends_on: []
+    confidence: medium
+    if_false_retract: []
+    status: active
+
+decisions:
+  - id: RD-DD-001
+    kind: decision
+    claim: ""
+    decision_area: layout | copy | visual_hierarchy | interaction | component | token | information_architecture
+    depends_on: []
+    reversibility: reversible | costly | irreversible
+    artifact_target: ""
+    status: active
+
+artifacts:
+  - id: RD-AR-001
+    kind: artifact
+    artifact_type: screen | flow | component | code | copy | wireframe | spec
+    path: ""
+    based_on: []
+    status: active
+
+critiques:
+  - id: RD-CR-001
+    kind: critique
+    target: ""
+    severity: low | medium | high | critical
+    claim: ""
+    violated_relation: ""
+    affected_decision: ""
+    recommendation: ""
+    status: active
+
+revisions: []
+retractions: []
+backflow: []
+open_questions: []

@@ -1,0 +1,20 @@
+design_hypothesis:
+  id: RD-H-001
+  name: trust-first
+  claim: ""
+  expected_effect: ""
+  risk: ""
+  visual_implications:
+    density: low | medium | high
+    hierarchy: ""
+    tone: ""
+    proof: ""
+  interaction_implications:
+    flow: ""
+    reversibility: ""
+  depends_on:
+    - RD-R-001
+  confidence: medium
+  if_false_retract:
+    - ""
+  status: active

@@ -1,7 +1,7 @@
 ---
 name: mobile-app-designer
 context: fork
-description: "iOS/Androidモバイルアプリのデザインを体系的に行うスキル。Apple HIG・Material Design 3などプラットフォームガイドラインに準拠し、ナビゲーション・レイアウト・コンポーネント・モーション・アクセシビリティを適切に設計する。Use when: 「モバイルアプリをデザインして」「iOSアプリのUIを設計して」「Androidアプリの画面を作って」「モバイルのナビゲーションを設計して」「タッチUIを改善して」「アプリのアクセシビリティを対応して」と言われた時。"
+description: "iOS/Androidモバイルアプリのデザインを体系的に行うスキル。Apple HIG・Material Design 3などプラットフォームガイドラインに準拠し、ナビゲーション・レイアウト・コンポーネント・モーション・アクセシビリティを適切に設計する。デザイン判断の観察・関係・仮説・撤回可能性をtraceとして残したい場合はrelational-design-pluginを使用すること。Use when: 「モバイルアプリをデザインして」「iOSアプリのUIを設計して」「Androidアプリの画面を作って」「モバイルのナビゲーションを設計して」「タッチUIを改善して」「アプリのアクセシビリティを対応して」と言われた時。"
 ---
 
 # Mobile App Designer（モバイルアプリデザイナー）

@@ -1,0 +1,21 @@
+{
+  "name": "relational-design-plugin",
+  "displayName": "Relational Design",
+  "version": "0.1.0",
+  "description": "Traceable, isolable, and retractable design reasoning for Claude Code: design skills, role-bounded subagents, and optional trace hooks.",
+  "author": {
+    "name": "CAPH TECH / Rizu-style design research"
+  },
+  "license": "MIT",
+  "skills": "./skills/",
+  "keywords": [
+    "design",
+    "ux",
+    "ui",
+    "relational-design",
+    "subagents",
+    "skills",
+    "hooks",
+    "design-system"
+  ]
+}

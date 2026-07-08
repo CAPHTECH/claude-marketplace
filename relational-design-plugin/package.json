@@ -1,0 +1,11 @@
+{
+  "name": "relational-design-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Claude Code plugin for relational design reasoning governance.",
+  "scripts": {
+    "check": "python3 scripts/trace-check.py --root .relational-design || true",
+    "report": "python3 scripts/trace-report.py --root .relational-design"
+  },
+  "license": "MIT"
+}
